@@ -1,0 +1,8 @@
+{
+  "name": "PKFire - Personal Website & Portfolio",
+  "description": "Modern personal portfolio and developer website for PKFire showcasing featured projects, technical skills, interactive demos, and contact info.",
+  "permissions": [],
+  "capabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
