@@ -229,12 +229,13 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
 
   // Rank title according to player level
   const getRankInfo = (level: number) => {
-    if (level >= 25) return { title: 'Tôn Giả Tối Cao', color: 'text-amber-300', badge: '👑 BẬC THẦY VĨ ĐẠI' };
-    if (level >= 15) return { title: 'Đại Pháp Sư Huyền Thoại', color: 'text-purple-400', badge: '🔮 HUYỀN THOẠI' };
-    if (level >= 10) return { title: 'Pháp Sư Tinh Anh', color: 'text-blue-400', badge: '⚡ TINH ANH' };
-    if (level >= 5) return { title: 'Pháp Sư Cấp Cao', color: 'text-emerald-400', badge: '🌿 CAO THỦ' };
-    if (level >= 2) return { title: 'Pháp Đồ Triển Vọng', color: 'text-sky-300', badge: '✨ TRIỂN VỌNG' };
-    return { title: 'Tập Sự Ma Pháp', color: 'text-neutral-400', badge: '🌱 KHỞI ĐẦU' };
+    if (level >= 75) return { title: 'Thần Vương Hư Không', color: 'text-purple-300', badge: '🌌 THẦN VƯƠNG' };
+    if (level >= 50) return { title: 'Tôn Giả Bất Diệt', color: 'text-amber-300', badge: '👑 BẬC THẦY VĨ ĐẠI' };
+    if (level >= 35) return { title: 'Bậc Thầy Nguyên Tố', color: 'text-rose-400', badge: '🔥 TỐI CAO' };
+    if (level >= 20) return { title: 'Đại Pháp Sư Trận Địa', color: 'text-purple-400', badge: '🔮 HUYỀN THOẠI' };
+    if (level >= 10) return { title: 'Pháp Sư Tinh Nhuệ', color: 'text-blue-400', badge: '⚡ TINH ANH' };
+    if (level >= 5) return { title: 'Pháp Đồ Rèn Giũa', color: 'text-emerald-400', badge: '🌿 CAO THỦ' };
+    return { title: 'Tân Binh Pháp Thuật', color: 'text-neutral-400', badge: '🌱 KHỞI ĐẦU' };
   };
 
   const currentRank = getRankInfo(playerLevel);
@@ -801,7 +802,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
                     <div className="text-right">
                       <span className="text-[10px] font-mono text-neutral-400 uppercase">HẠNG MỤC</span>
                       <div className="text-xs font-mono font-bold text-sky-400">
-                        {fanHighScore >= 200 ? '⚡ Siêu Cấp Cuồng Phong' : fanHighScore >= 80 ? '🌪️ Bão Táp' : '💨 Gió Nhẹ'}
+                        {fanHighScore >= 1400 ? '🌌 Vòi Rồng Xuyên Không' : fanHighScore >= 500 ? '🌪️ Cuồng Phong Bão Táp' : fanHighScore >= 250 ? '💨 Gió Bão Đồng' : '🍃 Gió Mát Nhẹ'}
                       </div>
                     </div>
                   </div>
@@ -846,7 +847,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
                     <div className="text-right">
                       <span className="text-[10px] font-mono text-neutral-400 uppercase">HẠNG MỤC</span>
                       <div className="text-xs font-mono font-bold text-lime-400">
-                        {snakeHighScore >= 150 ? '🐉 Long Xà Thượng Thừa' : snakeHighScore >= 60 ? '🐍 Mãng Xà Tinh Anh' : '🌿 Rắn Con Mới Nở'}
+                        {snakeHighScore >= 1500 ? '🐲 Thần Long Hóa Kiếp' : snakeHighScore >= 600 ? '🐍 Mãng Xà Bạc' : snakeHighScore >= 300 ? '🥉 Thợ Săn Đồng' : '🌱 Rắn Con Khởi Đầu'}
                       </div>
                     </div>
                   </div>
@@ -891,7 +892,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
                     <div className="text-right">
                       <span className="text-[10px] font-mono text-neutral-400 uppercase">HẠNG MỤC</span>
                       <div className="text-xs font-mono font-bold text-pink-400">
-                        {blockHighScore >= 300 ? '👑 Huyền Thoại Phá Khối' : blockHighScore >= 100 ? '⚡ Đại Sư Xếp Khối' : '🌱 Tập Sự Phá Khối'}
+                        {blockHighScore >= 1500 ? '👑 Thần Toán Bàn Cờ' : blockHighScore >= 500 ? '💎 Bậc Thầy Xóa Hàng' : blockHighScore >= 200 ? '🥉 Kỳ Thủ Bậc Đồng' : '🌱 Tập Sự Phá Khối'}
                       </div>
                     </div>
                   </div>
