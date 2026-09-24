@@ -194,6 +194,7 @@ export const DEFAULT_INITIAL_GAME_DATA: UserGameData = {
     enlighten: 0,
     treasury: 0,
   },
+  activeBoonIds: [],
 };
 
 // Clear guest data completely on page exit

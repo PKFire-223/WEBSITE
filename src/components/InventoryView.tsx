@@ -101,7 +101,8 @@ export const InventoryView: React.FC<InventoryViewProps> = ({
       if (owned > 1) {
         const dups = owned - 1;
         totalDups += dups;
-        totalVal += dups * (it.sellPrice * priceMult);
+        const basePrice = RARITY_CONFIG[it.rarity].sellPrice;
+        totalVal += dups * (basePrice * priceMult);
       }
     });
     return { totalDups, totalVal: Math.round(totalVal * 10) / 10 };
@@ -116,7 +117,8 @@ export const InventoryView: React.FC<InventoryViewProps> = ({
   const handleConfirmSell = () => {
     if (!sellingItem) return;
     gachaAudio.playCoinsSound();
-    const finalPricePerUnit = Math.round(sellingItem.item.sellPrice * priceMult * 10) / 10;
+    const basePrice = RARITY_CONFIG[sellingItem.item.rarity].sellPrice;
+    const finalPricePerUnit = Math.round(basePrice * priceMult * 10) / 10;
     onSellItem(sellingItem.item.id, sellQuantity, finalPricePerUnit);
     setSellingItem(null);
   };
@@ -136,7 +138,7 @@ export const InventoryView: React.FC<InventoryViewProps> = ({
                   Bán {sellingItem.item.name}
                 </h3>
                 <span className={`text-[11px] font-extrabold px-2 py-0.5 rounded ${sellingItem.item.colorScheme.badgeBg}`}>
-                  {sellingItem.item.rarity.toUpperCase()} • Giá: {(sellingItem.item.sellPrice * priceMult).toFixed(1)}🪙/món
+                  {sellingItem.item.rarity.toUpperCase()} • Giá: {(RARITY_CONFIG[sellingItem.item.rarity].sellPrice * priceMult).toFixed(1)}🪙/món
                 </span>
               </div>
             </div>
@@ -384,7 +386,7 @@ export const InventoryView: React.FC<InventoryViewProps> = ({
                 {/* Sell Action Button */}
                 <div className="mt-3 pt-2 border-t border-white/10 flex items-center justify-between">
                   <span className="text-[11px] font-bold text-amber-400 font-mono">
-                    +{Math.round(item.sellPrice * priceMult * 10) / 10}🪙
+                    +{Math.round(cfg.sellPrice * priceMult * 10) / 10}🪙
                   </span>
                   <button
                     onClick={() => handleOpenSell(item, count)}

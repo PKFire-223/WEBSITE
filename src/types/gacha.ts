@@ -76,15 +76,46 @@ export interface GachaCardState {
 }
 
 export type CoreType =
+  // Stage 1 (Initial)
   | 'alchemy'
   | 'destiny'
   | 'fortune'
+  // Stage 2
+  | 'roll_surge'
   | 'harvester'
   | 'order'
+  // Stage 3
+  | 'free_roll'
   | 'channelling'
   | 'miracle'
+  // Stage 4
   | 'enlighten'
-  | 'treasury';
+  | 'treasury'
+  | 'codex_master'
+  // Stage 5
+  | 'weapon_master'
+  | 'armor_master'
+  | 'potion_master'
+  // Stage 6
+  | 'relic_master'
+  | 'beast_master'
+  | 'rune_master'
+  // Stage 7
+  | 'roll_frenzy'
+  | 'element_metal'
+  | 'element_wood'
+  // Stage 8
+  | 'element_water'
+  | 'element_fire'
+  | 'element_earth'
+  // Stage 9
+  | 'element_wind'
+  | 'element_ice'
+  | 'void_abyss'
+  // Stage 10
+  | 'divine_light'
+  | 'dark_shadow'
+  | 'omnipresence';
 
 export interface CoreLevelBenefit {
   level: number;
@@ -104,5 +135,7 @@ export interface ArcaneCoreConfig {
   glowColor: string;
   description: string;
   maxLevel: number;
+  requiredStage: number; // 1 to 10: unlocks at this challenge stage
+  category: 'roll' | 'economy' | 'drop' | 'mastery' | 'element' | 'ultimate';
   levels: CoreLevelBenefit[];
 }

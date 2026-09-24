@@ -24,6 +24,7 @@ export interface UserGameData {
   playTimeSeconds: number;
   customBio?: string;
   coreLevels?: Record<string, number>;
+  activeBoonIds?: string[];
   pityCounter?: number;
 }
 

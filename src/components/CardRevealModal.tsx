@@ -200,7 +200,11 @@ export const CardRevealModal: React.FC<CardRevealModalProps> = ({
               <h2 className="text-xl sm:text-2xl font-black text-amber-100 flex items-center gap-2">
                 Đài Triệu Hồi Kỳ Trân
                 <span className="text-xs px-2.5 py-0.5 rounded-full bg-neutral-800 border border-neutral-700 text-neutral-300 font-medium">
-                  {cards.length === 1 ? 'Quay x1' : 'Quay x10'}
+                  {cards.length === 1
+                    ? 'Quay x1'
+                    : cards.length > 10
+                    ? `Bốc ${cards.length} Thẻ (Thưởng +${cards.length - 10} Thẻ!)`
+                    : 'Quay x10'}
                 </span>
               </h2>
               <p className="text-xs text-neutral-400">

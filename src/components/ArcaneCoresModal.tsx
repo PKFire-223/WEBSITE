@@ -2,12 +2,13 @@ import React, { useState } from 'react';
 import { ArcaneCoreConfig, CoreType } from '../types/gacha';
 import { ARCANE_CORES, CORE_TYPES } from '../data/coresData';
 import { playClickSound, playSealAwakenSound } from '../utils/audio';
-import { X, Sparkles, Coins, Zap, CheckCircle, ArrowUp, Info, Layers } from 'lucide-react';
+import { X, Sparkles, Coins, Zap, CheckCircle, ArrowUp, Info, Lock, Unlock, Dices } from 'lucide-react';
 
 interface ArcaneCoresModalProps {
   isOpen: boolean;
   onClose: () => void;
   coins: number;
+  currentStage: number; // 1 to 10
   coreLevels: Record<CoreType, number>;
   onUpgradeCore: (coreType: CoreType, cost: number) => void;
 }
@@ -16,33 +17,45 @@ export const ArcaneCoresModal: React.FC<ArcaneCoresModalProps> = ({
   isOpen,
   onClose,
   coins,
+  currentStage,
   coreLevels,
   onUpgradeCore,
 }) => {
-  const [filterType, setFilterType] = useState<'all' | 'economy' | 'drop' | 'utility'>('all');
+  const [filterType, setFilterType] = useState<
+    'all' | 'roll' | 'unlocked' | 'locked' | 'economy' | 'element' | 'mastery'
+  >('all');
 
   if (!isOpen) return null;
 
   const totalCoreLevels = CORE_TYPES.reduce((acc, t) => acc + (coreLevels[t] || 0), 0);
   const maxPossibleLevels = CORE_TYPES.length * 5;
 
+  const unlockedCount = CORE_TYPES.filter(type => ARCANE_CORES[type].requiredStage <= currentStage).length;
+  const lockedCount = CORE_TYPES.length - unlockedCount;
+
   const filteredCores = CORE_TYPES.filter(type => {
-    if (filterType === 'economy') return type === 'alchemy' || type === 'fortune' || type === 'treasury';
-    if (filterType === 'drop') return type === 'destiny' || type === 'harvester' || type === 'miracle';
-    if (filterType === 'utility') return type === 'order' || type === 'channelling' || type === 'enlighten';
+    const core = ARCANE_CORES[type];
+    const isUnlocked = core.requiredStage <= currentStage;
+
+    if (filterType === 'roll') return core.category === 'roll';
+    if (filterType === 'unlocked') return isUnlocked;
+    if (filterType === 'locked') return !isUnlocked;
+    if (filterType === 'economy') return core.category === 'economy';
+    if (filterType === 'element') return core.category === 'element';
+    if (filterType === 'mastery') return core.category === 'mastery' || core.category === 'ultimate';
     return true;
   });
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-black/85 backdrop-blur-md animate-fadeIn">
-      <div className="relative w-full max-w-5xl max-h-[92vh] flex flex-col bg-neutral-950 border-2 border-amber-500/50 rounded-2xl shadow-[0_0_50px_rgba(245,158,11,0.3)] overflow-hidden">
+      <div className="relative w-full max-w-6xl max-h-[92vh] flex flex-col bg-neutral-950 border-2 border-amber-500/50 rounded-3xl shadow-[0_0_60px_rgba(245,158,11,0.3)] overflow-hidden">
         {/* Ambient Top Glow */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 h-24 bg-gradient-to-b from-amber-500/20 via-purple-600/10 to-transparent blur-2xl pointer-events-none" />
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 h-28 bg-gradient-to-b from-amber-500/20 via-purple-600/10 to-transparent blur-3xl pointer-events-none" />
 
         {/* HEADER */}
         <div className="relative flex flex-col sm:flex-row sm:items-center justify-between px-5 py-4 border-b border-neutral-800 bg-neutral-900/80 gap-3 z-10">
           <div className="flex items-center gap-3">
-            <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-amber-600 via-yellow-500 to-amber-300 p-0.5 shadow-lg shadow-amber-500/30 flex items-center justify-center shrink-0">
+            <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-amber-600 via-yellow-500 to-amber-300 p-0.5 shadow-lg shadow-amber-500/30 flex items-center justify-center shrink-0">
               <div className="w-full h-full bg-neutral-950 rounded-[14px] flex items-center justify-center text-2xl">
                 🔮
               </div>
@@ -50,14 +63,17 @@ export const ArcaneCoresModal: React.FC<ArcaneCoresModalProps> = ({
             <div>
               <div className="flex items-center gap-2 flex-wrap">
                 <h3 className="text-base sm:text-lg font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-yellow-200 to-amber-400 font-mono tracking-wide uppercase">
-                  9 Lõi Ma Pháp Thượng Cổ
+                  30 Lõi Ma Pháp Thượng Cổ
                 </h3>
-                <span className="text-[10px] font-mono font-black px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                <span className="text-[10px] font-mono font-black px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40">
                   {totalCoreLevels}/{maxPossibleLevels} Cấp Độ
                 </span>
+                <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">
+                  Đã Mở: {unlockedCount}/30 Lõi (Đợt {currentStage}/10)
+                </span>
               </div>
-              <p className="text-xs text-neutral-400 font-mono">
-                Cộng hưởng 9 Lõi Nguyên Tố: Tăng giá bán, bùng nổ tỉ lệ Mystic, giảm chi phí quay và sinh lời ngân khố!
+              <p className="text-xs text-neutral-400 font-mono mt-0.5">
+                Khai mở theo từng Đợt Bí Chỉ: Tăng thêm lượt roll miễn phí, bùng nổ tỉ lệ hiếm, ngũ hành và kinh tế tối thượng!
               </p>
             </div>
           </div>
@@ -91,7 +107,40 @@ export const ArcaneCoresModal: React.FC<ArcaneCoresModalProps> = ({
                 : 'text-neutral-400 hover:text-white bg-neutral-900 border border-neutral-800'
             }`}
           >
-            Tất Cả (9 Lõi)
+            Tất Cả (30 Lõi)
+          </button>
+          <button
+            onClick={() => setFilterType('roll')}
+            className={`px-3 py-1 rounded-lg font-bold transition-all cursor-pointer whitespace-nowrap flex items-center gap-1.5 ${
+              filterType === 'roll'
+                ? 'bg-gradient-to-r from-cyan-400 to-indigo-500 text-neutral-950 shadow-sm'
+                : 'text-cyan-300 hover:text-white bg-cyan-950/40 border border-cyan-700/50'
+            }`}
+          >
+            <Dices className="w-3.5 h-3.5" />
+            <span>🎲 Tăng Lượt Roll (Tụ Khí, Thiên Lực, Cuồng Nộ)</span>
+          </button>
+          <button
+            onClick={() => setFilterType('unlocked')}
+            className={`px-3 py-1 rounded-lg font-bold transition-all cursor-pointer whitespace-nowrap flex items-center gap-1 ${
+              filterType === 'unlocked'
+                ? 'bg-emerald-500 text-neutral-950 shadow-sm'
+                : 'text-emerald-400 hover:text-white bg-neutral-900 border border-neutral-800'
+            }`}
+          >
+            <Unlock className="w-3 h-3" />
+            <span>Đã Mở Khóa ({unlockedCount})</span>
+          </button>
+          <button
+            onClick={() => setFilterType('locked')}
+            className={`px-3 py-1 rounded-lg font-bold transition-all cursor-pointer whitespace-nowrap flex items-center gap-1 ${
+              filterType === 'locked'
+                ? 'bg-rose-500 text-white shadow-sm'
+                : 'text-neutral-500 hover:text-neutral-300 bg-neutral-900 border border-neutral-800'
+            }`}
+          >
+            <Lock className="w-3 h-3" />
+            <span>Chờ Mở Khóa ({lockedCount})</span>
           </button>
           <button
             onClick={() => setFilterType('economy')}
@@ -101,27 +150,27 @@ export const ArcaneCoresModal: React.FC<ArcaneCoresModalProps> = ({
                 : 'text-neutral-400 hover:text-white bg-neutral-900 border border-neutral-800'
             }`}
           >
-            🪙 Kinh Tế & Giá Bán (Giả Kim, Thần Tài, Ngân Khố)
+            🪙 Kinh Tế & Giá Bán
           </button>
           <button
-            onClick={() => setFilterType('drop')}
+            onClick={() => setFilterType('element')}
             className={`px-3 py-1 rounded-lg font-bold transition-all cursor-pointer whitespace-nowrap ${
-              filterType === 'drop'
+              filterType === 'element'
                 ? 'bg-amber-500 text-neutral-950 shadow-sm'
                 : 'text-neutral-400 hover:text-white bg-neutral-900 border border-neutral-800'
             }`}
           >
-            ✨ Tỉ Lệ Rơi & Bội Thu (Vận Mệnh, Bội Thu, Kỳ Tích)
+            ⚡ Ngũ Hành & Nguyên Tố
           </button>
           <button
-            onClick={() => setFilterType('utility')}
+            onClick={() => setFilterType('mastery')}
             className={`px-3 py-1 rounded-lg font-bold transition-all cursor-pointer whitespace-nowrap ${
-              filterType === 'utility'
+              filterType === 'mastery'
                 ? 'bg-amber-500 text-neutral-950 shadow-sm'
                 : 'text-neutral-400 hover:text-white bg-neutral-900 border border-neutral-800'
             }`}
           >
-            ⚡ Tiết Kiệm & Khế Ước (Pháp Điển, Giác Ngộ, Bí Chỉ)
+            ⚔️ Chuyên Môn & Chí Tôn
           </button>
         </div>
 
@@ -132,6 +181,7 @@ export const ArcaneCoresModal: React.FC<ArcaneCoresModalProps> = ({
               const core = ARCANE_CORES[type];
               const curLevel = coreLevels[type] || 0;
               const isMax = curLevel >= core.maxLevel;
+              const isUnlocked = currentStage >= core.requiredStage;
               const nextBenefit = !isMax ? core.levels[curLevel] : null;
               const canAfford = nextBenefit ? coins >= nextBenefit.cost : false;
 
@@ -139,7 +189,9 @@ export const ArcaneCoresModal: React.FC<ArcaneCoresModalProps> = ({
                 <div
                   key={type}
                   className={`relative rounded-2xl p-4 border flex flex-col justify-between transition-all ${
-                    isMax
+                    !isUnlocked
+                      ? 'bg-neutral-950/80 border-neutral-850 opacity-60'
+                      : isMax
                       ? 'bg-gradient-to-b from-amber-950/40 to-neutral-950 border-amber-400 shadow-[0_0_20px_rgba(245,158,11,0.2)]'
                       : curLevel > 0
                       ? 'bg-neutral-900/80 border-neutral-700 hover:border-amber-500/60'
@@ -150,23 +202,34 @@ export const ArcaneCoresModal: React.FC<ArcaneCoresModalProps> = ({
                     {/* Top info */}
                     <div className="flex items-start justify-between gap-2.5 mb-2.5">
                       <div className="flex items-center gap-2.5">
-                        <div className="w-11 h-11 rounded-2xl bg-neutral-950 border border-neutral-800 flex items-center justify-center text-2xl shadow-inner shrink-0">
+                        <div
+                          className={`w-11 h-11 rounded-2xl bg-neutral-950 border flex items-center justify-center text-2xl shadow-inner shrink-0 ${
+                            isUnlocked ? 'border-neutral-800' : 'border-rose-900/40 text-neutral-600'
+                          }`}
+                        >
                           {core.iconEmoji}
                         </div>
                         <div className="min-w-0">
                           <div className="flex items-center gap-1.5 flex-wrap">
                             <h4 className="font-bold text-sm text-white font-mono truncate">{core.name}</h4>
-                            <span
-                              className={`text-[9px] font-mono font-black px-1.5 py-0.2 rounded-md ${
-                                isMax
-                                  ? 'bg-amber-500 text-neutral-950'
-                                  : curLevel > 0
-                                  ? 'bg-purple-900/80 text-purple-200 border border-purple-600'
-                                  : 'bg-neutral-800 text-neutral-400'
-                              }`}
-                            >
-                              {isMax ? 'MAX (CẤP 5)' : `CẤP ${curLevel}/${core.maxLevel}`}
-                            </span>
+                            {isUnlocked ? (
+                              <span
+                                className={`text-[9px] font-mono font-black px-1.5 py-0.2 rounded-md ${
+                                  isMax
+                                    ? 'bg-amber-500 text-neutral-950'
+                                    : curLevel > 0
+                                    ? 'bg-purple-900/80 text-purple-200 border border-purple-600'
+                                    : 'bg-neutral-800 text-neutral-400'
+                                }`}
+                              >
+                                {isMax ? 'MAX (CẤP 5)' : `CẤP ${curLevel}/${core.maxLevel}`}
+                              </span>
+                            ) : (
+                              <span className="text-[9px] font-mono font-bold px-1.5 py-0.2 rounded-md bg-rose-950/80 border border-rose-700/60 text-rose-300 flex items-center gap-1">
+                                <Lock className="w-2.5 h-2.5" />
+                                <span>ĐỢT {core.requiredStage}</span>
+                              </span>
+                            )}
                           </div>
                           <p className="text-[10px] text-amber-400/90 font-mono italic truncate">{core.title}</p>
                         </div>
@@ -223,9 +286,14 @@ export const ArcaneCoresModal: React.FC<ArcaneCoresModalProps> = ({
                     </div>
                   </div>
 
-                  {/* Upgrade Action */}
+                  {/* Upgrade / Unlock Action */}
                   <div className="pt-1">
-                    {isMax ? (
+                    {!isUnlocked ? (
+                      <div className="w-full py-2.5 px-3 rounded-xl bg-neutral-900 border border-neutral-800 text-center flex items-center justify-center gap-1.5 text-xs font-mono text-neutral-400">
+                        <Lock className="w-3.5 h-3.5 text-rose-400" />
+                        <span>Mở khóa khi đạt Đợt {core.requiredStage}</span>
+                      </div>
+                    ) : isMax ? (
                       <div className="w-full py-2 px-3 rounded-xl bg-amber-500/10 border border-amber-500/40 text-center flex items-center justify-center gap-1.5 text-xs font-mono font-bold text-amber-300">
                         <CheckCircle className="w-3.5 h-3.5 text-amber-400" />
                         <span>ĐẠT CỰC HẠN (MAX)</span>
@@ -268,7 +336,9 @@ export const ArcaneCoresModal: React.FC<ArcaneCoresModalProps> = ({
         <div className="px-6 py-3 border-t border-neutral-800 bg-neutral-900/80 flex flex-wrap items-center justify-between gap-3 text-xs font-mono text-neutral-400">
           <div className="flex items-center gap-2">
             <Info className="w-4 h-4 text-amber-400 shrink-0" />
-            <span>Mỗi lõi nâng cấp sẽ có tác dụng vĩnh viễn và cộng dồn ngay lập tức!</span>
+            <span>
+              Mỗi đợt hoàn thành Đơn Hàng Bí Chỉ sẽ tự động khai mở 3 Lõi Ma Pháp Thượng Cổ tương ứng!
+            </span>
           </div>
           <button
             onClick={() => {
