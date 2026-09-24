@@ -1,0 +1,96 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800" width="100%" height="100%">
+  <defs>
+    <radialGradient id="gachaBg" cx="50%" cy="40%" r="80%">
+      <stop offset="0%" stop-color="#3b1154" />
+      <stop offset="45%" stop-color="#19062b" />
+      <stop offset="85%" stop-color="#080214" />
+      <stop offset="100%" stop-color="#030008" />
+    </radialGradient>
+    <radialGradient id="goldGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#fbbf24" stop-opacity="0.8" />
+      <stop offset="50%" stop-color="#d97706" stop-opacity="0.3" />
+      <stop offset="100%" stop-color="#b45309" stop-opacity="0" />
+    </radialGradient>
+    <radialGradient id="mysticAura" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#ec4899" stop-opacity="0.9" />
+      <stop offset="40%" stop-color="#8b5cf6" stop-opacity="0.5" />
+      <stop offset="80%" stop-color="#3b82f6" stop-opacity="0.2" />
+      <stop offset="100%" stop-color="#000000" stop-opacity="0" />
+    </radialGradient>
+    <linearGradient id="cardGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#311042" />
+      <stop offset="50%" stop-color="#1c0926" />
+      <stop offset="100%" stop-color="#0e0314" />
+    </linearGradient>
+    <linearGradient id="goldBorder" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fef08a" />
+      <stop offset="50%" stop-color="#f59e0b" />
+      <stop offset="100%" stop-color="#b45309" />
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="800" height="800" fill="url(#gachaBg)" />
+
+  <!-- Mystic Glow in center -->
+  <circle cx="400" cy="400" r="360" fill="url(#mysticAura)" />
+  <circle cx="400" cy="380" r="240" fill="url(#goldGlow)" />
+
+  <!-- Concentric Rune Circles -->
+  <circle cx="400" cy="380" r="260" fill="none" stroke="#f59e0b" stroke-width="2" stroke-dasharray="12 6" opacity="0.6" />
+  <circle cx="400" cy="380" r="220" fill="none" stroke="#a855f7" stroke-width="3" opacity="0.7" />
+  <circle cx="400" cy="380" r="180" fill="none" stroke="#38bdf8" stroke-width="1.5" stroke-dasharray="8 4" opacity="0.6" />
+  <circle cx="400" cy="380" r="140" fill="none" stroke="#fbbf24" stroke-width="2" opacity="0.8" />
+
+  <!-- Octagram Stars -->
+  <polygon points="400,200 450,330 580,380 450,430 400,560 350,430 220,380 350,330" fill="none" stroke="#fbbf24" stroke-width="2" opacity="0.4" />
+  <polygon points="400,220 440,340 560,380 440,420 400,540 360,420 240,380 360,340" fill="none" stroke="#c084fc" stroke-width="1.5" opacity="0.5" />
+
+  <!-- Left Floating Card -->
+  <g transform="translate(200, 310) rotate(-18)">
+    <rect x="-60" y="-95" width="120" height="190" rx="14" fill="url(#cardGrad)" stroke="#38bdf8" stroke-width="3" />
+    <rect x="-52" y="-87" width="104" height="174" rx="10" fill="none" stroke="#38bdf8" stroke-width="1" stroke-dasharray="4 3" opacity="0.6" />
+    <circle cx="0" cy="-20" r="30" fill="#0284c7" opacity="0.4" />
+    <text x="0" y="-10" font-family="sans-serif" font-size="28" text-anchor="middle" fill="#bae6fd">⚔️</text>
+    <text x="0" y="45" font-family="sans-serif" font-size="12" font-weight="bold" text-anchor="middle" fill="#38bdf8">RARE</text>
+  </g>
+
+  <!-- Right Floating Card -->
+  <g transform="translate(600, 310) rotate(18)">
+    <rect x="-60" y="-95" width="120" height="190" rx="14" fill="url(#cardGrad)" stroke="#c084fc" stroke-width="3" />
+    <rect x="-52" y="-87" width="104" height="174" rx="10" fill="none" stroke="#c084fc" stroke-width="1" stroke-dasharray="4 3" opacity="0.6" />
+    <circle cx="0" cy="-20" r="30" fill="#7e22ce" opacity="0.4" />
+    <text x="0" y="-10" font-family="sans-serif" font-size="28" text-anchor="middle" fill="#f3e8ff">🛡️</text>
+    <text x="0" y="45" font-family="sans-serif" font-size="12" font-weight="bold" text-anchor="middle" fill="#c084fc">EPIC</text>
+  </g>
+
+  <!-- Center Grand Mystic Card -->
+  <g transform="translate(400, 350)">
+    <rect x="-85" y="-135" width="170" height="270" rx="18" fill="url(#cardGrad)" stroke="url(#goldBorder)" stroke-width="5" />
+    <rect x="-75" y="-125" width="150" height="250" rx="14" fill="none" stroke="#fbbf24" stroke-width="1.5" stroke-dasharray="6 4" />
+    <circle cx="0" cy="-35" r="48" fill="#f59e0b" opacity="0.25" />
+    <circle cx="0" cy="-35" r="40" fill="none" stroke="#fde047" stroke-width="2" />
+    <text x="0" y="-20" font-family="sans-serif" font-size="44" text-anchor="middle" fill="#ffffff">👑</text>
+    <text x="0" y="50" font-family="sans-serif" font-size="16" font-weight="900" text-anchor="middle" fill="#fde047" letter-spacing="2">MYSTIC</text>
+    <text x="0" y="75" font-family="sans-serif" font-size="11" text-anchor="middle" fill="#fef08a">THẦN THOẠI</text>
+  </g>
+
+  <!-- Magic Scroll & Parchment Banner at Bottom -->
+  <g transform="translate(400, 640)">
+    <path d="M-280,0 C-150,-20 150,-20 280,0 C270,45 280,90 260,95 C150,75 -150,75 -260,95 C-280,90 -270,45 -280,0 Z" fill="#2d1a08" stroke="#f59e0b" stroke-width="3" />
+    <text x="0" y="40" font-family="system-ui, sans-serif" font-size="28" font-weight="900" text-anchor="middle" fill="#fbbf24" letter-spacing="2">
+      VẠN CỔ KỲ TRÂN
+    </text>
+    <text x="0" y="68" font-family="system-ui, sans-serif" font-size="14" font-weight="bold" text-anchor="middle" fill="#fed7aa">
+      GACHA 120 BẢO VẬT • CUỘN BÍ CHỈ
+    </text>
+  </g>
+
+  <!-- Sparkles & Energy Orbs -->
+  <circle cx="320" cy="180" r="4" fill="#fde047" />
+  <circle cx="480" cy="190" r="5" fill="#38bdf8" />
+  <circle cx="160" cy="450" r="4" fill="#c084fc" />
+  <circle cx="640" cy="440" r="5" fill="#f43f5e" />
+  <circle cx="380" cy="240" r="3" fill="#ffffff" />
+  <circle cx="430" cy="230" r="4" fill="#fbbf24" />
+</svg>

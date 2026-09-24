@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { BookOpen, Sparkles, Volume2, VolumeX, Flame, Wand2, Star, Zap } from 'lucide-react';
+import { BookOpen, Sparkles, Volume2, VolumeX, Flame, Wand2, Star, Zap, Shield, User, Lock } from 'lucide-react';
 import {
   playClickSound,
   playStartSound,
@@ -7,14 +7,23 @@ import {
   playPageTurnSound,
   playSealAwakenSound,
 } from '../utils/audio';
+import { UserAccount } from '../types/auth';
 
 interface MagicBookCoverProps {
   onStart: () => void;
   soundEnabled: boolean;
   onToggleSound: () => void;
+  currentUser?: UserAccount | null;
+  onOpenAuth?: (mode?: 'login' | 'register' | 'security') => void;
 }
 
-export const MagicBookCover: React.FC<MagicBookCoverProps> = ({ onStart, soundEnabled, onToggleSound }) => {
+export const MagicBookCover: React.FC<MagicBookCoverProps> = ({
+  onStart,
+  soundEnabled,
+  onToggleSound,
+  currentUser,
+  onOpenAuth,
+}) => {
   const [isOpening, setIsOpening] = useState(false);
   const [openingPhase, setOpeningPhase] = useState<'idle' | 'opening' | 'turned'>('idle');
   const [sealAwakened, setSealAwakened] = useState(false);
@@ -90,24 +99,53 @@ export const MagicBookCover: React.FC<MagicBookCoverProps> = ({ onStart, soundEn
       <div className="absolute bottom-1/4 right-1/5 translate-x-1/2 w-80 h-80 bg-amber-500/15 blur-[120px] pointer-events-none -z-10 rounded-full" />
 
       {/* Top Floating Controls */}
-      <div className="absolute top-4 left-4 right-4 max-w-4xl mx-auto flex items-center justify-between z-30 pointer-events-auto">
+      <div className="absolute top-4 left-4 right-4 max-w-4xl mx-auto flex items-center justify-between z-30 pointer-events-auto gap-2">
         <div className="flex items-center gap-2 bg-neutral-900/90 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-amber-500/30 text-xs font-mono text-amber-300 shadow-lg">
           <Sparkles className="w-3.5 h-3.5 text-amber-400 animate-spin" />
-          <span>POLYPLAY • BẢO ĐIỂN MA THUẬT</span>
+          <span className="hidden sm:inline">POLYPLAY • BẢO ĐIỂN MA THUẬT</span>
+          <span className="sm:hidden">POLYPLAY</span>
         </div>
 
-        {/* Audio toggle */}
-        <button
-          onClick={() => {
-            playClickSound();
-            onToggleSound();
-          }}
-          className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-neutral-900/90 hover:bg-neutral-800 text-neutral-300 hover:text-white border border-neutral-800 transition-colors shadow-lg text-xs font-mono cursor-pointer"
-          title={soundEnabled ? 'Tắt âm thanh' : 'Bật âm thanh ma thuật'}
-        >
-          {soundEnabled ? <Volume2 className="w-4 h-4 text-amber-400" /> : <VolumeX className="w-4 h-4 text-neutral-500" />}
-          <span className="hidden sm:inline">{soundEnabled ? 'Âm thanh: BẬT' : 'Âm thanh: TẮT'}</span>
-        </button>
+        <div className="flex items-center gap-2">
+          {/* Account Status / Login button */}
+          {currentUser ? (
+            <button
+              onClick={() => {
+                playClickSound();
+                onOpenAuth?.('security');
+              }}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-neutral-900/90 hover:bg-neutral-850 text-white border border-amber-500/40 text-xs font-mono transition-colors shadow-lg cursor-pointer"
+            >
+              <span className="text-base">{currentUser.avatarEmoji || '🧙‍♂️'}</span>
+              <span className="font-bold max-w-[100px] truncate">{currentUser.displayName}</span>
+              <Shield className="w-3.5 h-3.5 text-amber-400" />
+            </button>
+          ) : (
+            <button
+              onClick={() => {
+                playClickSound();
+                onOpenAuth?.('login');
+              }}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/40 text-xs font-mono transition-colors shadow-lg cursor-pointer"
+            >
+              <User className="w-3.5 h-3.5 text-amber-400" />
+              <span>Đăng Nhập / Đăng Ký</span>
+            </button>
+          )}
+
+          {/* Audio toggle */}
+          <button
+            onClick={() => {
+              playClickSound();
+              onToggleSound();
+            }}
+            className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-neutral-900/90 hover:bg-neutral-800 text-neutral-300 hover:text-white border border-neutral-800 transition-colors shadow-lg text-xs font-mono cursor-pointer"
+            title={soundEnabled ? 'Tắt âm thanh' : 'Bật âm thanh ma thuật'}
+          >
+            {soundEnabled ? <Volume2 className="w-4 h-4 text-amber-400" /> : <VolumeX className="w-4 h-4 text-neutral-500" />}
+            <span className="hidden sm:inline">{soundEnabled ? 'Âm thanh' : 'Tắt'}</span>
+          </button>
+        </div>
       </div>
 
       {/* ========================================================================= */}
@@ -355,7 +393,7 @@ export const MagicBookCover: React.FC<MagicBookCoverProps> = ({ onStart, soundEn
               {/* ================================================================= */}
               {/* THE BIG MAGICAL "MỞ SÁCH BẮT ĐẦU" BUTTON */}
               {/* ================================================================= */}
-              <div className="pt-2 sm:pt-4">
+              <div className="pt-2 sm:pt-4 space-y-3">
                 <button
                   onClick={handleOpenBook}
                   disabled={isOpening}
@@ -367,6 +405,33 @@ export const MagicBookCover: React.FC<MagicBookCoverProps> = ({ onStart, soundEn
                   <span className="drop-shadow-sm uppercase">MỞ SÁCH BẮT ĐẦU</span>
                   <Sparkles className="w-5 h-5 text-neutral-950 animate-spin" />
                 </button>
+
+                {/* Account info or Guest Warning */}
+                <div className="text-[11px] font-mono text-amber-300/80 max-w-sm mx-auto">
+                  {currentUser ? (
+                    <div className="flex items-center justify-center gap-1.5 text-emerald-300">
+                      <Shield className="w-3.5 h-3.5" />
+                      <span>Đang vào với: <strong>{currentUser.displayName}</strong> (Dữ liệu bảo lưu vĩnh viễn)</span>
+                    </div>
+                  ) : (
+                    <div className="flex flex-col items-center gap-1 text-neutral-400">
+                      <span>
+                        Chế độ <strong className="text-amber-300">Khách vãng lai</strong> (Dữ liệu biến mất khi đóng trang web)
+                      </span>
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          playClickSound();
+                          onOpenAuth?.('login');
+                        }}
+                        className="text-amber-400 hover:underline cursor-pointer font-bold"
+                      >
+                        ⚡ Đăng Ký / Đăng Nhập để Bảo Lưu Cấp Độ & Vật Phẩm
+                      </button>
+                    </div>
+                  )}
+                </div>
               </div>
 
             </div>

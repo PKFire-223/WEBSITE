@@ -1,0 +1,253 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800" width="100%" height="100%">
+  <defs>
+    <!-- Background Storm & Duel Gradient -->
+    <radialGradient id="duelSky" cx="50%" cy="30%" r="85%">
+      <stop offset="0%" stop-color="#180e2b"/>
+      <stop offset="40%" stop-color="#0e071a"/>
+      <stop offset="80%" stop-color="#05020a"/>
+      <stop offset="100%" stop-color="#020005"/>
+    </radialGradient>
+
+    <!-- Solar Fire Gradients -->
+    <radialGradient id="fireOrb" cx="40%" cy="40%" r="60%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="20%" stop-color="#fef08a"/>
+      <stop offset="50%" stop-color="#f97316"/>
+      <stop offset="80%" stop-color="#dc2626"/>
+      <stop offset="100%" stop-color="#7f1d1d"/>
+    </radialGradient>
+
+    <linearGradient id="staffGold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fffbeb"/>
+      <stop offset="30%" stop-color="#fde047"/>
+      <stop offset="70%" stop-color="#d97706"/>
+      <stop offset="100%" stop-color="#78350f"/>
+    </linearGradient>
+
+    <!-- Frost Dragon & Ice Crystal Gradients -->
+    <linearGradient id="iceGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="30%" stop-color="#e0f2fe"/>
+      <stop offset="60%" stop-color="#38bdf8"/>
+      <stop offset="90%" stop-color="#0284c7"/>
+      <stop offset="100%" stop-color="#0c4a6e"/>
+    </linearGradient>
+
+    <radialGradient id="blizzardAura" cx="50%" cy="50%" r="60%">
+      <stop offset="0%" stop-color="#bae6fd"/>
+      <stop offset="40%" stop-color="#38bdf8"/>
+      <stop offset="80%" stop-color="#0369a1"/>
+      <stop offset="100%" stop-color="#082f49"/>
+    </radialGradient>
+
+    <!-- Filters -->
+    <filter id="solarGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="16" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <filter id="frostGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="16" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <filter id="clashFlash" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="22" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background Base -->
+  <rect width="800" height="800" fill="url(#duelSky)"/>
+
+  <!-- Colosseum & Ancient Ruined Pillars in Background -->
+  <g opacity="0.35" fill="#2d223f" stroke="#120c1d" stroke-width="2">
+    <!-- Broken Arches & Distant Colosseum Walls -->
+    <rect x="60" y="240" width="45" height="260"/>
+    <rect x="140" y="270" width="40" height="230"/>
+    <path d="M 60,240 Q 120,200 180,240 L 180,270 L 60,270 Z"/>
+    
+    <!-- Distant Mountain Peaks -->
+    <polygon points="-20,480 180,290 320,480"/>
+    <polygon points="500,480 660,310 820,480"/>
+
+    <!-- Right Ruins Pillars -->
+    <rect x="620" y="250" width="40" height="250"/>
+    <rect x="700" y="220" width="45" height="280"/>
+    <path d="M 620,250 Q 680,210 745,220 L 745,250 L 620,250 Z"/>
+  </g>
+
+  <!-- Ground Stone Battlefield (Hòn Đảo Đấu Trường Đá Nứt) -->
+  <path d="M -20,530 Q 200,490 400,530 Q 600,490 820,530 L 820,820 L -20,820 Z" fill="#140f22" stroke="#2a1b42" stroke-width="3"/>
+  <path d="M -20,550 C 150,530 250,560 400,540 C 550,560 650,530 820,550" fill="none" stroke="#f59e0b" stroke-width="1.5" opacity="0.3"/>
+
+  <!-- Glowing Magma Cracks on the Left (Hỏa Sơn) -->
+  <path d="M 80,560 Q 150,575 220,565 T 320,620" fill="none" stroke="#f97316" stroke-width="2.5" opacity="0.75" filter="url(#solarGlow)"/>
+  <path d="M 120,590 L 160,630 L 190,620 L 230,660" fill="none" stroke="#ef4444" stroke-width="2" opacity="0.6"/>
+
+  <!-- Frozen Glacial Cracks on the Right (Băng Tuyết) -->
+  <path d="M 500,610 Q 600,565 680,575 T 760,560" fill="none" stroke="#38bdf8" stroke-width="2.5" opacity="0.75" filter="url(#frostGlow)"/>
+  <path d="M 580,630 L 620,590 L 650,620 L 700,590" fill="none" stroke="#0ea5e9" stroke-width="2" opacity="0.6"/>
+
+  <!-- ======================================================== -->
+  <!-- LEFT SIDE: SOLAR FIRE WIZARD STAFF & MAGMA VORTEX -->
+  <!-- ======================================================== -->
+  <g transform="translate(180, 420)">
+    
+    <!-- Ancient Stone Pedestal -->
+    <path d="M -60,90 L 60,90 L 45,130 L -45,130 Z" fill="#2d1c14" stroke="#78350f" stroke-width="2"/>
+    <rect x="-70" y="125" width="140" height="20" rx="3" fill="#1b0e0a" stroke="#451a03" stroke-width="1.5"/>
+
+    <!-- Fiery Runic Rings Orbiting Staff -->
+    <g filter="url(#solarGlow)">
+      <ellipse cx="0" cy="-60" rx="90" ry="32" fill="none" stroke="#f97316" stroke-width="2.5" stroke-dasharray="12 8" transform="rotate(-15)"/>
+      <ellipse cx="0" cy="-60" rx="75" ry="24" fill="none" stroke="#fef08a" stroke-width="2" stroke-dasharray="6 14" transform="rotate(20)"/>
+    </g>
+
+    <!-- The Great Golden Solar Staff (Gậy Thần Hỏa Long) -->
+    <!-- Staff Shaft -->
+    <line x1="-15" y1="90" x2="15" y2="-120" stroke="url(#staffGold)" stroke-width="10" stroke-linecap="round"/>
+    <line x1="-15" y1="90" x2="15" y2="-120" stroke="#78350f" stroke-width="2"/>
+
+    <!-- Staff Head Filigree Crown -->
+    <g transform="translate(15, -120)">
+      <!-- Golden Crescent Prongs -->
+      <path d="M -35,-20 C -25,-60 25,-60 35,-20 C 20,-35 -20,-35 -35,-20 Z" fill="url(#staffGold)" stroke="#b45309" stroke-width="2"/>
+      <path d="M -45,10 C -55,-25 -25,-55 -15,-40" fill="none" stroke="url(#staffGold)" stroke-width="4"/>
+      <path d="M 45,10 C 55,-25 25,-55 15,-40" fill="none" stroke="url(#staffGold)" stroke-width="4"/>
+
+      <!-- Blazing Central Sun Core / Fireball -->
+      <circle cx="0" cy="-30" r="32" fill="url(#fireOrb)" filter="url(#solarGlow)"/>
+      <circle cx="0" cy="-30" r="16" fill="#ffffff"/>
+
+      <!-- Solar Fire Flares & Spikes -->
+      <polygon points="0,-75 8,-50 0,-40 -8,-50" fill="#fde047"/>
+      <polygon points="45,-30 25,-22 20,-30 25,-38" fill="#fde047"/>
+      <polygon points="-45,-30 -25,-22 -20,-30 -25,-38" fill="#fde047"/>
+    </g>
+
+    <!-- Orbiting Magma Rocks (Thiên Thạch Quanh Gậy) -->
+    <g fill="#451a03" stroke="#f97316" stroke-width="2" filter="url(#solarGlow)">
+      <polygon points="-80,-40 -65,-30 -70,-50" fill="#ea580c"/>
+      <polygon points="85,-85 100,-75 90,-95" fill="#ea580c"/>
+      <polygon points="-40,-130 -25,-120 -30,-140" fill="#f97316"/>
+    </g>
+
+    <!-- Fire Dragon Spirit Silhouette Emerging from Staff -->
+    <path d="M 25,-150 C 60,-200 120,-180 180,-140 C 130,-150 90,-130 55,-120" 
+          fill="url(#fireOrb)" opacity="0.85" filter="url(#solarGlow)"/>
+  </g>
+
+  <!-- ======================================================== -->
+  <!-- RIGHT SIDE: ANCIENT CRYSTALLINE FROST DRAGON & ICE MONOLITH -->
+  <!-- ======================================================== -->
+  <g transform="translate(600, 390)">
+    
+    <!-- Giant Glowing Ice Obelisk Monolith Behind Dragon -->
+    <polygon points="0,-180 40,-60 30,120 -30,120 -40,-60" fill="url(#iceGrad)" opacity="0.75" stroke="#bae6fd" stroke-width="2" filter="url(#frostGlow)"/>
+    <!-- Ice facets -->
+    <line x1="0" y1="-180" x2="0" y2="120" stroke="#ffffff" stroke-width="2" opacity="0.6"/>
+    <line x1="0" y1="-70" x2="40" y2="-60" stroke="#ffffff" stroke-width="1.5" opacity="0.7"/>
+    <line x1="0" y1="-70" x2="-40" y2="-60" stroke="#ffffff" stroke-width="1.5" opacity="0.7"/>
+
+    <!-- Orbiting Arcane Frost Rune Rings -->
+    <g filter="url(#frostGlow)">
+      <ellipse cx="0" cy="-40" rx="90" ry="30" fill="none" stroke="#38bdf8" stroke-width="2" stroke-dasharray="10 8" transform="rotate(15)"/>
+      <ellipse cx="0" cy="-40" rx="75" ry="22" fill="none" stroke="#e0f2fe" stroke-width="1.5" stroke-dasharray="8 12" transform="rotate(-20)"/>
+    </g>
+
+    <!-- ======================================== -->
+    <!-- THE CRYSTALLINE FROST DRAGON (RỒNG BĂNG TINH THỂ) -->
+    <!-- ======================================== -->
+    <g transform="translate(-40, -40)" filter="url(#frostGlow)">
+      <!-- Dragon Massive Wings Flared Left Towards Center -->
+      <!-- Wing Membrane -->
+      <path d="M -20,-40 C -80,-110 -150,-100 -210,-40 C -160,-20 -110,-10 -60,0 C -120,40 -160,30 -190,70 C -130,50 -70,30 -20,20 Z" 
+            fill="url(#iceGrad)" opacity="0.85" stroke="#ffffff" stroke-width="2"/>
+      <!-- Wing Bones -->
+      <line x1="-20" y1="-40" x2="-210" y2="-40" stroke="#bae6fd" stroke-width="3"/>
+      <line x1="-20" y1="-40" x2="-190" y2="70" stroke="#bae6fd" stroke-width="2.5"/>
+
+      <!-- Dragon Muscular Neck & Serpentine Body -->
+      <path d="M 40,90 C 20,40 10,-20 -30,-50 C -55,-70 -80,-65 -110,-60 C -80,-40 -45,-30 -10,-10 C 10,20 20,60 30,90 Z" 
+            fill="url(#iceGrad)" stroke="#38bdf8" stroke-width="2"/>
+
+      <!-- Dragon Head & Jaws Roaring Cyan Blizzard -->
+      <g transform="translate(-110, -60)">
+        <!-- Upper Skull & Horns -->
+        <path d="M 0,0 C -20,-10 -40,-8 -50,-2 C -40,12 -20,10 0,6 Z" fill="url(#iceGrad)" stroke="#ffffff" stroke-width="2"/>
+        <!-- Crystal Horns Extending Backward -->
+        <polygon points="-5,-6 35,-35 15,-10" fill="#bae6fd" stroke="#ffffff" stroke-width="1.5"/>
+        <polygon points="-12,-8 20,-45 0,-15" fill="#38bdf8" stroke="#ffffff" stroke-width="1.5"/>
+
+        <!-- Lower Jaw Open Wide -->
+        <path d="M -15,10 C -35,16 -45,14 -50,6 L -25,2 Z" fill="url(#iceGrad)" stroke="#38bdf8" stroke-width="1.5"/>
+
+        <!-- Glowing Cyan Eye -->
+        <circle cx="-25" cy="-2" r="3.5" fill="#ffffff"/>
+        <circle cx="-25" cy="-2" r="2" fill="#0284c7"/>
+
+        <!-- Torrential Blizzard Breath Exhaling Forward (Hơi Thở Băng Tuyết) -->
+        <path d="M -52,2 C -110,-20 -180,-10 -240,40 C -180,60 -120,30 -52,10 Z" 
+              fill="url(#blizzardAura)" opacity="0.8" filter="url(#frostGlow)"/>
+        <!-- Freezing Shards -->
+        <polygon points="-120,0 -135,10 -115,14" fill="#ffffff"/>
+        <polygon points="-170,25 -190,15 -175,35" fill="#ffffff"/>
+      </g>
+    </g>
+  </g>
+
+  <!-- ======================================================== -->
+  <!-- CENTER: THE PARABOLIC DUEL CLASH (VÒM BẮN & NỔ VA CHẠM) -->
+  <!-- ======================================================== -->
+  <!-- Parabolic trajectory flight path from left to right -->
+  <path d="M 195,300 Q 400,90 530,320" fill="none" stroke="#f59e0b" stroke-width="3" stroke-dasharray="10 8" opacity="0.75" filter="url(#solarGlow)"/>
+
+  <!-- Energy Clash in Center where Fire meets Ice -->
+  <g transform="translate(400, 270)" filter="url(#clashFlash)">
+    <!-- Shockwave Rings -->
+    <ellipse cx="0" cy="0" rx="90" ry="110" fill="none" stroke="#ffffff" stroke-width="3" opacity="0.9"/>
+    <circle cx="0" cy="0" r="60" fill="none" stroke="#fde047" stroke-width="2" opacity="0.7"/>
+    <circle cx="0" cy="0" r="45" fill="none" stroke="#38bdf8" stroke-width="2" opacity="0.7"/>
+
+    <!-- Blinding Core Flash -->
+    <circle cx="0" cy="0" r="28" fill="#ffffff"/>
+
+    <!-- Exploding Spark Rays -->
+    <line x1="-50" y1="-50" x2="50" y2="50" stroke="#f97316" stroke-width="3"/>
+    <line x1="-50" y1="50" x2="50" y2="-50" stroke="#38bdf8" stroke-width="3"/>
+    <line x1="0" y1="-70" x2="0" y2="70" stroke="#ffffff" stroke-width="3"/>
+  </g>
+
+  <!-- Game Title Badge Plate -->
+  <g transform="translate(400, 725)">
+    <rect x="-250" y="-35" width="500" height="66" rx="16" fill="#080411" fill-opacity="0.9" 
+          stroke="url(#staffGold)" stroke-width="2" filter="url(#frostGlow)"/>
+    
+    <text x="0" y="-3" text-anchor="middle" font-family="'Cinzel', 'Trajan Pro', 'Palatino', serif" 
+          font-size="26" font-weight="900" fill="#fef08a" letter-spacing="3" filter="url(#solarGlow)">
+      ĐẤU PHÁO MA PHÁP
+    </text>
+    <text x="0" y="20" text-anchor="middle" font-family="'Inter', -apple-system, sans-serif" 
+          font-size="12" font-weight="700" fill="#38bdf8" letter-spacing="2">
+      HỎA LONG VS BĂNG LONG • AI DUEL TỌA ĐỘ
+    </text>
+
+    <!-- Fire and Ice Icons on Sides -->
+    <circle cx="-230" cy="-2" r="6" fill="#f97316" stroke="#fde047" stroke-width="1.5"/>
+    <circle cx="230" cy="-2" r="6" fill="#0ea5e9" stroke="#e0f2fe" stroke-width="1.5"/>
+  </g>
+
+  <!-- Outer Cover Border -->
+  <rect x="18" y="18" width="764" height="764" rx="28" fill="none" stroke="url(#staffGold)" stroke-width="3"/>
+  <rect x="26" y="26" width="748" height="748" rx="22" fill="none" stroke="#38bdf8" stroke-width="1" opacity="0.35"/>
+</svg>

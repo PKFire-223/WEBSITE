@@ -28,6 +28,12 @@ import {
   Lock,
   Hourglass,
   CheckCircle,
+  Waves,
+  Mountain,
+  Sun,
+  Droplet,
+  Skull,
+  Eye,
 } from 'lucide-react';
 import {
   playCannonShotSound,
@@ -84,8 +90,8 @@ export const BASIC_FIREBALL: MagicSkill = {
   cooldownTurns: 0,
 };
 
-// 12 DISTINCT SPECIAL SKILLS (Pool from which 3 are randomly picked)
-export const ALL_12_SPECIAL_SKILLS: MagicSkill[] = [
+// 20 DISTINCT SPECIAL SKILLS (Pool from which 3 are randomly picked)
+export const ALL_20_SPECIAL_SKILLS: MagicSkill[] = [
   {
     id: 'meteor',
     name: 'Sao Băng Tận Thế',
@@ -216,11 +222,126 @@ export const ALL_12_SPECIAL_SKILLS: MagicSkill[] = [
     borderGlow: 'rgba(251,113,133,0.9)',
     damage: 50,
     craterSize: 30,
-    cooldownTurns: 1,
+    cooldownTurns: 2,
+  },
+  {
+    id: 'blackhole',
+    name: 'Hố Đen Tận Diệt',
+    desc: 'Tạo vùng hút trọng lực cực đại xé toạc mặt đất, sát thương 72 HP cực khủng!',
+    iconName: 'blackhole',
+    color: '#8b5cf6',
+    borderGlow: 'rgba(139,92,246,0.95)',
+    damage: 72,
+    craterSize: 46,
+    cooldownTurns: 3, // OP skill
+  },
+  {
+    id: 'lifesteal',
+    name: 'Huyết Chú Đoạt Mệnh',
+    desc: 'Gây 52 HP sát thương ma thuật và hút trực tiếp +35 HP hồi phục cho bản thân!',
+    iconName: 'lifesteal',
+    color: '#e11d48',
+    borderGlow: 'rgba(225,29,72,0.95)',
+    damage: 52,
+    craterSize: 26,
+    cooldownTurns: 2,
+  },
+  {
+    id: 'laser',
+    name: 'Chùm Quang Phổ Laze',
+    desc: 'Tia năng lượng bắn phá cực nhanh xé toạc bầu trời và công phá 58 HP!',
+    iconName: 'laser',
+    color: '#06b6d4',
+    borderGlow: 'rgba(6,182,212,0.95)',
+    damage: 58,
+    craterSize: 28,
+    cooldownTurns: 2,
+  },
+  {
+    id: 'landmine',
+    name: 'Địa Lôi Nổ Chậm',
+    desc: 'Găm mìn ma thuật vào lòng đất, khi kích nổ tạo chấn động 64 HP và hố sâu!',
+    iconName: 'landmine',
+    color: '#f97316',
+    borderGlow: 'rgba(249,115,22,0.95)',
+    damage: 64,
+    craterSize: 42,
+    cooldownTurns: 2,
+  },
+  {
+    id: 'tsunami',
+    name: 'Thủy Triều Sóng Thần',
+    desc: 'Cột sóng cuộn dâng đẩy lùi và cuốn trôi mục tiêu với 46 HP sát thương.',
+    iconName: 'tsunami',
+    color: '#0284c7',
+    borderGlow: 'rgba(2,132,199,0.95)',
+    damage: 46,
+    craterSize: 32,
+    cooldownTurns: 2,
+  },
+  {
+    id: 'earthquake',
+    name: 'Địa Chấn Đại Địa',
+    desc: 'Làm rung chuyển dữ dội địa hình, tạo hố nứt khổng lồ gây 50 HP chấn động!',
+    iconName: 'earthquake',
+    color: '#d97706',
+    borderGlow: 'rgba(217,119,6,0.95)',
+    damage: 50,
+    craterSize: 50,
+    cooldownTurns: 2,
+  },
+  {
+    id: 'solar',
+    name: 'Nhật Hoa Thái Dương',
+    desc: 'Ánh sáng mặt trời hội tụ thiêu đốt 60 HP và phá hủy lớp bảo vệ đối thủ!',
+    iconName: 'solar',
+    color: '#f59e0b',
+    borderGlow: 'rgba(245,158,11,0.95)',
+    damage: 60,
+    craterSize: 30,
+    cooldownTurns: 2,
+  },
+  {
+    id: 'poison_cloud',
+    name: 'Bụi Độc U Minh',
+    desc: 'Tạo màn khói độc bao phủ đối thủ gây 44 HP và làm mù phương hướng!',
+    iconName: 'poison',
+    color: '#84cc16',
+    borderGlow: 'rgba(132,204,22,0.95)',
+    damage: 44,
+    craterSize: 30,
+    cooldownTurns: 2,
   },
 ];
 
-export const ALL_SKILLS_CATALOG = [BASIC_FIREBALL, ...ALL_12_SPECIAL_SKILLS];
+export const ALL_12_SPECIAL_SKILLS = ALL_20_SPECIAL_SKILLS; // backwards compatibility alias
+export const ALL_SKILLS_CATALOG = [BASIC_FIREBALL, ...ALL_20_SPECIAL_SKILLS];
+
+export const getSkillIcon = (iconName: string) => {
+  switch (iconName) {
+    case 'flame': return Flame;
+    case 'snowflake': return Snowflake;
+    case 'crosshair': return Crosshair;
+    case 'shield': return Shield;
+    case 'heart': return Heart;
+    case 'zap': return Zap;
+    case 'skull': return Skull;
+    case 'droplet': return Droplet;
+    case 'bomb': return Bomb;
+    case 'dual': return Swords;
+    case 'vortex': return Wind;
+    case 'antigrav': return Sparkles;
+    case 'blackhole': return Eye;
+    case 'lifesteal': return Heart;
+    case 'laser': return Zap;
+    case 'landmine': return Bomb;
+    case 'tsunami': return Waves;
+    case 'earthquake': return Mountain;
+    case 'solar': return Sun;
+    case 'poison': return Skull;
+    default: return Sparkles;
+  }
+};
 
 interface Projectile {
   x: number;
@@ -270,6 +391,9 @@ export const ArtilleryDuelGame: React.FC = () => {
 
   // Match State
   const [turn, setTurn] = useState<TurnState>('player_aiming');
+  const turnRef = useRef<TurnState>(turn);
+  turnRef.current = turn;
+  const isTurnTransitioningRef = useRef(false);
   const [turnCount, setTurnCount] = useState(1);
   const [winner, setWinner] = useState<'player' | 'ai' | null>(null);
 
@@ -294,20 +418,30 @@ export const ArtilleryDuelGame: React.FC = () => {
   const [angle, setAngle] = useState(45);
   const [power, setPower] = useState(65);
 
-  // 12 SPECIAL SKILLS: Randomly Pick 3 Skills for this game session
+  // 20 SPECIAL SKILLS: Randomly Pick 3 Skills for player
   const [activeDeck, setActiveDeck] = useState<MagicSkill[]>(() => {
-    const shuffled = [...ALL_12_SPECIAL_SKILLS].sort(() => Math.random() - 0.5);
+    const shuffled = [...ALL_20_SPECIAL_SKILLS].sort(() => Math.random() - 0.5);
     return shuffled.slice(0, 3);
   });
+
+  // AI Special Skills Deck & Cooldowns
+  // - Veteran: 1 skill
+  // - Grandmaster: 3 random skills (same as player)
+  // - Novice: 0 skills
+  const [aiDeck, setAiDeck] = useState<MagicSkill[]>(() => {
+    const shuffled = [...ALL_20_SPECIAL_SKILLS].sort(() => Math.random() - 0.5);
+    return shuffled.slice(0, 1); // default veteran
+  });
+  const [aiCooldowns, setAiCooldowns] = useState<{ [id: string]: number }>({});
 
   // Selected skill defaults to BASIC_FIREBALL
   const [selectedSkillId, setSelectedSkillId] = useState<string>(BASIC_FIREBALL.id);
 
-  // Skill Cooldowns (tracked in turns)
+  // Skill Cooldowns (tracked in player's turns)
   const [cooldowns, setCooldowns] = useState<{ [id: string]: number }>({});
 
   // 2D WIND SYSTEM (Horizontal: -5.0 to +5.0, Vertical: -5.0 to +5.0)
-  // Horizontal: every 0.5 wind -> 2.5% force adjustment (0.1 wind = 0.5%)
+  // Horizontal: 1.0 wind -> 1% force adjustment (0.1 wind = 0.1%)
   // Vertical: every 1.0 wind -> 1 degree angle change (0.2 wind = 0.2 degree)
   const [windX, setWindX] = useState<number>(1.5);
   const [windY, setWindY] = useState<number>(1.0);
@@ -457,12 +591,34 @@ export const ArtilleryDuelGame: React.FC = () => {
     setWindY(signY * magY);
   }, []);
 
-  // Reroll 3 random skills out of 12 (ONLY ALLOWED IN PRE-MATCH MODAL)
-  const handleRerollDeck = () => {
+  // Reroll 3 random skills out of 20 for player and refresh AI deck based on difficulty
+  const handleRerollDeck = (diff = aiDifficulty) => {
     playClickSound();
-    const shuffled = [...ALL_12_SPECIAL_SKILLS].sort(() => Math.random() - 0.5);
-    const new3 = shuffled.slice(0, 3);
-    setActiveDeck(new3);
+    const shuffledPlayer = [...ALL_20_SPECIAL_SKILLS].sort(() => Math.random() - 0.5);
+    setActiveDeck(shuffledPlayer.slice(0, 3));
+
+    // Also roll AI skills
+    const shuffledAI = [...ALL_20_SPECIAL_SKILLS].sort(() => Math.random() - 0.5);
+    if (diff === 'grandmaster') {
+      setAiDeck(shuffledAI.slice(0, 3));
+    } else if (diff === 'veteran') {
+      setAiDeck(shuffledAI.slice(0, 1));
+    } else {
+      setAiDeck([]);
+    }
+  };
+
+  const handleSetDifficulty = (diff: AIDifficulty) => {
+    playClickSound();
+    setAiDifficulty(diff);
+    const shuffledAI = [...ALL_20_SPECIAL_SKILLS].sort(() => Math.random() - 0.5);
+    if (diff === 'grandmaster') {
+      setAiDeck(shuffledAI.slice(0, 3));
+    } else if (diff === 'veteran') {
+      setAiDeck(shuffledAI.slice(0, 1));
+    } else {
+      setAiDeck([]);
+    }
   };
 
   // Start battle from Pre-Match Modal
@@ -532,13 +688,12 @@ export const ArtilleryDuelGame: React.FC = () => {
 
     const windLiftAngle = windY * 1.0;
 
-    for (let testAngle = 115; testAngle <= 165; testAngle += 2) {
+    for (let testAngle = 105; testAngle <= 165; testAngle += 2) {
       for (let testPwr = 35; testPwr <= 95; testPwr += 3) {
-        const totalAngle = testAngle + aiSlope + windLiftAngle;
-        const rad = (totalAngle * Math.PI) / 180;
+        const rad = (testAngle * Math.PI) / 180;
 
-        const horizBoost = (windX / 0.1) * 0.005;
-        const effectiveSpeed = testPwr * 5.6 * (1 + horizBoost * -1);
+        const horizBoost = windX * 0.01; // 1 wind unit = 1% force adjustment
+        const effectiveSpeed = testPwr * 5.6 * (1 - horizBoost);
 
         let simX = aiX - 16;
         let simY = aiY - 18;
@@ -596,7 +751,7 @@ export const ArtilleryDuelGame: React.FC = () => {
       finalPower = Math.min(100, Math.max(25, finalPower + errorCompensation));
       finalAngle += Math.random() * 1.2 - 0.6;
       setAiThoughtLog(
-        `Đại Pháp Sư AI: Bù trừ địa hình nghiêng (${aiSlope}°) & gió 2D... Tự sửa sai: ${errorCompensation.toFixed(1)}% lực!`
+        `Đại Pháp Sư AI: Bù trừ đường đạn & Gió 2D... Tự sửa sai: ${errorCompensation.toFixed(1)}% lực!`
       );
     }
 
@@ -605,6 +760,54 @@ export const ArtilleryDuelGame: React.FC = () => {
       power: Math.min(100, Math.max(25, Math.round(finalPower))),
     };
   }, [getGroundY, getGroundSlopeDeg, windX, windY, aiDifficulty]);
+
+  // Turn Advancement Functions
+  const advanceTurnToAi = useCallback(() => {
+    // Transition to AI turn: decrease active AI cooldowns by 1
+    setAiCooldowns((prev) => {
+      const next: { [id: string]: number } = {};
+      for (const [k, v] of Object.entries(prev)) {
+        if (v > 1) next[k] = v - 1;
+      }
+      return next;
+    });
+    setTurn('ai_thinking');
+    isTurnTransitioningRef.current = false;
+  }, []);
+
+  const advanceTurnToPlayer = useCallback(() => {
+    // End of round / Transition to Player turn: reset movements, new 2D wind, decrease player cooldowns by 1
+    setPlayerSteps(5);
+    setAiSteps(5);
+    setPlayerFrozen(false);
+    setAiFrozen(false);
+    generateNew2DWind();
+    setTurnCount((t) => t + 1);
+
+    // Decrease active player cooldowns by 1
+    setCooldowns((prev) => {
+      const next: { [id: string]: number } = {};
+      for (const [k, v] of Object.entries(prev)) {
+        if (v > 1) next[k] = v - 1;
+      }
+      return next;
+    });
+    setTurn('player_aiming');
+    isTurnTransitioningRef.current = false;
+  }, [generateNew2DWind]);
+
+  const advanceTurnFromProjectile = useCallback(
+    (finishedTurn: TurnState) => {
+      if (finishedTurn === 'player_projectile') {
+        advanceTurnToAi();
+      } else if (finishedTurn === 'ai_projectile') {
+        advanceTurnToPlayer();
+      } else {
+        isTurnTransitioningRef.current = false;
+      }
+    },
+    [advanceTurnToAi, advanceTurnToPlayer]
+  );
 
   // Player Fire Execution with Cooldown Logic
   const handlePlayerFire = useCallback(() => {
@@ -629,7 +832,7 @@ export const ArtilleryDuelGame: React.FC = () => {
       setPlayerHp((hp) => Math.min(MAX_HP, hp + 80));
       playHealSound();
       addFloatingText('💚 +80 HP HỒI MÁU!', playerXRef.current, getGroundY(playerXRef.current) - 45, '#34d399', 22);
-      setTurn('ai_thinking');
+      advanceTurnToAi();
       return;
     }
 
@@ -638,7 +841,7 @@ export const ArtilleryDuelGame: React.FC = () => {
       setPlayerShield(true);
       playShieldSound();
       addFloatingText('🛡️ KÍCH HOẠT THÁNH GIÁP!', playerXRef.current, getGroundY(playerXRef.current) - 45, '#60a5fa', 18);
-      setTurn('ai_thinking');
+      advanceTurnToAi();
       return;
     }
 
@@ -647,16 +850,13 @@ export const ArtilleryDuelGame: React.FC = () => {
     setTurn('player_projectile');
     playCannonShotSound();
 
-    const groundSlope = getGroundSlopeDeg(playerXRef.current);
-    const windLift = windY * 1.0;
-    const effectiveAngle = Math.min(88, Math.max(8, angle + groundSlope + windLift));
-
-    const windForceFactor = 1 + (windX / 0.1) * 0.005;
+    const effectiveAngle = Math.min(90, Math.max(10, angle));
+    const windForceFactor = 1 + windX * 0.01; // 1 wind unit = 1% force adjustment
     const effectiveSpeed = power * 5.6 * windForceFactor;
 
     const rad = (effectiveAngle * Math.PI) / 180;
-    const startX = playerXRef.current + 22;
-    const startY = getGroundY(playerXRef.current) - 24;
+    const startX = playerXRef.current + Math.cos(rad) * 26;
+    const startY = getGroundY(playerXRef.current) - 24 - Math.sin(rad) * 26;
 
     const baseProj: Projectile = {
       x: startX,
@@ -671,18 +871,19 @@ export const ArtilleryDuelGame: React.FC = () => {
       bornAt: Date.now(),
     };
 
-    projectilesRef.current = [baseProj];
-
-    // Dual shot: fire second bullet after delay
+    // Dual shot: fire 2 projectiles in tandem
     if (skill.id === 'dual') {
-      setTimeout(() => {
-        playCannonShotSound();
-        projectilesRef.current.push({
-          ...baseProj,
-          vy: baseProj.vy - 16,
-          bornAt: Date.now(),
-        });
-      }, 260);
+      const secondProj: Projectile = {
+        ...baseProj,
+        x: startX - Math.sin(rad) * 10,
+        y: startY - Math.cos(rad) * 10,
+        vx: baseProj.vx * 0.96,
+        vy: baseProj.vy - 16,
+        bornAt: Date.now(),
+      };
+      projectilesRef.current = [baseProj, secondProj];
+    } else {
+      projectilesRef.current = [baseProj];
     }
   }, [
     turn,
@@ -696,6 +897,7 @@ export const ArtilleryDuelGame: React.FC = () => {
     getGroundSlopeDeg,
     getGroundY,
     addFloatingText,
+    advanceTurnToAi,
   ]);
 
   // AI Turn Logic
@@ -720,18 +922,67 @@ export const ArtilleryDuelGame: React.FC = () => {
           triggerAiSpeech('Lá chắn này sẽ chặn đứng đòn tấn công của ngươi!');
 
           // Pass turn back to player
-          setTurn('player_aiming');
-          setPlayerSteps(5);
-          setAiSteps(5);
-          setTurnCount((t) => t + 1);
-          generateNew2DWind();
-          // Decrease cooldowns
-          setCooldowns((prev) =>
-            Object.fromEntries(
-              Object.entries(prev).map(([k, v]) => [k, Math.max(0, v - 1)])
-            )
-          );
+          advanceTurnToPlayer();
           return;
+        }
+
+        // AI Skill Selection logic (Elite: 1 skill, Grandmaster: 3 skills)
+        let chosenAiSkill = BASIC_FIREBALL;
+        if (aiDeck && aiDeck.length > 0) {
+          // Find available skills that are off cooldown
+          const availableAiSkills = aiDeck.filter((s) => (aiCooldowns[s.id] || 0) === 0);
+          if (availableAiSkills.length > 0) {
+            // Smart selection logic
+            if (aiHp < 160 && availableAiSkills.some((s) => s.id === 'heal')) {
+              chosenAiSkill = availableAiSkills.find((s) => s.id === 'heal')!;
+            } else if (aiHp < 180 && !aiShield && availableAiSkills.some((s) => s.id === 'shield') && Math.random() < 0.6) {
+              chosenAiSkill = availableAiSkills.find((s) => s.id === 'shield')!;
+            } else {
+              // 75% chance to use an offensive special skill if available
+              if (Math.random() < 0.75) {
+                const attackSkills = availableAiSkills.filter((s) => s.id !== 'heal' && s.id !== 'shield');
+                if (attackSkills.length > 0) {
+                  chosenAiSkill = attackSkills[Math.floor(Math.random() * attackSkills.length)];
+                }
+              }
+            }
+          }
+        }
+
+        // Handle AI Shield skill
+        if (chosenAiSkill.id === 'shield') {
+          setAiShield(true);
+          playShieldSound();
+          addFloatingText('🛡️ AI BẬT THÁNH GIÁP PHÒNG HỘ!', aiXRef.current, getGroundY(aiXRef.current) - 45, '#c084fc', 18);
+          triggerAiSpeech('Lá chắn thánh giáp đã kích hoạt! Đòn đánh của ngươi vô hiệu!');
+
+          // Put skill on cooldown
+          setAiCooldowns((prev) => ({ ...prev, [chosenAiSkill.id]: chosenAiSkill.cooldownTurns }));
+
+          // Transition turn to player
+          advanceTurnToPlayer();
+          return;
+        }
+
+        // Handle AI Heal skill
+        if (chosenAiSkill.id === 'heal') {
+          setAiHp((hp) => Math.min(MAX_HP, hp + 80));
+          playHealSound();
+          addFloatingText('💚 AI HỒI +80 HP!', aiXRef.current, getGroundY(aiXRef.current) - 45, '#34d399', 22);
+          triggerAiSpeech('Hắc ma pháp hồi sinh sinh mệnh cho ta!');
+
+          // Put skill on cooldown
+          setAiCooldowns((prev) => ({ ...prev, [chosenAiSkill.id]: chosenAiSkill.cooldownTurns }));
+
+          // Transition turn to player
+          advanceTurnToPlayer();
+          return;
+        }
+
+        // Apply cooldown to used skill if not basic
+        if (chosenAiSkill.id !== BASIC_FIREBALL.id && chosenAiSkill.cooldownTurns > 0) {
+          setAiCooldowns((prev) => ({ ...prev, [chosenAiSkill.id]: chosenAiSkill.cooldownTurns }));
+          addFloatingText(`✨ AI DÙNG ${chosenAiSkill.name.toUpperCase()}!`, aiXRef.current, getGroundY(aiXRef.current) - 50, chosenAiSkill.color, 16);
         }
 
         // AI Fires Projectile
@@ -740,35 +991,46 @@ export const ArtilleryDuelGame: React.FC = () => {
         playCannonShotSound();
         setStats((s) => ({ ...s, aiShots: s.aiShots + 1 }));
 
-        const groundSlope = getGroundSlopeDeg(aiXRef.current);
-        const windLift = windY * 1.0;
-        const totalAngle = aiAngle + groundSlope + windLift;
-        const rad = (totalAngle * Math.PI) / 180;
+        const rad = (aiAngle * Math.PI) / 180;
 
-        const windForceFactor = 1 + (windX / 0.1) * 0.005 * -1;
+        // 1 unit wind = 1% force adjustment
+        const windForceFactor = 1 - windX * 0.01;
         const initialSpeed = aiPower * 5.6 * windForceFactor;
 
-        const startX = aiXRef.current - 22;
-        const startY = getGroundY(aiXRef.current) - 24;
+        const startX = aiXRef.current + Math.cos(rad) * 26;
+        const startY = getGroundY(aiXRef.current) - 24 - Math.sin(rad) * 26;
 
         const aiProj: Projectile = {
           x: startX,
           y: startY,
           vx: Math.cos(rad) * initialSpeed,
           vy: -Math.sin(rad) * initialSpeed,
-          radius: 6,
-          skillId: 'fireball',
+          radius: chosenAiSkill.craterSize > 40 ? 9 : 6,
+          skillId: chosenAiSkill.id,
           owner: 'ai',
-          color: '#a855f7',
-          glow: 'rgba(168,85,247,0.9)',
+          color: chosenAiSkill.color || '#a855f7',
+          glow: chosenAiSkill.borderGlow || 'rgba(168,85,247,0.9)',
           bornAt: Date.now(),
         };
 
-        projectilesRef.current = [aiProj];
+        // Dual shot skill handling for AI (tandem spawn)
+        if (chosenAiSkill.id === 'dual') {
+          const secondAiProj: Projectile = {
+            ...aiProj,
+            x: startX + 10,
+            y: startY - 8,
+            vx: aiProj.vx * 0.96,
+            vy: aiProj.vy - 16,
+            bornAt: Date.now(),
+          };
+          projectilesRef.current = [aiProj, secondAiProj];
+        } else {
+          projectilesRef.current = [aiProj];
+        }
 
         const quotes = [
-          'Vector này đã được tối ưu hóa!',
-          'Hỏa cầu hắc ám sẽ tìm đến ngươi!',
+          `Nhận lấy ${chosenAiSkill.name}! Vector này đã hoàn hảo!`,
+          'Kỹ năng này sẽ kết liễu trận đấu!',
           'Gió 2D đã được tính toán kỹ lưỡng!',
           'Hãy xem ngươi né được cú này không!',
         ];
@@ -783,11 +1045,13 @@ export const ArtilleryDuelGame: React.FC = () => {
     aiHp,
     aiShield,
     aiFrozen,
+    aiDeck,
+    aiCooldowns,
     getGroundSlopeDeg,
     getGroundY,
     windX,
     windY,
-    generateNew2DWind,
+    advanceTurnToPlayer,
     addFloatingText,
     spawnDust,
     triggerAiSpeech,
@@ -900,7 +1164,8 @@ export const ArtilleryDuelGame: React.FC = () => {
       // ==========================================
       ctx.save();
       ctx.translate(pX, pY);
-      ctx.rotate((pSlope * Math.PI) / 180);
+      const clampedPSlope = Math.max(-20, Math.min(20, pSlope));
+      ctx.rotate((clampedPSlope * Math.PI) / 180);
 
       // Ground Shadow
       ctx.fillStyle = 'rgba(0,0,0,0.45)';
@@ -1001,7 +1266,8 @@ export const ArtilleryDuelGame: React.FC = () => {
 
       // Golden Arcane Staff & Pulsating Celestial Crystal
       ctx.save();
-      const staffRad = (angle * Math.PI) / 180;
+      const effectiveStaffAngle = angle - clampedPSlope;
+      const staffRad = (effectiveStaffAngle * Math.PI) / 180;
       const staffLen = 34;
       const staffBaseX = 8;
       const staffBaseY = -18 + breathing;
@@ -1197,13 +1463,14 @@ export const ArtilleryDuelGame: React.FC = () => {
         p.vy += currentGravity * dt;
 
         // Homing missile logic
-        if (p.skillId === 'homing' && p.owner === 'player') {
-          const targetX = aiXRef.current;
-          const targetY = aY - 14;
+        if (p.skillId === 'homing') {
+          const targetX = p.owner === 'player' ? aiXRef.current : playerXRef.current;
+          const targetY = (p.owner === 'player' ? aY : pY) - 14;
           const dx = targetX - p.x;
           const dy = targetY - p.y;
           const dist = Math.hypot(dx, dy);
-          if (dist < 120 && p.x < targetX) {
+          const isApproaching = p.owner === 'player' ? p.x < targetX : p.x > targetX;
+          if (dist < 130 && isApproaching) {
             p.vy += (dy / dist) * 220 * dt;
             p.vx += (dx / dist) * 130 * dt;
           }
@@ -1242,15 +1509,50 @@ export const ArtilleryDuelGame: React.FC = () => {
         const distToPlayer = Math.hypot(p.x - pX, p.y - (pY - 18));
         if (p.owner === 'ai' && distToPlayer < 26) {
           hasHit = true;
-          let dmg = Math.round(36 + Math.random() * 10);
+          const skillObj = ALL_SKILLS_CATALOG.find((s) => s.id === p.skillId) || BASIC_FIREBALL;
+          let dmg = skillObj.damage > 0 ? skillObj.damage : Math.round(36 + Math.random() * 10);
+
           if (playerShield) {
             dmg = Math.round(dmg * 0.4);
             setPlayerShield(false);
             addFloatingText('🛡️ KHIÊN HẤP THỤ 60% SÁT THƯƠNG!', pX, pY - 50, '#38bdf8');
           }
+
+          if (p.skillId === 'frost') {
+            setPlayerFrozen(true);
+            addFloatingText('❄️ BẠN BỊ ĐÓNG BĂNG!', pX, pY - 65, '#67e8f9');
+          }
+
+          if (p.skillId === 'lifesteal') {
+            setAiHp((hp) => Math.min(MAX_HP, hp + 35));
+            addFloatingText('💚 AI HÚT +35 HP!', aX, aY - 65, '#34d399');
+          }
+
+          if (p.skillId === 'thunder') {
+            for (let ly = 0; ly < p.y; ly += 14) {
+              particlesRef.current.push({
+                x: p.x + (Math.random() * 12 - 6),
+                y: ly,
+                vx: (Math.random() * 2 - 1) * 10,
+                vy: Math.random() * 50 + 50,
+                radius: 3,
+                color: '#fef08a',
+                alpha: 1,
+                decay: 0.08,
+              });
+            }
+          }
+
           setPlayerHp((hp) => Math.max(0, hp - dmg));
           setStats((s) => ({ ...s, aiHits: s.aiHits + 1 }));
-          spawnExplosion(p.x, p.y, '#a855f7', 35, 26, 20);
+          spawnExplosion(
+            p.x,
+            p.y,
+            skillObj.color || '#a855f7',
+            skillObj.craterSize > 35 ? 45 : 35,
+            skillObj.craterSize || 26,
+            skillObj.id === 'acid' ? 38 : 20
+          );
           playHitDamageSound();
           addFloatingText(`-${dmg} HP!`, pX, pY - 30, '#ef4444', 22);
         }
@@ -1356,32 +1658,12 @@ export const ArtilleryDuelGame: React.FC = () => {
 
       projectilesRef.current = remainingProjs;
 
-      // When all projectiles disappear, advance turn
-      if (currentProjs.length > 0 && remainingProjs.length === 0) {
+      // When all projectiles disappear, advance turn safely ONCE
+      if (currentProjs.length > 0 && remainingProjs.length === 0 && !isTurnTransitioningRef.current) {
+        isTurnTransitioningRef.current = true;
+        const finishedTurn = turnRef.current;
         setTimeout(() => {
-          setTurn((curr) => {
-            if (curr === 'player_projectile') {
-              return 'ai_thinking';
-            } else if (curr === 'ai_projectile') {
-              // End of round: Reset steps, generate new 2D wind, decrease skill cooldowns!
-              setPlayerSteps(5);
-              setAiSteps(5);
-              setPlayerFrozen(false);
-              setAiFrozen(false);
-              generateNew2DWind();
-              setTurnCount((t) => t + 1);
-
-              // Decrease all active cooldowns by 1 turn!
-              setCooldowns((prev) =>
-                Object.fromEntries(
-                  Object.entries(prev).map(([k, v]) => [k, Math.max(0, v - 1)])
-                )
-              );
-
-              return 'player_aiming';
-            }
-            return curr;
-          });
+          advanceTurnFromProjectile(finishedTurn);
         }, 400);
       }
 
@@ -1444,7 +1726,7 @@ export const ArtilleryDuelGame: React.FC = () => {
     isPreMatchModalOpen,
     spawnExplosion,
     addFloatingText,
-    generateNew2DWind,
+    advanceTurnFromProjectile,
   ]);
 
   // Game Over Checking
@@ -1493,6 +1775,7 @@ export const ArtilleryDuelGame: React.FC = () => {
   // Restart match
   const handleRestart = () => {
     playClickSound();
+    isTurnTransitioningRef.current = false;
     setPlayerHp(MAX_HP);
     setAiHp(MAX_HP);
     setPlayerShield(false);
@@ -1502,6 +1785,7 @@ export const ArtilleryDuelGame: React.FC = () => {
     setPlayerSteps(5);
     setAiSteps(5);
     setCooldowns({});
+    setAiCooldowns({});
     setSelectedSkillId(BASIC_FIREBALL.id);
     playerXRef.current = 130;
     aiXRef.current = 710;
@@ -1509,7 +1793,7 @@ export const ArtilleryDuelGame: React.FC = () => {
     setTurnCount(1);
     setWinner(null);
     setIsPreMatchModalOpen(true); // Open preparation modal for new game!
-    handleRerollDeck();
+    handleRerollDeck(aiDifficulty);
     generateNew2DWind();
     projectilesRef.current = [];
     particlesRef.current = [];
@@ -1555,15 +1839,19 @@ export const ArtilleryDuelGame: React.FC = () => {
 
   const updateAimFromPoint = (targetX: number, targetY: number) => {
     const pX = playerXRef.current;
-    const pY = getGroundY(pX) - 16;
+    const pY = getGroundY(pX) - 20;
     const dx = targetX - pX;
     const dy = pY - targetY;
 
-    if (dx > 0) {
-      const calcAngle = Math.round((Math.atan2(dy, dx) * 180) / Math.PI);
-      setAngle(Math.min(85, Math.max(10, calcAngle)));
+    // Upward or forward aiming
+    if (dy > 0 || dx > 0) {
+      // Clamping effectiveDx to 0 when aiming straight up/behind ensures angle smoothly reaches 90°
+      const effectiveDx = Math.max(0, dx);
+      const effectiveDy = Math.max(0.01, dy);
+      const calcAngle = Math.round((Math.atan2(effectiveDy, effectiveDx) * 180) / Math.PI);
+      setAngle(Math.min(90, Math.max(10, calcAngle)));
       const dist = Math.hypot(dx, dy);
-      setPower(Math.min(100, Math.max(20, Math.round((dist / 140) * 100))));
+      setPower(Math.min(100, Math.max(20, Math.round((dist / 150) * 100))));
     }
   };
 
@@ -1583,7 +1871,7 @@ export const ArtilleryDuelGame: React.FC = () => {
         handlePlayerMove('right');
       } else if (e.key === 'ArrowUp') {
         e.preventDefault();
-        setAngle((a) => Math.min(85, a + 1));
+        setAngle((a) => Math.min(90, a + 1));
       } else if (e.key === 'ArrowDown') {
         e.preventDefault();
         setAngle((a) => Math.max(10, a - 1));
@@ -1609,9 +1897,7 @@ export const ArtilleryDuelGame: React.FC = () => {
   }, [turn, handlePlayerFire, isPreMatchModalOpen, activeDeck, cooldowns, playerSteps, playerFrozen]);
 
   const currentGroundSlope = getGroundSlopeDeg(playerXRef.current);
-  const currentWindLift = Math.round(windY * 10) / 10;
-  const effectiveCalculatedAngle = Math.min(88, Math.max(8, angle + currentGroundSlope + currentWindLift));
-  const horizontalForceBoostPct = Math.round((windX / 0.1) * 0.5 * 10) / 10;
+  const horizontalForceBoostPct = Math.round(windX * 10) / 10; // 1 unit wind = 1% force adjustment
 
   // Selected skill preview object
   const activeSelectedSkill = ALL_SKILLS_CATALOG.find((s) => s.id === selectedSkillId) || BASIC_FIREBALL;
@@ -1668,7 +1954,7 @@ export const ArtilleryDuelGame: React.FC = () => {
               <span>{Math.abs(windY)} m/s</span>
             </div>
             <span className="text-[8px] font-mono text-neutral-400">
-              {windY > 0 ? `+${currentWindLift}° góc nâng` : `-${Math.abs(currentWindLift)}° góc`}
+              {windY > 0 ? `Lực nâng: +${Math.abs(windY)} m/s` : `Lực ép: -${Math.abs(windY)} m/s`}
             </span>
           </div>
         </div>
@@ -1690,6 +1976,35 @@ export const ArtilleryDuelGame: React.FC = () => {
               style={{ width: `${(aiHp / MAX_HP) * 100}%` }}
             />
           </div>
+          {/* AI Skill Badges */}
+          {aiDeck.length > 0 && (
+            <div className="flex items-center gap-1.5 pt-0.5">
+              <span className="text-[9px] font-mono text-purple-300/80">Kỹ năng AI:</span>
+              <div className="flex items-center gap-1 flex-wrap">
+                {aiDeck.map((s) => {
+                  const cd = aiCooldowns[s.id] || 0;
+                  return (
+                    <span
+                      key={s.id}
+                      className={`text-[9px] font-mono px-1.5 py-0.2 rounded border flex items-center gap-1 ${
+                        cd > 0
+                          ? 'bg-neutral-900/90 text-neutral-500 border-neutral-800'
+                          : 'bg-purple-950/80 text-purple-200 border-purple-500/50 shadow-[0_0_8px_rgba(168,85,247,0.3)]'
+                      }`}
+                      title={s.desc}
+                    >
+                      <span className="truncate max-w-[80px]">{s.name}</span>
+                      {cd > 0 ? (
+                        <span className="text-rose-400 font-bold">({cd}t)</span>
+                      ) : (
+                        <span className="text-emerald-400 font-bold">✓</span>
+                      )}
+                    </span>
+                  );
+                })}
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
@@ -1744,13 +2059,15 @@ export const ArtilleryDuelGame: React.FC = () => {
             </div>
           )}
 
-          {/* Real-time Terrain Slope & Effective Angle HUD */}
-          <div className="absolute top-3 left-4 pointer-events-none text-[10px] font-mono text-sky-200 bg-neutral-950/80 px-2.5 py-1 rounded-lg border border-sky-500/30 flex items-center gap-2">
+          {/* Real-time Aim HUD */}
+          <div className="absolute top-3 left-4 pointer-events-none text-[11px] font-mono text-sky-200 bg-neutral-950/85 px-3 py-1.5 rounded-xl border border-sky-500/40 flex items-center gap-3 shadow-lg backdrop-blur-sm">
             <span>
-              Độ nghiêng địa hình: <strong>{currentGroundSlope > 0 ? `+${currentGroundSlope}°` : `${currentGroundSlope}°`}</strong>
+              Góc ngắm: <strong className="text-amber-400 font-bold">{angle}°</strong>
+              {angle === 90 && <span className="text-emerald-400 ml-1 font-sans text-[10px] font-semibold">(Bắn thẳng đứng 90° ⬆)</span>}
             </span>
-            <span className="text-amber-400">
-              ➔ Góc thực: <strong>{effectiveCalculatedAngle}°</strong>
+            <span className="text-neutral-600">|</span>
+            <span>
+              Lực: <strong className="text-orange-400 font-bold">{power}%</strong>
             </span>
           </div>
         </div>
@@ -1795,7 +2112,7 @@ export const ArtilleryDuelGame: React.FC = () => {
                 key={level}
                 onClick={() => {
                   playClickSound();
-                  setAiDifficulty(level);
+                  handleSetDifficulty(level);
                 }}
                 className={`px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase transition-all cursor-pointer ${
                   aiDifficulty === level
@@ -1905,7 +2222,7 @@ export const ArtilleryDuelGame: React.FC = () => {
             <input
               type="range"
               min="10"
-              max="85"
+              max="90"
               value={angle}
               onChange={(e) => setAngle(parseInt(e.target.value, 10))}
               disabled={turn !== 'player_aiming' || isPreMatchModalOpen}
@@ -1982,9 +2299,9 @@ export const ArtilleryDuelGame: React.FC = () => {
                   <span>THIẾT LẬP CẤP ĐỘ ĐỐI THỦ AI:</span>
                 </span>
                 <span className="text-[10px] text-neutral-400 font-sans">
-                  {aiDifficulty === 'novice' && '🟢 Tập Sự: Sai số lớn, đạn bay chệch nhiều'}
-                  {aiDifficulty === 'veteran' && '🟡 Tinh Nhuệ: Tính toán gió 2D và độ dốc địa hình'}
-                  {aiDifficulty === 'grandmaster' && '🔴 Đại Pháp Sư: Monte Carlo cao cấp, tự sửa sai số'}
+                  {aiDifficulty === 'novice' && '🟢 Tập Sự: Sai số lớn, chỉ dùng Hỏa Cầu cơ bản'}
+                  {aiDifficulty === 'veteran' && '🟡 Tinh Nhuệ: Có 1 kỹ năng phép thuật đặc biệt (có hồi chiêu)'}
+                  {aiDifficulty === 'grandmaster' && '🔴 Đại Pháp Sư: Có 3 kỹ năng ngẫu nhiên giống người chơi!'}
                 </span>
               </div>
 
@@ -1994,21 +2311,21 @@ export const ArtilleryDuelGame: React.FC = () => {
                     {
                       id: 'novice',
                       name: 'Tập Sự (Dễ)',
-                      desc: 'Sai số lớn, thích hợp tập dượt',
+                      desc: 'Sai số lớn, chỉ dùng đạn cơ bản',
                       badge: '🌱 DỄ',
                       activeStyle: 'bg-emerald-950/60 border-emerald-400 text-emerald-300 shadow-[0_0_15px_rgba(52,211,153,0.35)]',
                     },
                     {
                       id: 'veteran',
                       name: 'Tinh Nhuệ (Vừa)',
-                      desc: 'Cân bằng gió 2D & địa hình dốc',
+                      desc: 'AI sở hữu 1 kỹ năng ngẫu nhiên (có hồi chiêu)',
                       badge: '⚡ VỪA',
                       activeStyle: 'bg-amber-950/60 border-amber-400 text-amber-300 shadow-[0_0_15px_rgba(245,158,11,0.35)]',
                     },
                     {
                       id: 'grandmaster',
                       name: 'Đại Pháp Sư (Khó)',
-                      desc: 'Tự sửa sai, bách phát bách trúng',
+                      desc: 'AI sở hữu 3 kỹ năng ngẫu nhiên như người chơi',
                       badge: '🔥 KHÓ',
                       activeStyle: 'bg-rose-950/60 border-rose-400 text-rose-300 shadow-[0_0_15px_rgba(244,63,94,0.35)]',
                     },
@@ -2021,7 +2338,7 @@ export const ArtilleryDuelGame: React.FC = () => {
                       type="button"
                       onClick={() => {
                         playClickSound();
-                        setAiDifficulty(lvl.id);
+                        handleSetDifficulty(lvl.id);
                       }}
                       className={`p-2.5 rounded-xl border text-left transition-all cursor-pointer flex flex-col justify-between ${
                         isSelected
@@ -2048,7 +2365,7 @@ export const ArtilleryDuelGame: React.FC = () => {
             <div className="space-y-1.5">
               <span className="text-[11px] font-mono font-bold text-amber-400 flex items-center gap-1.5">
                 <Flame className="w-3.5 h-3.5 text-amber-400" />
-                <span>KỸ NĂNG CƠ BẢN MẶC ĐỊNH (KHÔNG NẰM TRONG 12 KỸ NĂNG):</span>
+                <span>KỸ NĂNG CƠ BẢN MẶC ĐỊNH (KHÔNG NẰM TRONG 20 KỸ NĂNG):</span>
               </span>
               <div className="p-3 rounded-2xl bg-neutral-950/80 border border-amber-500/40 flex items-center justify-between gap-3">
                 <div className="flex items-center gap-3">
@@ -2071,7 +2388,7 @@ export const ArtilleryDuelGame: React.FC = () => {
               <div className="flex items-center justify-between text-[11px] font-mono font-bold text-purple-300">
                 <span className="flex items-center gap-1.5">
                   <Sparkles className="w-3.5 h-3.5 text-purple-400" />
-                  <span>3 KỸ NĂNG ĐƯỢC BAN TẶNG (TRONG 12 KỸ NĂNG):</span>
+                  <span>3 KỸ NĂNG ĐƯỢC BAN TẶNG (TRONG KHO 20 KỸ NĂNG):</span>
                 </span>
                 <span className="text-[10px] text-neutral-400">Tối đa hồi chiêu: 3 lượt</span>
               </div>
@@ -2109,7 +2426,7 @@ export const ArtilleryDuelGame: React.FC = () => {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <button
-                  onClick={handleRerollDeck}
+                  onClick={() => handleRerollDeck(aiDifficulty)}
                   className="w-full py-3 px-4 rounded-xl bg-purple-900/80 hover:bg-purple-800 border border-purple-400/50 text-purple-200 font-bold text-xs font-mono flex items-center justify-center gap-2 cursor-pointer transition-all hover:scale-[1.02] active:scale-95"
                 >
                   <Dices className="w-4 h-4 text-purple-300" />

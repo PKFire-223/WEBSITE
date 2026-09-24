@@ -22,6 +22,8 @@ import {
   Filter,
   BarChart3,
   ChevronRight,
+  Shield,
+  ShieldCheck,
   ShieldAlert
 } from 'lucide-react';
 import { playClickSound, playCoinSound, playPageTurnSound, playSealAwakenSound } from '../utils/audio';
@@ -33,6 +35,9 @@ import {
   PlayerStatsContext
 } from '../data/achievementsData';
 
+import { UserAccount } from '../types/auth';
+import { calculateAccountSecurityRating } from '../utils/security';
+
 interface ProfilePageProps {
   playerLevel: number;
   totalPlaySeconds: number;
@@ -41,6 +46,8 @@ interface ProfilePageProps {
   onBackToHub: () => void;
   soundEnabled: boolean;
   onToggleSound: () => void;
+  currentUser?: UserAccount | null;
+  onOpenAuth?: (mode?: 'login' | 'register' | 'security') => void;
 }
 
 export interface UserProfileData {
@@ -69,6 +76,8 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
   onBackToHub,
   soundEnabled,
   onToggleSound,
+  currentUser,
+  onOpenAuth,
 }) => {
   // Navigation Tabs: 'overview' | 'achievements'
   const [activeTab, setActiveTab] = useState<'overview' | 'achievements'>('overview');
@@ -516,16 +525,44 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
                   </button>
                 </div>
               ) : (
-                <button
-                  onClick={() => {
-                    playClickSound();
-                    setIsEditing(true);
-                  }}
-                  className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 text-xs font-mono font-bold transition-colors cursor-pointer"
-                >
-                  <Edit3 className="w-4 h-4" />
-                  <span>CHỈNH SỬA HỒ SƠ</span>
-                </button>
+                <div className="flex items-center gap-2 flex-wrap">
+                  <button
+                    onClick={() => {
+                      playClickSound();
+                      setIsEditing(true);
+                    }}
+                    className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 text-xs font-mono font-bold transition-colors cursor-pointer"
+                  >
+                    <Edit3 className="w-4 h-4" />
+                    <span>CHỈNH SỬA</span>
+                  </button>
+
+                  {currentUser ? (
+                    <button
+                      onClick={() => {
+                        playClickSound();
+                        onOpenAuth?.('security');
+                      }}
+                      className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/40 text-xs font-mono font-bold transition-colors cursor-pointer"
+                      title="Quản lý mật khẩu, mã PIN và bảo mật tài khoản"
+                    >
+                      <ShieldCheck className="w-4 h-4 text-emerald-400" />
+                      <span>BẢO MẬT</span>
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() => {
+                        playClickSound();
+                        onOpenAuth?.('register');
+                      }}
+                      className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-neutral-950 text-xs font-mono font-black transition-colors cursor-pointer shadow-md"
+                      title="Đăng ký tài khoản để lưu trữ vĩnh viễn"
+                    >
+                      <Shield className="w-4 h-4" />
+                      <span>LƯU TÀI KHOẢN</span>
+                    </button>
+                  )}
+                </div>
               )}
 
               {/* Big Level Emblem */}

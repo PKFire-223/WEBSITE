@@ -1,0 +1,241 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800" width="100%" height="100%">
+  <defs>
+    <!-- Background Gradient -->
+    <radialGradient id="bgGrad" cx="50%" cy="45%" r="75%">
+      <stop offset="0%" stop-color="#1e1035"/>
+      <stop offset="40%" stop-color="#0e061c"/>
+      <stop offset="80%" stop-color="#06020c"/>
+      <stop offset="100%" stop-color="#020005"/>
+    </radialGradient>
+
+    <!-- Silk Teal Gradient -->
+    <linearGradient id="silkGrad" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#0f4c5c"/>
+      <stop offset="35%" stop-color="#136f63"/>
+      <stop offset="70%" stop-color="#2bb6a3"/>
+      <stop offset="100%" stop-color="#6ee7b7"/>
+    </linearGradient>
+
+    <!-- Gold Foil Gradient -->
+    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fffbeb"/>
+      <stop offset="25%" stop-color="#fcd34d"/>
+      <stop offset="50%" stop-color="#f59e0b"/>
+      <stop offset="75%" stop-color="#d97706"/>
+      <stop offset="100%" stop-color="#78350f"/>
+    </linearGradient>
+
+    <!-- Rich Gold Gradient -->
+    <linearGradient id="goldBright" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#fef08a"/>
+      <stop offset="50%" stop-color="#facc15"/>
+      <stop offset="100%" stop-color="#ca8a04"/>
+    </linearGradient>
+
+    <!-- Glow Filters -->
+    <filter id="goldGlow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="8" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <filter id="windGlow" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="12" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <filter id="shadowDepth" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="16" stdDeviation="18" flood-color="#000000" flood-opacity="0.85"/>
+    </filter>
+  </defs>
+
+  <!-- Background Base -->
+  <rect width="800" height="800" fill="url(#bgGrad)"/>
+
+  <!-- Celestial Wind Vortexes / Energy Spirals in Background -->
+  <g opacity="0.35" filter="url(#windGlow)">
+    <circle cx="400" cy="450" r="320" fill="none" stroke="#22d3ee" stroke-width="1.5" stroke-dasharray="12 24"/>
+    <circle cx="400" cy="450" r="260" fill="none" stroke="#38bdf8" stroke-width="2" stroke-dasharray="20 40"/>
+    <circle cx="400" cy="450" r="200" fill="none" stroke="#facc15" stroke-width="1" stroke-dasharray="8 16"/>
+  </g>
+
+  <!-- Golden Stars & Dust -->
+  <g fill="#fef08a" opacity="0.6">
+    <circle cx="120" cy="140" r="2.5"/>
+    <circle cx="220" cy="90" r="1.5"/>
+    <circle cx="340" cy="70" r="2"/>
+    <circle cx="580" cy="85" r="2"/>
+    <circle cx="690" cy="150" r="3"/>
+    <circle cx="710" cy="280" r="1.5"/>
+    <circle cx="90" cy="320" r="2"/>
+    <circle cx="160" cy="240" r="1"/>
+    <circle cx="640" cy="220" r="1.5"/>
+  </g>
+
+  <!-- Swirling Arcane Wind Currents -->
+  <path d="M 80,480 C 140,380 260,340 380,360 C 460,375 520,440 500,500 C 480,560 380,570 340,510" 
+        fill="none" stroke="#38bdf8" stroke-width="3" opacity="0.4" stroke-dasharray="6 8" filter="url(#windGlow)"/>
+  <path d="M 720,460 C 660,350 520,320 420,350 C 340,370 290,440 320,510" 
+        fill="none" stroke="#67e8f9" stroke-width="2.5" opacity="0.5" stroke-dasharray="10 14" filter="url(#windGlow)"/>
+
+  <!-- Lightning Energy Sparks (OnlyaFan mechanic) -->
+  <path d="M 400,220 L 415,260 L 395,275 L 420,320" fill="none" stroke="#fef08a" stroke-width="3" filter="url(#goldGlow)" opacity="0.8"/>
+  <path d="M 260,320 L 280,345 L 265,355 L 285,385" fill="none" stroke="#38bdf8" stroke-width="2.5" filter="url(#windGlow)" opacity="0.75"/>
+  <path d="M 540,310 L 525,335 L 540,348 L 520,380" fill="none" stroke="#38bdf8" stroke-width="2.5" filter="url(#windGlow)" opacity="0.75"/>
+
+  <!-- Main Ornate Fan Structure Group -->
+  <g transform="translate(400, 470)" filter="url(#shadowDepth)">
+    
+    <!-- Fan Leaves / Blades Arc -->
+    <!-- Fan sector path: -75 deg to +75 deg, radius 320 -->
+    <path d="M -309,-83 A 320,320 0 0,1 309,-83 L 0,0 Z" fill="url(#silkGrad)" stroke="url(#goldGrad)" stroke-width="4"/>
+
+    <!-- Subtle Fan Fold Shadow Segments -->
+    <g opacity="0.25">
+      <path d="M 0,0 L -309,-83 L -285,-145 Z" fill="#000000"/>
+      <path d="M 0,0 L -230,-222 L -165,-274 Z" fill="#000000"/>
+      <path d="M 0,0 L -85,-308 L 0,-320 Z" fill="#000000"/>
+      <path d="M 0,0 L 85,-308 L 165,-274 Z" fill="#000000"/>
+      <path d="M 0,0 L 230,-222 L 285,-145 Z" fill="#000000"/>
+    </g>
+
+    <!-- Golden Auspicious Cloud Swirls on Fan Silk -->
+    <g fill="none" stroke="url(#goldBright)" stroke-width="2" opacity="0.85">
+      <!-- Left clouds -->
+      <path d="M -220,-110 C -200,-130 -170,-130 -160,-110 C -150,-95 -160,-80 -180,-80 C -200,-80 -220,-95 -220,-110 Z"/>
+      <path d="M -235,-105 C -245,-115 -245,-130 -230,-135 C -220,-140 -205,-135 -200,-125"/>
+      <path d="M -140,-160 C -120,-180 -90,-175 -85,-155 C -80,-140 -95,-130 -115,-130"/>
+      
+      <!-- Right clouds -->
+      <path d="M 180,-100 C 200,-120 230,-120 240,-100 C 250,-85 240,-70 220,-70 C 200,-70 180,-85 180,-100 Z"/>
+      <path d="M 140,-160 C 160,-180 190,-175 195,-155 C 200,-140 185,-130 165,-130"/>
+      <path d="M 80,-210 C 95,-225 120,-220 125,-205"/>
+    </g>
+
+    <!-- Magnificent Golden Phoenix in Center (Phượng Hoàng Hoàng Kim) -->
+    <g id="goldenPhoenix" transform="translate(25, -135) scale(0.9)" filter="url(#goldGlow)">
+      <!-- Phoenix Body & Breast -->
+      <path d="M -10,-10 C -15,-30 0,-55 20,-65 C 35,-60 40,-45 35,-30 C 30,-15 15,5 -10,20 C -20,10 -15,0 -10,-10 Z" 
+            fill="url(#goldGrad)" stroke="#78350f" stroke-width="1.5"/>
+
+      <!-- Phoenix Head & Royal Crown Crest -->
+      <path d="M 20,-65 C 25,-75 22,-85 15,-90 C 25,-92 35,-85 35,-75 C 40,-85 50,-88 52,-80 C 48,-70 40,-65 35,-60 Z" 
+            fill="url(#goldBright)" stroke="#78350f" stroke-width="1"/>
+      <circle cx="24" cy="-78" r="2" fill="#047857"/> <!-- Emerald Eye -->
+
+      <!-- Beak -->
+      <path d="M 15,-85 L 5,-82 L 14,-78 Z" fill="#f59e0b"/>
+
+      <!-- Magnificent Wings Flared (Cánh Phượng Hoàng) -->
+      <!-- Left / Top Primary Wing -->
+      <path d="M 25,-45 C 50,-80 90,-115 145,-130 C 130,-100 110,-75 80,-55 C 115,-70 140,-85 160,-95 C 140,-70 115,-50 75,-35 C 105,-45 130,-50 145,-55 C 115,-35 80,-25 50,-20 Z" 
+            fill="url(#goldGrad)" stroke="#b45309" stroke-width="1.5"/>
+
+      <!-- Secondary Wing Feathers -->
+      <path d="M 10,-25 C -5,-55 -30,-80 -70,-95 C -50,-75 -35,-55 -20,-35 C -45,-55 -70,-70 -95,-75 C -70,-55 -45,-35 -15,-20 Z" 
+            fill="url(#goldGrad)" stroke="#b45309" stroke-width="1.5"/>
+
+      <!-- Flowing Royal Tail Feathers (Đuôi Phượng Hoàng Bay Lượn) -->
+      <path d="M -10,20 C -40,55 -90,75 -150,70 C -120,50 -70,35 -30,10 Z" 
+            fill="url(#goldBright)" stroke="#b45309" stroke-width="1.5"/>
+      <circle cx="-135" cy="65" r="5" fill="#059669" stroke="#fef08a" stroke-width="1.5"/> <!-- Jewel in tail -->
+
+      <path d="M -5,25 C -25,70 -60,105 -110,120 C -85,90 -50,60 -15,25 Z" 
+            fill="url(#goldGrad)" stroke="#b45309" stroke-width="1.5"/>
+      <circle cx="-95" cy="110" r="4.5" fill="#059669" stroke="#fef08a" stroke-width="1.5"/>
+
+      <path d="M 0,25 C 10,65 15,115 -10,145 C 5,115 10,80 5,30 Z" 
+            fill="url(#goldBright)" stroke="#b45309" stroke-width="1.5"/>
+      <circle cx="-5" cy="135" r="4" fill="#059669" stroke="#fef08a" stroke-width="1.5"/>
+    </g>
+
+    <!-- Golden Fan Ribs / Spines Radiating from Pivot (Nan Quạt Hoàng Kim) -->
+    <g stroke="url(#goldGrad)" stroke-width="3" stroke-linecap="round" filter="url(#goldGlow)">
+      <line x1="0" y1="0" x2="-309" y2="-83"/>
+      <line x1="0" y1="0" x2="-285" y2="-145"/>
+      <line x1="0" y1="0" x2="-230" y2="-222"/>
+      <line x1="0" y1="0" x2="-165" y2="-274"/>
+      <line x1="0" y1="0" x2="-85" y2="-308"/>
+      <line x1="0" y1="0" x2="0" y2="-320"/>
+      <line x1="0" y1="0" x2="85" y2="-308"/>
+      <line x1="0" y1="0" x2="165" y2="-274"/>
+      <line x1="0" y1="0" x2="230" y2="-222"/>
+      <line x1="0" y1="0" x2="285" y2="-145"/>
+      <line x1="0" y1="0" x2="309" y2="-83"/>
+    </g>
+
+    <!-- Ornate Golden Outer Rim Border -->
+    <path d="M -309,-83 A 320,320 0 0,1 309,-83" fill="none" stroke="url(#goldBright)" stroke-width="7"/>
+    <path d="M -313,-84 A 324,324 0 0,1 313,-84" fill="none" stroke="#78350f" stroke-width="1.5"/>
+
+    <!-- Central Golden Fan Pivot & Jade Rosette (Trục Khóa Ngọc Bích) -->
+    <circle cx="0" cy="0" r="28" fill="url(#goldGrad)" stroke="#78350f" stroke-width="3"/>
+    <circle cx="0" cy="0" r="16" fill="#059669" stroke="#fef08a" stroke-width="2"/>
+    <circle cx="0" cy="0" r="7" fill="#fef08a"/>
+
+    <!-- Silk Tassel Hanging from Pivot (Tua Rua Lụa Đỏ Hoàng Gia) -->
+    <path d="M 0,28 L 0,65" stroke="url(#goldGrad)" stroke-width="3"/>
+    <rect x="-8" y="65" width="16" height="12" rx="3" fill="url(#goldGrad)"/>
+    <path d="M -12,77 C -8,130 -14,170 -16,210 M -4,77 C -2,130 -4,170 -5,210 M 4,77 C 2,130 4,170 5,210 M 12,77 C 8,130 14,170 16,210" 
+          stroke="#ef4444" stroke-width="2.5" opacity="0.9"/>
+  </g>
+
+  <!-- Carved Wooden Display Stand at Bottom (Kệ Gỗ Cẩm Lai Đỡ Quạt) -->
+  <g transform="translate(400, 520)" filter="url(#shadowDepth)">
+    <!-- Stand Posts -->
+    <path d="M -45,-30 L -35,-30 L -35,15 L -45,15 Z" fill="#451a03" stroke="#78350f" stroke-width="2"/>
+    <path d="M 35,-30 L 45,-30 L 45,15 L 35,15 Z" fill="#451a03" stroke="#78350f" stroke-width="2"/>
+    
+    <!-- Base Plinth -->
+    <rect x="-110" y="10" width="220" height="24" rx="5" fill="#542307" stroke="#9a3412" stroke-width="2"/>
+    <rect x="-130" y="32" width="260" height="20" rx="4" fill="#361404" stroke="#78350f" stroke-width="2"/>
+    <!-- Table top surface -->
+    <path d="M -360,50 L 360,50 L 380,85 L -380,85 Z" fill="#2d1205" stroke="#78350f" stroke-width="2"/>
+  </g>
+
+  <!-- Cinematic Game Header Banner & Badges -->
+  <g transform="translate(400, 715)">
+    <!-- Plate Background -->
+    <rect x="-240" y="-35" width="480" height="66" rx="16" fill="#0b0416" fill-opacity="0.9" 
+          stroke="url(#goldGrad)" stroke-width="2" filter="url(#shadowDepth)"/>
+    
+    <!-- Title Text -->
+    <text x="0" y="-3" text-anchor="middle" font-family="'Cinzel', 'Trajan Pro', 'Palatino', serif" 
+          font-size="28" font-weight="900" fill="url(#goldBright)" letter-spacing="4" filter="url(#goldGlow)">
+      ONLYAFAN
+    </text>
+    <text x="0" y="20" text-anchor="middle" font-family="'Inter', -apple-system, sans-serif" 
+          font-size="12" font-weight="700" fill="#38bdf8" letter-spacing="2">
+      THẦN PHONG VŨ ĐIỆU • SINH TỒN PHẢN XẠ
+    </text>
+
+    <!-- Corner Filigree Diamonds -->
+    <polygon points="-220,-2 -228,-10 -236,-2 -228,6" fill="url(#goldBright)"/>
+    <polygon points="220,-2 228,-10 236,-2 228,6" fill="url(#goldBright)"/>
+  </g>
+
+  <!-- Golden Ornate Border Around Entire Cover -->
+  <rect x="18" y="18" width="764" height="764" rx="28" fill="none" stroke="url(#goldGrad)" stroke-width="3"/>
+  <rect x="26" y="26" width="748" height="748" rx="22" fill="none" stroke="#f59e0b" stroke-width="1" opacity="0.4"/>
+  
+  <!-- Corner Ornaments -->
+  <g fill="url(#goldBright)">
+    <!-- Top Left -->
+    <path d="M 32,32 L 65,32 L 65,40 L 40,40 L 40,65 L 32,65 Z"/>
+    <circle cx="50" cy="50" r="4"/>
+    <!-- Top Right -->
+    <path d="M 768,32 L 735,32 L 735,40 L 760,40 L 760,65 L 768,65 Z"/>
+    <circle cx="750" cy="50" r="4"/>
+    <!-- Bottom Left -->
+    <path d="M 32,768 L 65,768 L 65,760 L 40,760 L 40,735 L 32,735 Z"/>
+    <circle cx="50" cy="750" r="4"/>
+    <!-- Bottom Right -->
+    <path d="M 768,768 L 735,768 L 735,760 L 760,760 L 760,735 L 768,735 Z"/>
+    <circle cx="750" cy="750" r="4"/>
+  </g>
+</svg>

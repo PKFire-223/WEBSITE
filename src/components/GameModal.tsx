@@ -1,10 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { X, Clock, Zap, Sparkles, Shield, Trophy, RotateCcw } from 'lucide-react';
 import { GameItem } from '../data/gamesData';
+import { UserAccount } from '../types/auth';
 import { OnlyaFanGame } from './games/OnlyaFanGame';
 import { SnakeGame } from './games/SnakeGame';
 import { BlockPuzzleGame } from './games/BlockPuzzleGame';
 import { ArtilleryDuelGame } from './games/ArtilleryDuelGame';
+import { GachaGame } from './games/GachaGame';
 import { playClickSound, playCoinSound, stopFanGameBGM, stopSnakeGameBGM } from '../utils/audio';
 
 interface GameModalProps {
@@ -16,6 +18,8 @@ interface GameModalProps {
   levelProgressPercent: number;
   onClose: () => void;
   onForceLevelUp?: () => void;
+  currentUser?: UserAccount | null;
+  onOpenAuth?: (mode?: 'login' | 'register') => void;
 }
 
 export const GameModal: React.FC<GameModalProps> = ({
@@ -27,11 +31,14 @@ export const GameModal: React.FC<GameModalProps> = ({
   levelProgressPercent,
   onClose,
   onForceLevelUp,
+  currentUser,
+  onOpenAuth,
 }) => {
   const isOnlyAFan = game?.id === 'only-a-fan' || game?.gameType === 'only-a-fan';
   const isSnake = game?.id === 'snake-game' || game?.gameType === 'snake';
   const isBlockPuzzle = game?.id === 'block-puzzle' || game?.gameType === 'block-puzzle';
   const isArtillery = game?.id === 'artillery-duel' || game?.gameType === 'artillery-duel';
+  const isGacha = game?.id === 'gacha-game' || game?.gameType === 'gacha';
 
   // Ensure music stops if modal unmounts
   useEffect(() => {
@@ -190,6 +197,8 @@ export const GameModal: React.FC<GameModalProps> = ({
             <BlockPuzzleGame />
           ) : isArtillery ? (
             <ArtilleryDuelGame />
+          ) : isGacha ? (
+            <GachaGame key={currentUser ? currentUser.id : 'guest'} currentUser={currentUser} onOpenAuth={onOpenAuth} />
           ) : (
             <div className="relative w-full h-[360px] bg-[#07030d] flex items-center justify-center">
               <canvas ref={canvasRef} width={760} height={360} className="w-full h-full block" />
@@ -224,6 +233,8 @@ export const GameModal: React.FC<GameModalProps> = ({
                   ? 'Quy tắc Xếp Khối Ma Thuật'
                   : isArtillery
                   ? 'Quy tắc Đấu Pháo AI Duel'
+                  : isGacha
+                  ? 'Quy tắc Vạn Cổ Kỳ Trân Gacha'
                   : 'Quy tắc trò chơi'}
               </span>
             </h4>
@@ -256,6 +267,15 @@ export const GameModal: React.FC<GameModalProps> = ({
                   </div>
                   <div className="p-2 rounded-lg bg-neutral-950 border border-neutral-800">
                     • Dùng <strong>Bùa Đổi Khối [D]</strong> và <strong>Bùa Sấm Sét [F]</strong> phá ô giải cứu bàn cờ!
+                  </div>
+                </>
+              ) : isGacha ? (
+                <>
+                  <div className="p-2 rounded-lg bg-neutral-950 border border-neutral-800">
+                    • Quay x1: <strong>2 Đồng</strong> | Quay x10: <strong>20 Đồng</strong> (Có nút <strong>Lật Nhanh Skip</strong>).
+                  </div>
+                  <div className="p-2 rounded-lg bg-neutral-950 border border-neutral-800">
+                    • Nâng cấp cửa hàng 6 bậc, hoàn thành <strong>10 Đợt Đơn Hàng Bí Chỉ</strong> nhận thưởng lớn!
                   </div>
                 </>
               ) : isArtillery ? (

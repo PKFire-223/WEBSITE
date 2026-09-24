@@ -1,6 +1,6 @@
 {
-  "name": "PKFire - Personal Website & Portfolio",
-  "description": "Modern personal portfolio and developer website for PKFire showcasing featured projects, technical skills, interactive demos, and contact info.",
+  "name": "Vạn Cổ Kỳ Trân - Gacha & Cuộn Bí Chỉ",
+  "description": "Game gacha triệu hồi 120 kỳ trân dị bảo, nâng cấp cửa hàng 6 bậc, hoàn thành 10 đợt thử thách cuộn đơn hàng bí chỉ ma thuật.",
   "permissions": [],
   "capabilities": [
     "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"

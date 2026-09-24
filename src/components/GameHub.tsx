@@ -1,6 +1,27 @@
 import React, { useState } from 'react';
 import { GameItem } from '../data/gamesData';
-import { Sparkles, Star, Play, ArrowLeft, Volume2, VolumeX, Flame, Wand2, Trophy, Clock, Zap, BookOpen, User } from 'lucide-react';
+import { UserAccount } from '../types/auth';
+import { calculateAccountSecurityRating } from '../utils/security';
+import {
+  Sparkles,
+  Star,
+  Play,
+  ArrowLeft,
+  Volume2,
+  VolumeX,
+  Flame,
+  Wand2,
+  Trophy,
+  Clock,
+  Zap,
+  BookOpen,
+  User,
+  Shield,
+  ShieldAlert,
+  ShieldCheck,
+  Lock,
+  KeyRound,
+} from 'lucide-react';
 import { playClickSound, playCoinSound } from '../utils/audio';
 
 interface GameHubProps {
@@ -13,8 +34,11 @@ interface GameHubProps {
   onSelectEmptySlot: (slotNumber: number) => void;
   onBackToCover: () => void;
   onOpenProfile: () => void;
+  onOpenPortfolio?: () => void;
   soundEnabled: boolean;
   onToggleSound: () => void;
+  currentUser?: UserAccount | null;
+  onOpenAuth?: (mode?: 'login' | 'register' | 'security') => void;
 }
 
 export const GameHub: React.FC<GameHubProps> = ({
@@ -27,8 +51,11 @@ export const GameHub: React.FC<GameHubProps> = ({
   onSelectEmptySlot,
   onBackToCover,
   onOpenProfile,
+  onOpenPortfolio,
   soundEnabled,
   onToggleSound,
+  currentUser,
+  onOpenAuth,
 }) => {
   const [activeCategory, setActiveCategory] = useState<string>('Tất cả');
 
@@ -175,6 +202,50 @@ export const GameHub: React.FC<GameHubProps> = ({
               <span>Hồ Sơ</span>
             </button>
 
+            {/* Account & Security Button */}
+            {currentUser ? (
+              <button
+                onClick={() => {
+                  playClickSound();
+                  onOpenAuth?.('security');
+                }}
+                className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-neutral-900 hover:bg-neutral-800 text-white border border-amber-500/40 text-xs font-mono transition-all cursor-pointer shrink-0 self-center sm:self-auto"
+                title="Quản trị bảo mật tài khoản"
+              >
+                <span className="text-base leading-none">{currentUser.avatarEmoji || '🧙‍♂️'}</span>
+                <span className="font-bold hidden sm:inline max-w-[90px] truncate">{currentUser.displayName}</span>
+                <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+              </button>
+            ) : (
+              <button
+                onClick={() => {
+                  playClickSound();
+                  onOpenAuth?.('login');
+                }}
+                className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/40 text-xs font-mono font-bold transition-all cursor-pointer shrink-0 self-center sm:self-auto"
+                title="Đăng nhập hoặc tạo tài khoản để bảo lưu dữ liệu"
+              >
+                <Shield className="w-4 h-4 text-amber-400" />
+                <span className="hidden sm:inline">Tài Khoản / Bảo Mật</span>
+                <span className="sm:hidden">Đăng Nhập</span>
+              </button>
+            )}
+
+            {/* Portfolio View Button */}
+            {onOpenPortfolio && (
+              <button
+                onClick={() => {
+                  playClickSound();
+                  onOpenPortfolio();
+                }}
+                className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-neutral-900 hover:bg-neutral-800 text-neutral-300 hover:text-white border border-neutral-700 text-xs font-mono font-bold transition-all cursor-pointer shrink-0 self-center sm:self-auto"
+                title="Xem Hồ sơ năng lực & Dự án lập trình viên"
+              >
+                <Sparkles className="w-4 h-4 text-amber-400" />
+                <span className="hidden sm:inline">Portfolio</span>
+              </button>
+            )}
+
             {/* Audio Toggle Button */}
             <button
               onClick={() => {
@@ -190,6 +261,41 @@ export const GameHub: React.FC<GameHubProps> = ({
           </div>
 
         </div>
+
+        {/* ========================================================================= */}
+        {/* ACCOUNT STATUS & GUEST SECURITY WARNING BANNER */}
+        {/* ========================================================================= */}
+        {!currentUser ? (
+          <div className="relative z-10 mb-4 p-3 sm:p-4 rounded-2xl bg-gradient-to-r from-red-950/40 via-amber-950/30 to-red-950/40 border border-amber-500/40 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs font-mono shadow-lg">
+            <div className="flex items-center gap-2.5 text-amber-200">
+              <ShieldAlert className="w-5 h-5 text-amber-400 shrink-0 animate-pulse" />
+              <span>
+                <strong className="text-amber-300 uppercase">Chế độ Khách vãng lai:</strong> Dữ liệu (Cấp độ, Điểm số, Xu & Kho đồ Gacha) <strong className="text-red-300 underline">sẽ không lưu lại khi bạn thoát hoặc đóng trang web</strong>!
+              </span>
+            </div>
+            <button
+              onClick={() => onOpenAuth?.('register')}
+              className="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-neutral-950 font-black text-xs transition-all shadow whitespace-nowrap cursor-pointer"
+            >
+              Đăng Ký Lưu Vĩnh Viễn →
+            </button>
+          </div>
+        ) : (
+          <div className="relative z-10 mb-4 p-2.5 sm:p-3 rounded-2xl bg-emerald-950/30 border border-emerald-500/30 flex items-center justify-between gap-2 text-xs font-mono text-emerald-200">
+            <div className="flex items-center gap-2">
+              <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
+              <span>
+                Đang bảo vệ dữ liệu cho <strong>{currentUser.displayName}</strong> (@{currentUser.username}) • Cấp bảo mật: <strong className="text-cyan-300">{calculateAccountSecurityRating(currentUser).level}</strong>
+              </span>
+            </div>
+            <button
+              onClick={() => onOpenAuth?.('security')}
+              className="text-[11px] text-emerald-400 hover:text-emerald-300 underline cursor-pointer"
+            >
+              Quản Trị Bảo Mật
+            </button>
+          </div>
+        )}
 
         {/* ========================================================================= */}
         {/* SUBTITLE & INSTRUCTION NOTIFICATION */}
@@ -227,10 +333,11 @@ export const GameHub: React.FC<GameHubProps> = ({
                     <img
                       src={game.thumbnail}
                       alt={game.title}
-                      className="absolute inset-0 w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700 ease-out z-0"
+                      referrerPolicy="no-referrer"
+                      className="absolute inset-0 w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700 ease-out z-0"
                     />
                   )}
-                  <div className="absolute inset-0 bg-gradient-to-t from-neutral-950 via-neutral-950/60 to-black/40 z-10" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-neutral-950/90 via-transparent to-black/40 group-hover:from-neutral-950/70 transition-all duration-300 z-10" />
 
                   {/* Top info */}
                   <div className="relative z-20 flex items-center justify-between w-full">
