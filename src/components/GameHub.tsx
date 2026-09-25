@@ -237,38 +237,38 @@ export const GameHub: React.FC<GameHubProps> = ({
         {/* ========================================================================= */}
         {/* TOP HEADER: BRAND, LEVEL TRACKER & LEVEL UP PROGRESS */}
         {/* ========================================================================= */}
-        <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-5 pb-6 border-b-2 border-neutral-800/80 mb-8">
+        <div className="relative z-10 flex flex-col xl:flex-row xl:items-center justify-between gap-4 pb-5 border-b-2 border-neutral-800/80 mb-6 w-full min-w-0">
           
           {/* Back to Magic Book & PolyPlay Title */}
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap sm:flex-nowrap items-center gap-3 min-w-0">
             <button
               onClick={() => {
                 playClickSound();
                 onBackToCover();
               }}
-              className="flex items-center gap-2 px-3.5 py-2.5 rounded-xl bg-neutral-900/90 hover:bg-neutral-800 border border-amber-500/30 hover:border-amber-400 text-xs font-mono font-bold text-amber-200 transition-all shadow-md group shrink-0"
+              className="flex items-center gap-2 px-3 py-2 sm:px-3.5 sm:py-2.5 rounded-xl bg-neutral-900/90 hover:bg-neutral-800 border border-amber-500/30 hover:border-amber-400 text-xs font-mono font-bold text-amber-200 transition-all shadow-md group shrink-0 cursor-pointer"
               title="Gấp sách và quay lại trang bìa ma thuật"
             >
               <BookOpen className="w-4 h-4 text-amber-400 group-hover:-translate-x-0.5 transition-transform" />
               <span>Đóng Sách</span>
             </button>
 
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
               <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-amber-500 via-yellow-400 to-purple-600 p-0.5 flex items-center justify-center shadow-lg shadow-amber-500/30 shrink-0">
                 <div className="w-full h-full bg-[#120501] rounded-[14px] flex items-center justify-center">
                   <Flame className="w-5 h-5 text-amber-400 animate-pulse" />
                 </div>
               </div>
-              <div>
+              <div className="min-w-0">
                 <div className="flex items-center gap-2">
-                  <h1 className="text-xl sm:text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-yellow-400 to-amber-500 font-serif tracking-wide">
+                  <h1 className="text-xl sm:text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-yellow-400 to-amber-500 font-serif tracking-wide truncate">
                     POLYPLAY
                   </h1>
-                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 font-mono font-semibold">
-                    SẢNH GAME MA THUẬT
+                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 font-mono font-semibold shrink-0">
+                    SẢNH GAME
                   </span>
                 </div>
-                <p className="text-[11px] font-mono text-neutral-400">
+                <p className="text-[11px] font-mono text-neutral-400 truncate max-w-[280px] sm:max-w-md">
                   Chọn trò chơi bất kỳ • Cứ đủ thời gian chơi là Cấp độ tăng (LV +1)
                 </p>
               </div>
@@ -276,7 +276,7 @@ export const GameHub: React.FC<GameHubProps> = ({
           </div>
 
           {/* PLAYER AVATAR, TITLE, LEVEL & REAL-TIME PROGRESS BAR */}
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3.5 bg-neutral-950/90 p-3 sm:p-3.5 rounded-2xl border-2 border-amber-500/40 shadow-[0_0_35px_rgba(245,158,11,0.2)]">
+          <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 bg-neutral-950/90 p-2.5 sm:p-3 rounded-2xl border-2 border-amber-500/40 shadow-[0_0_35px_rgba(245,158,11,0.2)] w-full xl:w-auto min-w-0 overflow-hidden">
             
             {/* AVATAR + LEVEL DOCKED CREST */}
             <div
@@ -284,12 +284,12 @@ export const GameHub: React.FC<GameHubProps> = ({
                 playClickSound();
                 onOpenProfile();
               }}
-              className="flex items-center gap-3 cursor-pointer group"
+              className="flex items-center gap-2.5 sm:gap-3 cursor-pointer group min-w-0 flex-1"
               title="Nhấp để vào Hồ Sơ Cá Nhân"
             >
               <div className="relative shrink-0">
                 <div
-                  className={`w-12 h-12 sm:w-14 sm:h-14 rounded-2xl overflow-hidden border-2 flex items-center justify-center transition-all duration-300 ${currentBorderClass} bg-gradient-to-tr ${currentAvatarObj.color} group-hover:scale-105`}
+                  className={`w-11 h-11 sm:w-12 sm:h-12 rounded-2xl overflow-hidden border-2 flex items-center justify-center transition-all duration-300 ${currentBorderClass} bg-gradient-to-tr ${currentAvatarObj.color} group-hover:scale-105`}
                 >
                   {userProfile.avatarUrl ? (
                     <img
@@ -298,7 +298,7 @@ export const GameHub: React.FC<GameHubProps> = ({
                       className="w-full h-full object-cover rounded-xl"
                     />
                   ) : (
-                    <span className="text-2xl sm:text-3xl select-none leading-none">
+                    <span className="text-2xl select-none leading-none">
                       {currentAvatarObj.emoji}
                     </span>
                   )}
@@ -312,9 +312,9 @@ export const GameHub: React.FC<GameHubProps> = ({
               </div>
 
               {/* NAME, TITLE (CLICKABLE TO CHANGE), AND PLAY TIME */}
-              <div className="min-w-0 pr-1">
+              <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-1.5 leading-tight">
-                  <span className="font-bold text-white text-sm font-sans truncate max-w-[130px] sm:max-w-[160px] group-hover:text-amber-200 transition-colors">
+                  <span className="font-bold text-white text-xs sm:text-sm font-sans truncate max-w-[120px] sm:max-w-[150px] group-hover:text-amber-200 transition-colors">
                     {userProfile.name}
                   </span>
                 </div>
@@ -327,97 +327,108 @@ export const GameHub: React.FC<GameHubProps> = ({
                       playClickSound();
                       setIsTitleModalOpen(true);
                     }}
-                    className="px-2 py-0.5 rounded-md bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 text-[10px] font-mono font-bold flex items-center gap-1 cursor-pointer transition-all hover:scale-105"
+                    className="px-2 py-0.5 rounded-md bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 text-[9px] sm:text-[10px] font-mono font-bold flex items-center gap-1 cursor-pointer transition-all hover:scale-105 max-w-full"
                     title="Bấm để chọn danh hiệu"
                   >
-                    <Sparkles className="w-2.5 h-2.5 text-amber-400" />
-                    <span className="truncate max-w-[130px] sm:max-w-[160px]">{userProfile.customTitle || 'Tân Thủ Nhập Môn'}</span>
-                    <span className="text-[9px] text-amber-400/80 font-normal underline">[Đổi]</span>
+                    <Sparkles className="w-2.5 h-2.5 text-amber-400 shrink-0" />
+                    <span className="truncate max-w-[100px] sm:max-w-[130px]">{userProfile.customTitle || 'Tân Thủ Nhập Môn'}</span>
+                    <span className="text-[9px] text-amber-400/80 font-normal underline shrink-0">[Đổi]</span>
                   </button>
                 </div>
 
                 {/* Time Played */}
-                <div className="text-[11px] font-mono text-neutral-400 flex items-center gap-1 mt-0.5 whitespace-nowrap">
+                <div className="text-[10px] sm:text-[11px] font-mono text-neutral-400 flex items-center gap-1 mt-0.5 truncate">
                   <Clock className="w-3 h-3 text-neutral-500 shrink-0" />
-                  <span>Đã chơi: <strong className="text-neutral-200">{formatTime(playTimeSeconds)}</strong></span>
+                  <span className="truncate">Đã chơi: <strong className="text-neutral-200">{formatTime(playTimeSeconds)}</strong></span>
                 </div>
               </div>
             </div>
 
             {/* Level Progress Gauge */}
-            <div className="flex flex-col justify-center min-w-[160px] sm:min-w-[190px] space-y-1 sm:pl-3 sm:border-l sm:border-neutral-800">
+            <div className="flex flex-col justify-center min-w-[110px] max-w-[150px] w-full md:w-36 space-y-1 md:pl-3 md:border-l md:border-neutral-800 shrink-0">
               <div className="flex items-center justify-between text-[10px] font-mono">
                 <span className="text-neutral-400">Lên Cấp {playerLevel + 1}:</span>
                 <span className="text-amber-300 font-bold">{levelProgressPercent}%</span>
               </div>
-              <div className="w-full h-2.5 bg-neutral-900 rounded-full border border-neutral-700 overflow-hidden relative shadow-inner">
+              <div className="w-full h-2 bg-neutral-900 rounded-full border border-neutral-700 overflow-hidden relative shadow-inner">
                 <div
                   className="h-full bg-gradient-to-r from-amber-500 via-orange-400 to-yellow-300 rounded-full transition-all duration-500 ease-out"
                   style={{ width: `${levelProgressPercent}%` }}
                 />
               </div>
-              <div className="text-[9px] font-mono text-amber-400/80 text-right">
-                ⚡ Còn <strong className="text-white">{formatTime(secondsToNextLevel)}</strong> chơi để LV +1
+              <div className="text-[9px] font-mono text-amber-400/80 text-right truncate">
+                ⚡ Còn <strong className="text-white">{formatTime(secondsToNextLevel)}</strong>
               </div>
             </div>
 
-            {/* Profile Page Button */}
-            <button
-              onClick={() => {
-                playClickSound();
-                onOpenProfile();
-              }}
-              className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-gradient-to-r from-amber-500/20 to-yellow-500/20 hover:from-amber-500/30 hover:to-yellow-500/30 text-amber-300 border border-amber-500/40 text-xs font-mono font-bold transition-all shadow hover:shadow-amber-500/20 cursor-pointer shrink-0 self-center sm:self-auto"
-              title="Xem hồ sơ cá nhân và 108 thành tựu"
-            >
-              <Trophy className="w-4 h-4 text-amber-400" />
-              <span>Hồ Sơ (108)</span>
-            </button>
-
-            {/* Account & Security Button */}
-            {currentUser ? (
+            {/* Action Buttons Toolbar */}
+            <div className="flex items-center gap-1.5 sm:gap-2 shrink-0 md:pl-3 md:border-l md:border-neutral-800/80 justify-end">
+              {/* Profile Page Button */}
               <button
                 onClick={() => {
                   playClickSound();
-                  onOpenAuth?.('security');
+                  onOpenProfile();
                 }}
-                className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-neutral-900 hover:bg-neutral-800 text-white border border-amber-500/40 text-xs font-mono transition-all cursor-pointer shrink-0 self-center sm:self-auto"
-                title="Quản trị bảo mật tài khoản"
+                className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-xl bg-gradient-to-r from-amber-500/20 to-yellow-500/20 hover:from-amber-500/30 hover:to-yellow-500/30 text-amber-300 border border-amber-500/40 text-[11px] sm:text-xs font-mono font-bold transition-all shadow hover:shadow-amber-500/20 cursor-pointer shrink-0"
+                title="Xem hồ sơ cá nhân và 108 thành tựu"
               >
-                {userProfile.avatarUrl ? (
-                  <img src={userProfile.avatarUrl} alt="avatar" className="w-4 h-4 rounded-full object-cover border border-amber-400" />
+                <Trophy className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-400" />
+                <span className="whitespace-nowrap">Hồ Sơ (108)</span>
+              </button>
+
+              {/* Account & Security Button */}
+              {currentUser ? (
+                <button
+                  onClick={() => {
+                    playClickSound();
+                    onOpenAuth?.('security');
+                  }}
+                  className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-xl bg-neutral-900 hover:bg-neutral-800 text-white border border-amber-500/40 text-[11px] sm:text-xs font-mono transition-all cursor-pointer shrink-0"
+                  title="Quản trị bảo mật tài khoản"
+                >
+                  {userProfile.avatarUrl ? (
+                    <img src={userProfile.avatarUrl} alt="avatar" className="w-4 h-4 rounded-full object-cover border border-amber-400" />
+                  ) : (
+                    <span className="text-base leading-none">{currentUser.avatarEmoji || currentAvatarObj.emoji}</span>
+                  )}
+                  <span className="font-bold hidden md:inline max-w-[70px] truncate">{currentUser.displayName}</span>
+                  <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+                </button>
+              ) : (
+                <button
+                  onClick={() => {
+                    playClickSound();
+                    onOpenAuth?.('login');
+                  }}
+                  className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/40 text-[11px] sm:text-xs font-mono font-bold transition-all cursor-pointer shrink-0"
+                  title="Đăng nhập hoặc tạo tài khoản để bảo lưu dữ liệu"
+                >
+                  <Shield className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-400" />
+                  <span className="hidden sm:inline">Tài Khoản / Bảo Mật</span>
+                  <span className="sm:hidden">Tài Khoản</span>
+                </button>
+              )}
+
+              {/* Audio Toggle Button */}
+              <button
+                onClick={() => {
+                  playClickSound();
+                  onToggleSound();
+                }}
+                className={`p-1.5 sm:p-2 rounded-xl border transition-all cursor-pointer shrink-0 ${
+                  soundEnabled
+                    ? 'bg-neutral-900/90 text-amber-400 border-amber-500/40 hover:bg-neutral-800'
+                    : 'bg-neutral-900 text-neutral-600 border-neutral-800 hover:text-neutral-400'
+                }`}
+                title={soundEnabled ? 'Tắt âm thanh PolyPlay' : 'Bật âm thanh PolyPlay'}
+              >
+                {soundEnabled ? (
+                  <Volume2 className="w-4 h-4" />
                 ) : (
-                  <span className="text-base leading-none">{currentUser.avatarEmoji || currentAvatarObj.emoji}</span>
+                  <VolumeX className="w-4 h-4" />
                 )}
-                <span className="font-bold hidden sm:inline max-w-[90px] truncate">{currentUser.displayName}</span>
-                <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
               </button>
-            ) : (
-              <button
-                onClick={() => {
-                  playClickSound();
-                  onOpenAuth?.('login');
-                }}
-                className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/40 text-xs font-mono font-bold transition-all cursor-pointer shrink-0 self-center sm:self-auto"
-                title="Đăng nhập hoặc tạo tài khoản để bảo lưu dữ liệu"
-              >
-                <Shield className="w-4 h-4 text-amber-400" />
-                <span className="hidden sm:inline">Tài Khoản / Bảo Mật</span>
-                <span className="sm:hidden">Đăng Nhập</span>
-              </button>
-            )}
-
-            {/* Audio Toggle Button */}
-            <button
-              onClick={() => {
-                playClickSound();
-                onToggleSound();
-              }}
-              className="p-2 rounded-xl bg-neutral-900 hover:bg-neutral-800 text-neutral-300 hover:text-white border border-neutral-800 transition-colors self-center sm:self-auto cursor-pointer"
-              title={soundEnabled ? 'Tắt âm thanh' : 'Bật âm thanh'}
-            >
-              {soundEnabled ? <Volume2 className="w-4 h-4 text-amber-400" /> : <VolumeX className="w-4 h-4 text-neutral-500" />}
-            </button>
+            </div>
 
           </div>
 
@@ -427,31 +438,31 @@ export const GameHub: React.FC<GameHubProps> = ({
         {/* ACCOUNT STATUS & GUEST SECURITY WARNING BANNER */}
         {/* ========================================================================= */}
         {!currentUser ? (
-          <div className="relative z-10 mb-4 p-3 sm:p-4 rounded-2xl bg-gradient-to-r from-red-950/40 via-amber-950/30 to-red-950/40 border border-amber-500/40 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs font-mono shadow-lg">
-            <div className="flex items-center gap-2.5 text-amber-200">
+          <div className="relative z-10 mb-4 p-3 sm:p-4 rounded-2xl bg-gradient-to-r from-red-950/40 via-amber-950/30 to-red-950/40 border border-amber-500/40 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs font-mono shadow-lg min-w-0">
+            <div className="flex items-center gap-2.5 text-amber-200 min-w-0 flex-1">
               <ShieldAlert className="w-5 h-5 text-amber-400 shrink-0 animate-pulse" />
-              <span>
+              <span className="break-words min-w-0">
                 <strong className="text-amber-300 uppercase">Chế độ Khách vãng lai:</strong> Dữ liệu (Cấp độ, Điểm số, Xu & Kho đồ Gacha) <strong className="text-red-300 underline">sẽ không lưu lại khi bạn thoát hoặc đóng trang web</strong>!
               </span>
             </div>
             <button
               onClick={() => onOpenAuth?.('register')}
-              className="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-neutral-950 font-black text-xs transition-all shadow whitespace-nowrap cursor-pointer"
+              className="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-neutral-950 font-black text-xs transition-all shadow whitespace-nowrap cursor-pointer shrink-0"
             >
               Đăng Ký Lưu Vĩnh Viễn →
             </button>
           </div>
         ) : (
-          <div className="relative z-10 mb-4 p-2.5 sm:p-3 rounded-2xl bg-emerald-950/30 border border-emerald-500/30 flex items-center justify-between gap-2 text-xs font-mono text-emerald-200">
-            <div className="flex items-center gap-2">
+          <div className="relative z-10 mb-4 p-2.5 sm:p-3 rounded-2xl bg-emerald-950/30 border border-emerald-500/30 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs font-mono text-emerald-200 min-w-0">
+            <div className="flex items-center gap-2 min-w-0 flex-1">
               <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
-              <span>
+              <span className="break-words min-w-0">
                 Đang bảo vệ dữ liệu cho <strong>{currentUser.displayName}</strong> (@{currentUser.username}) • Cấp bảo mật: <strong className="text-cyan-300">{calculateAccountSecurityRating(currentUser).level}</strong>
               </span>
             </div>
             <button
               onClick={() => onOpenAuth?.('security')}
-              className="text-[11px] text-emerald-400 hover:text-emerald-300 underline cursor-pointer"
+              className="text-[11px] text-emerald-400 hover:text-emerald-300 underline cursor-pointer shrink-0 whitespace-nowrap"
             >
               Quản Trị Bảo Mật
             </button>
@@ -460,10 +471,10 @@ export const GameHub: React.FC<GameHubProps> = ({
 
         {/* ========================================================================= */}
         {/* SUBTITLE & INSTRUCTION NOTIFICATION */}
-        <div className="relative z-10 mb-6 p-3 sm:p-4 rounded-2xl bg-amber-500/10 border border-amber-500/25 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs font-mono text-amber-200">
-          <div className="flex items-center gap-2.5">
+        <div className="relative z-10 mb-6 p-3 sm:p-4 rounded-2xl bg-amber-500/10 border border-amber-500/25 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs font-mono text-amber-200 min-w-0">
+          <div className="flex items-center gap-2.5 min-w-0 flex-1">
             <Sparkles className="w-4 h-4 text-amber-400 shrink-0 animate-spin" />
-            <span>
+            <span className="break-words min-w-0">
               <strong>Chế độ PolyPlay:</strong> Nhấp vào bất kỳ ô vuông trò chơi nào để mở màn hình chơi. Hệ thống sẽ tự động tính thời gian và tăng cấp độ <strong>(LV +1)</strong> cho bạn!
             </span>
           </div>

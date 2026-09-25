@@ -116,12 +116,12 @@ export const TitleSelectorModal: React.FC<TitleSelectorModalProps> = ({
         </div>
 
         {/* Current Equipped Banner */}
-        <div className="px-4 sm:px-6 py-3 bg-amber-950/20 border-b border-amber-500/20 flex flex-wrap items-center justify-between gap-3">
-          <div className="flex items-center gap-2 text-xs font-mono">
-            <span className="text-neutral-400">Danh hiệu hiện tại:</span>
-            <span className="px-3 py-1 rounded-lg bg-gradient-to-r from-amber-500/30 to-yellow-400/30 border border-amber-400/60 text-amber-200 font-bold shadow-[0_0_15px_rgba(245,158,11,0.25)] flex items-center gap-1.5">
-              <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-              <span>{currentTitle}</span>
+        <div className="px-4 sm:px-6 py-3 bg-amber-950/20 border-b border-amber-500/20 flex flex-wrap items-center justify-between gap-3 min-w-0">
+          <div className="flex items-center gap-2 text-xs font-mono min-w-0 flex-1">
+            <span className="text-neutral-400 shrink-0">Danh hiệu hiện tại:</span>
+            <span className="px-3 py-1 rounded-lg bg-gradient-to-r from-amber-500/30 to-yellow-400/30 border border-amber-400/60 text-amber-200 font-bold shadow-[0_0_15px_rgba(245,158,11,0.25)] flex items-center gap-1.5 min-w-0">
+              <Sparkles className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+              <span className="truncate max-w-[180px] sm:max-w-md">{currentTitle}</span>
             </span>
           </div>
 
@@ -216,14 +216,14 @@ export const TitleSelectorModal: React.FC<TitleSelectorModalProps> = ({
                         : 'bg-neutral-950/50 border-neutral-900 opacity-60'
                     }`}
                   >
-                    <div className="flex items-start gap-3">
+                    <div className="flex items-start gap-3 min-w-0 flex-1">
                       <div className="w-10 h-10 rounded-xl bg-neutral-900 border border-neutral-800 flex items-center justify-center text-xl shrink-0 shadow-inner">
                         {item.icon}
                       </div>
 
-                      <div>
+                      <div className="min-w-0 flex-1">
                         <div className="flex items-center gap-2">
-                          <h4 className="text-sm font-bold text-white font-mono leading-tight">
+                          <h4 className="text-sm font-bold text-white font-mono leading-tight truncate">
                             {item.title}
                           </h4>
                           {item.isEquipped && (

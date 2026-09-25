@@ -1,4 +1,5 @@
 import { UserAccount, UserGameData, ACCOUNT_AVATARS } from '../types/auth';
+import { getInitialSeedUsers } from '../data/mockSeedData';
 
 // Web Crypto API SHA-256
 export async function sha256(message: string, salt: string = ''): Promise<string> {
@@ -65,20 +66,30 @@ export const SEED_TESTER_USER: UserAccount = {
 // Users Database stored in localStorage
 const USERS_DB_KEY = 'polyplay_secure_users_db_v1';
 const ACTIVE_USER_ID_KEY = 'polyplay_active_auth_uid';
+const OTP_STORAGE_KEY = 'polyplay_password_recovery_otp_v1';
 
 export function getAllUsers(): UserAccount[] {
   try {
     const raw = localStorage.getItem(USERS_DB_KEY);
     let users: UserAccount[] = raw ? JSON.parse(raw) : [];
     
-    // Auto-seed Tester123 if not present
-    if (!users.some(u => u.username.toLowerCase() === 'tester123')) {
-      users = [SEED_TESTER_USER, ...users];
+    // Auto-seed initial users from mockSeedData if database is empty
+    if (!users || users.length === 0) {
+      users = getInitialSeedUsers();
+      localStorage.setItem(USERS_DB_KEY, JSON.stringify(users));
+    } else {
+      // Ensure seed tester user exists if missing
+      const seedUsers = getInitialSeedUsers();
+      seedUsers.forEach((seedU) => {
+        if (!users.some((u) => u.username.toLowerCase() === seedU.username.toLowerCase())) {
+          users.push(seedU);
+        }
+      });
       localStorage.setItem(USERS_DB_KEY, JSON.stringify(users));
     }
     return users;
   } catch {
-    return [SEED_TESTER_USER];
+    return getInitialSeedUsers();
   }
 }
 
@@ -95,7 +106,114 @@ export function updateUserAccount(updatedUser: UserAccount): void {
 export function findUserByUsername(username: string): UserAccount | undefined {
   const users = getAllUsers();
   const normalized = username.trim().toLowerCase();
-  return users.find(u => u.username.toLowerCase() === normalized);
+  return users.find((u) => u.username.toLowerCase() === normalized);
+}
+
+export function findUserByEmail(email: string): UserAccount | undefined {
+  const users = getAllUsers();
+  const normalized = email.trim().toLowerCase();
+  return users.find((u) => (u.email || '').toLowerCase() === normalized);
+}
+
+export function findUserByUsernameOrEmail(identifier: string): UserAccount | undefined {
+  const users = getAllUsers();
+  const normalized = identifier.trim().toLowerCase();
+  return users.find(
+    (u) =>
+      u.username.toLowerCase() === normalized ||
+      (u.email || '').toLowerCase() === normalized
+  );
+}
+
+// Generate a random 6-digit OTP code and store with 10-minute expiry
+export function requestPasswordResetOtp(emailOrUsername: string): {
+  success: boolean;
+  message: string;
+  otp?: string;
+  email?: string;
+  user?: UserAccount;
+} {
+  const user = findUserByUsernameOrEmail(emailOrUsername);
+  if (!user) {
+    return {
+      success: false,
+      message: 'Không tìm thấy tài khoản tương ứng với Gmail hoặc Tên đăng nhập này.',
+    };
+  }
+
+  const targetEmail = user.email || `${user.username.toLowerCase()}@gmail.com`;
+  
+  // Generate random 6-digit code
+  const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
+  const expiresAt = Date.now() + 10 * 60 * 1000; // 10 minutes
+
+  try {
+    const rawOtp = localStorage.getItem(OTP_STORAGE_KEY);
+    const store = rawOtp ? JSON.parse(rawOtp) : {};
+    store[user.id] = { otp: otpCode, email: targetEmail, expiresAt };
+    localStorage.setItem(OTP_STORAGE_KEY, JSON.stringify(store));
+  } catch {}
+
+  return {
+    success: true,
+    message: `Đã gửi mã xác thực gồm 6 chữ số đến Gmail: ${targetEmail}`,
+    otp: otpCode,
+    email: targetEmail,
+    user,
+  };
+}
+
+// Verify OTP and reset password
+export async function verifyAndResetPassword(
+  userId: string,
+  inputOtp: string,
+  newPassword: string
+): Promise<{ success: boolean; message: string }> {
+  if (!newPassword || newPassword.length < 6) {
+    return { success: false, message: 'Mật khẩu mới phải có tối thiểu 6 ký tự.' };
+  }
+
+  try {
+    const rawOtp = localStorage.getItem(OTP_STORAGE_KEY);
+    const store = rawOtp ? JSON.parse(rawOtp) : {};
+    const record = store[userId];
+
+    if (!record) {
+      return { success: false, message: 'Mã xác thực không tồn tại hoặc đã hết hạn. Vui lòng gửi lại.' };
+    }
+
+    if (Date.now() > record.expiresAt) {
+      delete store[userId];
+      localStorage.setItem(OTP_STORAGE_KEY, JSON.stringify(store));
+      return { success: false, message: 'Mã xác thực OTP đã hết hạn (quá 10 phút). Vui lòng yêu cầu mã mới.' };
+    }
+
+    if (record.otp !== inputOtp.trim()) {
+      return { success: false, message: 'Mã OTP không chính xác. Vui lòng kiểm tra kỹ lại email.' };
+    }
+
+    // OTP matched! Generate new salt and password hash
+    const users = getAllUsers();
+    const userIndex = users.findIndex((u) => u.id === userId);
+    if (userIndex === -1) {
+      return { success: false, message: 'Tài khoản không tồn tại trong hệ thống.' };
+    }
+
+    const newSalt = generateSalt();
+    const newHash = await sha256(newPassword, newSalt);
+
+    users[userIndex].salt = newSalt;
+    users[userIndex].passwordHash = newHash;
+    saveUsers(users);
+
+    // Clear used OTP
+    delete store[userId];
+    localStorage.setItem(OTP_STORAGE_KEY, JSON.stringify(store));
+
+    return { success: true, message: 'Đặt lại mật khẩu thành công! Bạn có thể đăng nhập ngay với mật khẩu mới.' };
+  } catch {
+    return { success: false, message: 'Đã xảy ra lỗi hệ thống khi đặt lại mật khẩu.' };
+  }
 }
 
 export function findUserById(id: string): UserAccount | undefined {

@@ -2,6 +2,7 @@ export interface UserAccount {
   id: string;
   username: string;
   displayName: string;
+  email?: string; // Registered Gmail address for account recovery
   avatarId: string;
   avatarEmoji: string;
   avatarUrl?: string; // Custom uploaded avatar image (Base64/URL)

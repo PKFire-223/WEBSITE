@@ -475,9 +475,9 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
             </div>
 
             {/* PROFILE INFO & EXP PROGRESS */}
-            <div className="flex-1 text-center md:text-left space-y-2.5">
-              <div className="flex flex-wrap items-center justify-center md:justify-start gap-2.5">
-                <h1 className="text-2xl sm:text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-yellow-200 to-amber-400 tracking-wide">
+            <div className="flex-1 text-center md:text-left space-y-2.5 min-w-0">
+              <div className="flex flex-wrap items-center justify-center md:justify-start gap-2.5 min-w-0">
+                <h1 className="text-2xl sm:text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-yellow-200 to-amber-400 tracking-wide truncate max-w-full">
                   {profile.name}
                 </h1>
                 <button
@@ -485,12 +485,12 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
                     playClickSound();
                     setIsTitleModalOpen(true);
                   }}
-                  className="px-3 py-1 rounded-xl bg-gradient-to-r from-amber-500/20 to-yellow-500/20 hover:from-amber-500/30 hover:to-yellow-500/30 border border-amber-400/50 text-amber-300 text-xs font-mono font-bold flex items-center gap-1.5 shadow-sm transition-all hover:scale-105 active:scale-95 cursor-pointer group"
+                  className="px-3 py-1 rounded-xl bg-gradient-to-r from-amber-500/20 to-yellow-500/20 hover:from-amber-500/30 hover:to-yellow-500/30 border border-amber-400/50 text-amber-300 text-xs font-mono font-bold flex items-center gap-1.5 shadow-sm transition-all hover:scale-105 active:scale-95 cursor-pointer group max-w-full"
                   title="Bấm để mở kho danh hiệu và chọn danh hiệu yêu thích"
                 >
-                  <Sparkles className="w-3.5 h-3.5 text-amber-400 group-hover:rotate-12 transition-transform" />
-                  <span>{profile.customTitle || 'Tân Thủ Nhập Môn'}</span>
-                  <span className="text-[10px] text-amber-400/80 underline font-normal">[Đổi Danh Hiệu]</span>
+                  <Sparkles className="w-3.5 h-3.5 text-amber-400 group-hover:rotate-12 transition-transform shrink-0" />
+                  <span className="truncate max-w-[140px] sm:max-w-[200px]">{profile.customTitle || 'Tân Thủ Nhập Môn'}</span>
+                  <span className="text-[10px] text-amber-400/80 underline font-normal shrink-0">[Đổi Danh Hiệu]</span>
                 </button>
                 {currentUser && (
                   <span className="px-2 py-0.5 rounded-full bg-emerald-950/80 border border-emerald-500/40 text-emerald-300 text-[10px] font-mono flex items-center gap-1">
