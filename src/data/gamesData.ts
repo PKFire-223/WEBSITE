@@ -10,10 +10,31 @@ export interface GameItem {
   releaseYear?: string;
   controls?: string[];
   iframeUrl?: string;
-  gameType?: 'only-a-fan' | 'snake' | 'block-puzzle' | 'artillery-duel' | 'gacha' | 'battleship' | 'canvas' | 'iframe' | 'custom';
+  gameType?: 'typing-shark' | 'battleship' | 'gacha' | 'only-a-fan' | 'snake' | 'block-puzzle' | 'artillery-duel' | 'canvas' | 'iframe' | 'custom';
 }
 
 export const INITIAL_GAMES: GameItem[] = [
+  {
+    id: 'typing-shark-game',
+    title: 'Typing Shark: Vực Sâu Thần Hải',
+    genre: 'Gõ chữ sinh tồn • Cây Kỹ Năng Vô Tận • 3 Boss',
+    thumbnail: '/covers/typingshark.svg',
+    rating: 5.0,
+    playersCount: '120.5k',
+    description: 'Trò chơi gõ phím sinh tồn đáy biển cực hấp dẫn theo phong cách Typing Shark kinh điển! Gõ chữ diệt cá mập và quái vật biển trước khi chúng va chạm tàu ngầm. Hạ quái nhận vàng, nâng cấp Cây Kỹ Năng Vô Tận với Trợ Thủ AI Tự Gõ (1s gõ 1 chữ lên tới 1s gõ 10 chữ), Giáp Titan, Bom Sóng Siêu Âm và Khiên Từ Trường. Sinh tồn mỗi 5 phút đối đầu 3 Đại Boss: Megalodon Phục Kích (phút 5), Kraken Mực Đen Xúc Tu (phút 10), và Leviathan Thần Trùng Hư Không (phút 15 - Đánh bại là WIN)!',
+    badge: 'SIÊU PHẨM MỚI',
+    releaseYear: '2026',
+    controls: [
+      'Gõ phím A-Z: Nhắm và bắn diệt quái',
+      'Phím SPACE: Kích nổ Bom Sóng Siêu Âm',
+      'Trợ Thủ Drone AI: Tự động gõ phụ mục tiêu gần nhất',
+      'Hạ quái nhận Vàng 🪙: Mở Cây Kỹ Năng nâng cấp vô hạn',
+      'Boss Phút 5: Megalodon Hàm Cá Mập Hắc Ám',
+      'Boss Phút 10: Kraken Phun Mực & Xúc Tu Phong Tỏa',
+      'Boss Phút 15: Leviathan Titan - Đánh bại để WIN!'
+    ],
+    gameType: 'typing-shark'
+  },
   {
     id: 'battleship-game',
     title: 'Hải Chiến Bắn Tàu: Naval Command',

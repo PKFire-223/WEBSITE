@@ -8,6 +8,7 @@ import { BlockPuzzleGame } from './games/BlockPuzzleGame';
 import { ArtilleryDuelGame } from './games/ArtilleryDuelGame';
 import { GachaGame } from './games/GachaGame';
 import { BattleshipGame } from './games/BattleshipGame';
+import { TypingSharkGame } from './games/TypingSharkGame';
 import { playClickSound, playCoinSound, stopFanGameBGM, stopSnakeGameBGM } from '../utils/audio';
 
 interface GameModalProps {
@@ -41,6 +42,7 @@ export const GameModal: React.FC<GameModalProps> = ({
   const isArtillery = game?.id === 'artillery-duel' || game?.gameType === 'artillery-duel';
   const isGacha = game?.id === 'gacha-game' || game?.gameType === 'gacha';
   const isBattleship = game?.id === 'battleship-game' || game?.gameType === 'battleship';
+  const isTypingShark = game?.id === 'typing-shark-game' || game?.gameType === 'typing-shark';
 
   // Ensure music stops if modal unmounts
   useEffect(() => {
@@ -191,7 +193,9 @@ export const GameModal: React.FC<GameModalProps> = ({
 
         {/* ACTIVE GAME VIEWPORT */}
         <div className="relative rounded-2xl bg-neutral-950 border-2 border-neutral-800 overflow-hidden shadow-inner">
-          {isOnlyAFan ? (
+          {isTypingShark ? (
+            <TypingSharkGame />
+          ) : isOnlyAFan ? (
             <OnlyaFanGame />
           ) : isSnake ? (
             <SnakeGame />
@@ -229,7 +233,9 @@ export const GameModal: React.FC<GameModalProps> = ({
             <h4 className="text-xs font-mono uppercase tracking-wider text-neutral-400 flex items-center gap-1.5">
               <Shield className="w-4 h-4 text-orange-400" />
               <span>
-                {isOnlyAFan
+                {isTypingShark
+                  ? 'Quy tắc Typing Shark Roguelike'
+                  : isOnlyAFan
                   ? 'Quy tắc OnlyaFan'
                   : isSnake
                   ? 'Quy tắc Rắn Săn Mồi'
@@ -245,7 +251,25 @@ export const GameModal: React.FC<GameModalProps> = ({
               </span>
             </h4>
             <div className="space-y-1 text-xs font-mono text-neutral-300">
-              {isOnlyAFan ? (
+              {isTypingShark ? (
+                <>
+                  <div className="p-2 rounded-lg bg-neutral-950 border border-cyan-500/30 text-cyan-200">
+                    • <strong>Gõ chữ A-Z</strong>: Bắn ngư lôi diệt cá mập và quái vật trước khi chúng đâm trúng tàu ngầm!
+                  </div>
+                  <div className="p-2 rounded-lg bg-neutral-950 border border-neutral-800">
+                    • <strong>Trợ thủ Drone AI</strong>: Tự động gõ chữ phụ bạn từ 1s gõ 1 chữ lên tới 1s gõ 10 chữ!
+                  </div>
+                  <div className="p-2 rounded-lg bg-neutral-950 border border-neutral-800">
+                    • <strong>Phím SPACE</strong>: Kích nổ Bom Sóng Siêu Âm quét sạch quái vật trên màn hình.
+                  </div>
+                  <div className="p-2 rounded-lg bg-neutral-950 border border-neutral-800 text-amber-300">
+                    • <strong>3 Đại Boss</strong>: Phút 5 (Megalodon), Phút 10 (Kraken xúc tu mực đen), Phút 15 (Leviathan Titan - Hạ gục để WIN)!
+                  </div>
+                  <div className="p-2 rounded-lg bg-neutral-950 border border-neutral-800">
+                    • <strong>Cây Kỹ Năng Vô Tận</strong>: Hạ quái kiếm vàng 🪙, chết vào nâng cấp vô hạn rồi vào game cày tiếp.
+                  </div>
+                </>
+              ) : isOnlyAFan ? (
                 <>
                   <div className="p-2 rounded-lg bg-neutral-950 border border-neutral-800">
                     • Quạt quay 1 giây = <strong>+1 điểm</strong>
