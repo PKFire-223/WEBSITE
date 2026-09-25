@@ -406,12 +406,12 @@ export const ANCIENT_BOONS: AncientBoon[] = [
   {
     id: 'boon-39',
     name: 'Cộng Hưởng Toàn Phần',
-    title: 'Cửu Lõi Đồng Thanh',
+    title: 'Tam Thập Lõi Đồng Thanh',
     rarity: 'mystic',
     category: 'core',
     iconEmoji: '🌟',
-    description: 'Tăng vĩnh viễn hiệu quả của TẤT CẢ 9 Lõi Ma Pháp thêm +20% sức mạnh cộng dồn!',
-    shortEffect: '+20% Hiệu Quả Toàn Bộ 9 Lõi',
+    description: 'Tăng vĩnh viễn hiệu quả của TẤT CẢ 30 Lõi Ma Pháp thêm +20% sức mạnh cộng dồn!',
+    shortEffect: '+20% Hiệu Quả Toàn Bộ 30 Lõi',
   },
 
   // 40 - 48: CHUYÊN MÔN HÓA TRANG BỊ (CATEGORY MASTERY)
@@ -837,14 +837,86 @@ export const ANCIENT_BOONS: AncientBoon[] = [
 ];
 
 /**
- * Helper to pick 3 unique random boons from the 80 boons pool
+ * Helper to pick 3 unique random boons from the 80 boons pool with Roguelike stage weighting
  */
-export function rollThreeRandomBoons(excludeIds: string[] = []): AncientBoon[] {
-  const available = ANCIENT_BOONS.filter(b => !excludeIds.includes(b.id));
-  const pool = available.length >= 3 ? available : ANCIENT_BOONS;
+export function rollThreeRandomBoons(
+  excludeIds: string[] = [],
+  stage: number = 1,
+  currentShopTier: number = 0
+): AncientBoon[] {
+  // Filter out already acquired boons
+  let available = ANCIENT_BOONS.filter(b => !excludeIds.includes(b.id));
 
-  const shuffled = [...pool].sort(() => Math.random() - 0.5);
-  return shuffled.slice(0, 3);
+  // If shop tier is already maxed (Bậc 6 = index 5), do not offer boon-02
+  if (currentShopTier >= 5) {
+    available = available.filter(b => b.id !== 'boon-02');
+  }
+
+  if (available.length < 3) {
+    available = ANCIENT_BOONS.filter(b => currentShopTier < 5 || b.id !== 'boon-02');
+  }
+
+  // Weight rarity by stage:
+  // Stage 1-2: Rare (70%), Epic (30%)
+  // Stage 3-4: Rare (30%), Epic (50%), Legend (20%)
+  // Stage 5: Rare (10%), Epic (40%), Legend (35%), Mystic (15%)
+  // Stage 6: Rare (5%), Epic (30%), Legend (40%), Mystic (25%) -> Stage 6 has strong Mystic appearance!
+  // Stage 7-8: Epic (20%), Legend (45%), Mystic (35%)
+  // Stage 9-10: Legend (45%), Mystic (55%)
+  const getWeight = (rarity: string): number => {
+    if (stage <= 2) {
+      if (rarity === 'rare') return 70;
+      if (rarity === 'epic') return 30;
+      return 1;
+    }
+    if (stage <= 4) {
+      if (rarity === 'rare') return 30;
+      if (rarity === 'epic') return 50;
+      if (rarity === 'legend') return 20;
+      return 2;
+    }
+    if (stage === 5) {
+      if (rarity === 'rare') return 10;
+      if (rarity === 'epic') return 40;
+      if (rarity === 'legend') return 35;
+      if (rarity === 'mystic') return 15;
+    }
+    if (stage <= 7) {
+      // Stage 6 and 7: Mystic powers prominently appear!
+      if (rarity === 'rare') return 5;
+      if (rarity === 'epic') return 30;
+      if (rarity === 'legend') return 40;
+      if (rarity === 'mystic') return 25;
+    }
+    // Stage 8 - 10:
+    if (rarity === 'epic') return 15;
+    if (rarity === 'legend') return 45;
+    if (rarity === 'mystic') return 40;
+    return 5;
+  };
+
+  const selected: AncientBoon[] = [];
+  const candidatePool = [...available];
+
+  for (let i = 0; i < 3 && candidatePool.length > 0; i++) {
+    const weights = candidatePool.map(b => getWeight(b.rarity));
+    const totalWeight = weights.reduce((a, b) => a + b, 0);
+
+    let randomVal = Math.random() * totalWeight;
+    let chosenIdx = 0;
+    for (let j = 0; j < candidatePool.length; j++) {
+      randomVal -= weights[j];
+      if (randomVal <= 0) {
+        chosenIdx = j;
+        break;
+      }
+    }
+
+    selected.push(candidatePool[chosenIdx]);
+    candidatePool.splice(chosenIdx, 1);
+  }
+
+  return selected.length === 3 ? selected : available.slice(0, 3);
 }
 
 export function getBoonById(id: string): AncientBoon | undefined {

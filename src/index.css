@@ -129,3 +129,65 @@
 ::-webkit-scrollbar-thumb:hover {
   background: #404040;
 }
+
+/* Naval Combat Animations */
+@keyframes radarSweep {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes shakeScreen {
+  0%, 100% { transform: translate(0, 0); }
+  20% { transform: translate(-3px, 2px); }
+  40% { transform: translate(3px, -2px); }
+  60% { transform: translate(-2px, -2px); }
+  80% { transform: translate(2px, 1px); }
+}
+
+@keyframes pingRipple {
+  0% {
+    transform: scale(0.6);
+    opacity: 0.9;
+  }
+  100% {
+    transform: scale(2.2);
+    opacity: 0;
+  }
+}
+
+@keyframes explosionBurst {
+  0% {
+    transform: scale(0.4);
+    opacity: 1;
+    filter: brightness(2);
+  }
+  50% {
+    transform: scale(1.3);
+    opacity: 0.9;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+    filter: brightness(1);
+  }
+}
+
+.animate-radar-sweep {
+  animation: radarSweep 3s linear infinite;
+}
+
+.animate-naval-shake {
+  animation: shakeScreen 0.4s ease-in-out;
+}
+
+.animate-ping-ripple {
+  animation: pingRipple 1s cubic-bezier(0, 0.2, 0.8, 1) infinite;
+}
+
+.animate-explosion-burst {
+  animation: explosionBurst 0.45s cubic-bezier(0.17, 0.89, 0.32, 1.28) forwards;
+}

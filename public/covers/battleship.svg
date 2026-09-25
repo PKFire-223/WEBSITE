@@ -1,0 +1,129 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800" width="100%" height="100%">
+  <defs>
+    <radialGradient id="oceanBg" cx="50%" cy="50%" r="75%">
+      <stop offset="0%" stop-color="#07203d" />
+      <stop offset="45%" stop-color="#041224" />
+      <stop offset="85%" stop-color="#020813" />
+      <stop offset="100%" stop-color="#01040a" />
+    </radialGradient>
+    <radialGradient id="sonarGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#06b6d4" stop-opacity="0.6" />
+      <stop offset="60%" stop-color="#0891b2" stop-opacity="0.15" />
+      <stop offset="100%" stop-color="#000000" stop-opacity="0" />
+    </radialGradient>
+    <radialGradient id="fireHit" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#f97316" stop-opacity="0.9" />
+      <stop offset="40%" stop-color="#ef4444" stop-opacity="0.6" />
+      <stop offset="100%" stop-color="#7f1d1d" stop-opacity="0" />
+    </radialGradient>
+    <linearGradient id="shipGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38bdf8" />
+      <stop offset="50%" stop-color="#0284c7" />
+      <stop offset="100%" stop-color="#034e7b" />
+    </linearGradient>
+    <linearGradient id="armorMetal" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#475569" />
+      <stop offset="50%" stop-color="#1e293b" />
+      <stop offset="100%" stop-color="#0f172a" />
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="800" height="800" fill="url(#oceanBg)" />
+
+  <!-- Radar Grid Background Rings -->
+  <circle cx="400" cy="400" r="350" fill="none" stroke="#0891b2" stroke-width="1.5" opacity="0.25" />
+  <circle cx="400" cy="400" r="270" fill="none" stroke="#0891b2" stroke-width="1.5" opacity="0.35" />
+  <circle cx="400" cy="400" r="180" fill="none" stroke="#06b6d4" stroke-width="2" opacity="0.45" stroke-dasharray="8 6" />
+  <circle cx="400" cy="400" r="90" fill="none" stroke="#22d3ee" stroke-width="2" opacity="0.6" />
+  <circle cx="400" cy="400" r="370" fill="url(#sonarGlow)" />
+
+  <!-- Radar Crosshairs -->
+  <line x1="50" y1="400" x2="750" y2="400" stroke="#06b6d4" stroke-width="1.5" opacity="0.3" stroke-dasharray="10 8" />
+  <line x1="400" y1="50" x2="400" y2="750" stroke="#06b6d4" stroke-width="1.5" opacity="0.3" stroke-dasharray="10 8" />
+  <line x1="150" y1="150" x2="650" y2="650" stroke="#06b6d4" stroke-width="1" opacity="0.15" />
+  <line x1="650" y1="150" x2="150" y2="650" stroke="#06b6d4" stroke-width="1" opacity="0.15" />
+
+  <!-- Rotating Radar Sweep Cone -->
+  <path d="M400,400 L680,220 A340,340 0 0,0 600,140 Z" fill="#06b6d4" opacity="0.18" />
+
+  <!-- Tactical Grid Lines -->
+  <g opacity="0.15" stroke="#38bdf8" stroke-width="1">
+    <line x1="200" y1="100" x2="200" y2="700" />
+    <line x1="300" y1="100" x2="300" y2="700" />
+    <line x1="500" y1="100" x2="500" y2="700" />
+    <line x1="600" y1="100" x2="600" y2="700" />
+    <line x1="100" y1="200" x2="700" y2="200" />
+    <line x1="100" y1="300" x2="700" y2="300" />
+    <line x1="100" y1="500" x2="700" y2="500" />
+    <line x1="100" y1="600" x2="700" y2="600" />
+  </g>
+
+  <!-- Battleship Main Silhouette (angled modern stealth cruiser) -->
+  <g transform="translate(180, 260) rotate(-25)">
+    <!-- Shadow -->
+    <path d="M50,80 L350,60 L440,80 L350,100 L50,80 Z" fill="#000" opacity="0.6" filter="blur(6px)" />
+    <!-- Hull Base -->
+    <path d="M60,80 L340,60 L430,80 L340,100 L60,80 Z" fill="url(#armorMetal)" stroke="#38bdf8" stroke-width="2" />
+    <!-- Main Deck -->
+    <path d="M100,74 L320,68 L380,80 L320,92 L100,86 Z" fill="url(#shipGrad)" opacity="0.9" />
+    <!-- Turret 1 -->
+    <circle cx="160" cy="80" r="14" fill="#0f172a" stroke="#38bdf8" stroke-width="2" />
+    <rect x="155" y="77" width="30" height="6" rx="2" fill="#38bdf8" />
+    <!-- Turret 2 -->
+    <circle cx="230" cy="80" r="16" fill="#0f172a" stroke="#38bdf8" stroke-width="2" />
+    <rect x="225" y="77" width="36" height="6" rx="2" fill="#38bdf8" />
+    <!-- Bridge Tower -->
+    <polygon points="270,72 310,75 320,80 310,85 270,88" fill="#1e293b" stroke="#00f0ff" stroke-width="1.5" />
+    <!-- Forward Cannon -->
+    <circle cx="350" cy="80" r="10" fill="#0f172a" stroke="#38bdf8" stroke-width="1.5" />
+    <rect x="348" y="78" width="26" height="4" rx="1" fill="#38bdf8" />
+  </g>
+
+  <!-- Smaller Patrol Submarine Silhouette -->
+  <g transform="translate(420, 520) rotate(15)">
+    <ellipse cx="120" cy="50" rx="90" ry="20" fill="url(#armorMetal)" stroke="#22d3ee" stroke-width="1.5" />
+    <ellipse cx="120" cy="50" rx="40" ry="10" fill="#0284c7" />
+    <rect x="110" y="32" width="22" height="18" rx="4" fill="#0f172a" stroke="#38bdf8" stroke-width="1.5" />
+    <line x1="120" y1="20" x2="120" y2="34" stroke="#22d3ee" stroke-width="2" />
+  </g>
+
+  <!-- Explosion Hit on Target -->
+  <circle cx="490" cy="330" r="45" fill="url(#fireHit)" />
+  <circle cx="490" cy="330" r="15" fill="#fef08a" />
+  <line x1="490" y1="300" x2="490" y2="360" stroke="#f97316" stroke-width="3" stroke-linecap="round" />
+  <line x1="460" y1="330" x2="520" y2="330" stroke="#f97316" stroke-width="3" stroke-linecap="round" />
+
+  <!-- Target Crosshair on target -->
+  <g transform="translate(490, 330)">
+    <circle cx="0" cy="0" r="30" fill="none" stroke="#ef4444" stroke-width="2" stroke-dasharray="6 4" />
+    <circle cx="0" cy="0" r="8" fill="none" stroke="#ef4444" stroke-width="2" />
+  </g>
+
+  <!-- Water Miss Splash with Ripple -->
+  <g transform="translate(260, 480)">
+    <ellipse cx="0" cy="0" rx="28" ry="10" fill="none" stroke="#38bdf8" stroke-width="2" opacity="0.8" />
+    <ellipse cx="0" cy="0" rx="45" ry="16" fill="none" stroke="#38bdf8" stroke-width="1.5" opacity="0.4" />
+    <ellipse cx="0" cy="0" rx="65" ry="22" fill="none" stroke="#38bdf8" stroke-width="1" opacity="0.2" />
+    <circle cx="0" cy="-6" r="3" fill="#e0f2fe" />
+    <circle cx="-8" cy="-14" r="2" fill="#bae6fd" />
+    <circle cx="10" cy="-18" r="2.5" fill="#bae6fd" />
+  </g>
+
+  <!-- Radar Detected Echo Silhouette (Fuzzy Ping) -->
+  <g transform="translate(320, 200)">
+    <rect x="-25" y="-12" width="50" height="24" rx="6" fill="#facc15" fill-opacity="0.25" stroke="#facc15" stroke-width="2" stroke-dasharray="4 3" />
+    <text x="0" y="5" font-family="monospace" font-size="14" font-weight="900" fill="#fef08a" text-anchor="middle">?</text>
+  </g>
+
+  <!-- Title Badge Banner at Bottom -->
+  <g transform="translate(400, 715)">
+    <rect x="-240" y="-35" width="480" height="65" rx="18" fill="#041426" stroke="#06b6d4" stroke-width="2" opacity="0.95" />
+    <text x="0" y="-5" font-family="'Segoe UI', Roboto, sans-serif" font-size="22" font-weight="900" fill="#38bdf8" text-anchor="middle" letter-spacing="3">
+      HẢI CHIẾN BẮN TÀU
+    </text>
+    <text x="0" y="18" font-family="monospace" font-size="12" font-weight="700" fill="#94a3b8" text-anchor="middle" letter-spacing="1.5">
+      NAVAL WARFARE COMMAND • ĐẤU AI &amp; 2 NGƯỜI
+    </text>
+  </g>
+</svg>

@@ -70,7 +70,7 @@ export const BoonSelectionModal: React.FC<BoonSelectionModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-black/90 backdrop-blur-lg animate-fadeIn">
+    <div className="fixed inset-0 z-[80] flex items-center justify-center p-3 sm:p-5 bg-black/90 backdrop-blur-lg animate-fadeIn">
       <div className="relative w-full max-w-5xl flex flex-col bg-neutral-950 border-2 border-amber-500/60 rounded-3xl shadow-[0_0_60px_rgba(245,158,11,0.3)] overflow-hidden">
         {/* Top ambient glow */}
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-4/5 h-28 bg-gradient-to-b from-amber-500/25 via-purple-600/15 to-transparent blur-3xl pointer-events-none" />

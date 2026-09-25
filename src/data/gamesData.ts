@@ -10,10 +10,30 @@ export interface GameItem {
   releaseYear?: string;
   controls?: string[];
   iframeUrl?: string;
-  gameType?: 'only-a-fan' | 'snake' | 'block-puzzle' | 'artillery-duel' | 'gacha' | 'canvas' | 'iframe' | 'custom';
+  gameType?: 'only-a-fan' | 'snake' | 'block-puzzle' | 'artillery-duel' | 'gacha' | 'battleship' | 'canvas' | 'iframe' | 'custom';
 }
 
 export const INITIAL_GAMES: GameItem[] = [
+  {
+    id: 'battleship-game',
+    title: 'Hải Chiến Bắn Tàu: Naval Command',
+    genre: 'Chiến thuật hải quân • Đấu AI / 2 Người',
+    thumbnail: '/covers/battleship.svg',
+    rating: 5.0,
+    playersCount: '64.2k',
+    description: 'Bắn tàu chiến thuật hải quân đỉnh cao! Đấu AI thông minh hoặc 2 người chung máy. Mỗi bên 4 tàu ngẫu nhiên cùng kích cỡ. Sở hữu 3 siêu thiết bị: Radar quét 3x3, Đổi vị trí cơ động tàu, Oanh tạc 3 ô! Bắn chìm 1 tàu thưởng ngay +1 thiết bị ngẫu nhiên. Bấm phím R để xoay tàu.',
+    badge: 'MỚI RA MẮT',
+    releaseYear: '2026',
+    controls: [
+      'Click chọn tọa độ bắn ô',
+      'Phím R / Nút Xoay: Đổi chiều ngang/dọc',
+      'Radar: Quét 3x3 phát hiện tàu mờ',
+      'Đổi Vị Trí: Cơ động tàu chưa trúng đạn',
+      'Oanh Tạc: Bắn 3 ô ngang hoặc dọc liên tiếp',
+      'Hạ 1 tàu: Thưởng +1 thiết bị ngẫu nhiên'
+    ],
+    gameType: 'battleship'
+  },
   {
     id: 'gacha-game',
     title: 'Vạn Cổ Kỳ Trân: Gacha Bí Chỉ',

@@ -7,6 +7,7 @@ import { SnakeGame } from './games/SnakeGame';
 import { BlockPuzzleGame } from './games/BlockPuzzleGame';
 import { ArtilleryDuelGame } from './games/ArtilleryDuelGame';
 import { GachaGame } from './games/GachaGame';
+import { BattleshipGame } from './games/BattleshipGame';
 import { playClickSound, playCoinSound, stopFanGameBGM, stopSnakeGameBGM } from '../utils/audio';
 
 interface GameModalProps {
@@ -39,6 +40,7 @@ export const GameModal: React.FC<GameModalProps> = ({
   const isBlockPuzzle = game?.id === 'block-puzzle' || game?.gameType === 'block-puzzle';
   const isArtillery = game?.id === 'artillery-duel' || game?.gameType === 'artillery-duel';
   const isGacha = game?.id === 'gacha-game' || game?.gameType === 'gacha';
+  const isBattleship = game?.id === 'battleship-game' || game?.gameType === 'battleship';
 
   // Ensure music stops if modal unmounts
   useEffect(() => {
@@ -199,6 +201,8 @@ export const GameModal: React.FC<GameModalProps> = ({
             <ArtilleryDuelGame />
           ) : isGacha ? (
             <GachaGame key={currentUser ? currentUser.id : 'guest'} currentUser={currentUser} onOpenAuth={onOpenAuth} />
+          ) : isBattleship ? (
+            <BattleshipGame />
           ) : (
             <div className="relative w-full h-[360px] bg-[#07030d] flex items-center justify-center">
               <canvas ref={canvasRef} width={760} height={360} className="w-full h-full block" />
@@ -235,6 +239,8 @@ export const GameModal: React.FC<GameModalProps> = ({
                   ? 'Quy tắc Đấu Pháo AI Duel'
                   : isGacha
                   ? 'Quy tắc Vạn Cổ Kỳ Trân Gacha'
+                  : isBattleship
+                  ? 'Quy tắc Hải Chiến Bắn Tàu'
                   : 'Quy tắc trò chơi'}
               </span>
             </h4>
@@ -276,6 +282,21 @@ export const GameModal: React.FC<GameModalProps> = ({
                   </div>
                   <div className="p-2 rounded-lg bg-neutral-950 border border-neutral-800">
                     • Nâng cấp cửa hàng 6 bậc, hoàn thành <strong>10 Đợt Đơn Hàng Bí Chỉ</strong> nhận thưởng lớn!
+                  </div>
+                </>
+              ) : isBattleship ? (
+                <>
+                  <div className="p-2 rounded-lg bg-neutral-950 border border-neutral-800">
+                    • <strong>Đấu AI hoặc 2 Người 1 Máy</strong>: Mỗi bên nhận 4 tàu ngẫu nhiên cùng kích cỡ (tổng số ô bằng nhau).
+                  </div>
+                  <div className="p-2 rounded-lg bg-neutral-950 border border-neutral-800">
+                    • <strong>Phím R hoặc nút Xoay</strong>: Đổi chiều tàu ngang / dọc khi xếp và khi ngắm bắn.
+                  </div>
+                  <div className="p-2 rounded-lg bg-neutral-950 border border-neutral-800">
+                    • <strong>3 Thiết Bị (Khởi đầu 2 lượt/loại)</strong>: <strong>Radar 3x3</strong> (lộ mờ tàu), <strong>Đổi Vị Trí</strong> (di chuyển tàu chưa trúng đạn), <strong>Oanh Tạc 3 Ô</strong> (bắn 3 ô ngang/dọc)!
+                  </div>
+                  <div className="p-2 rounded-lg bg-neutral-950 border border-neutral-800">
+                    • <strong>Phần thưởng</strong>: Bắn chìm 1 tàu địch thưởng ngay <strong>+1 Thiết Bị ngẫu nhiên</strong>!
                   </div>
                 </>
               ) : isArtillery ? (

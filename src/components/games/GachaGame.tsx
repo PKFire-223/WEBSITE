@@ -255,30 +255,32 @@ export const GachaGame: React.FC<GachaGameProps> = ({
   const boonSet = useMemo(() => new Set(activeBoonIds), [activeBoonIds]);
 
   const hasExtraDiscountBoon = boonSet.has('boon-60'); // -2 coins on 10-pull
+  const hasWindDiscountBoon = boonSet.has('boon-14'); // -1 coin on 10-pull
   const hasPassiveInterestBoon = boonSet.has('boon-25'); // +4 coins on 10-pull
   const hasDoubleFortuneBoon = boonSet.has('boon-63'); // double fortune chance
   const supremeStatsBoonMultiplier = boonSet.has('boon-80') ? 0.25 : 0;
+  const coreHarmonizeMultiplier = boonSet.has('boon-39') ? 1.20 : 1.0; // Boon-39: +20% all 30 cores
   const extraSellMultiplierFromBoons =
     (boonSet.has('boon-69') ? 0.10 : 0) +
     (boonSet.has('boon-78') ? 0.30 : 0) +
     supremeStatsBoonMultiplier;
 
-  // Multipliers from 9 Arcane Cores + Boons
-  const baseAlchemyBonus = getCoreBonusMultiplier('alchemy', coreLevels.alchemy || 0);
+  // Multipliers from Arcane Cores + Boons
+  const baseAlchemyBonus = getCoreBonusMultiplier('alchemy', coreLevels.alchemy || 0) * coreHarmonizeMultiplier;
   const alchemyBonusMultiplier = baseAlchemyBonus + extraSellMultiplierFromBoons;
 
-  const baseOrderBonus = getCoreBonusMultiplier('order', coreLevels.order || 0);
+  const baseOrderBonus = getCoreBonusMultiplier('order', coreLevels.order || 0) * coreHarmonizeMultiplier;
   const boonOrderBonus = boonSet.has('boon-73') ? 0.40 : 0;
   const orderBonusMultiplier = baseOrderBonus + boonOrderBonus + supremeStatsBoonMultiplier;
 
-  const rawFortuneChance = getCoreBonusMultiplier('fortune', coreLevels.fortune || 0);
+  const rawFortuneChance = getCoreBonusMultiplier('fortune', coreLevels.fortune || 0) * coreHarmonizeMultiplier;
   const fortuneChance = hasDoubleFortuneBoon ? Math.min(0.85, rawFortuneChance * 2) : rawFortuneChance;
 
-  const harvesterChance = getCoreBonusMultiplier('harvester', coreLevels.harvester || 0);
+  const harvesterChance = getCoreBonusMultiplier('harvester', coreLevels.harvester || 0) * coreHarmonizeMultiplier;
 
   // Channelling Core calculations (discounts on 10-pull and Shop Tier)
   const channellingDiscount = getCoreBonusMultiplier('channelling', coreLevels.channelling || 0);
-  const total10PullDiscount = channellingDiscount + (hasExtraDiscountBoon ? 2 : 0);
+  const total10PullDiscount = channellingDiscount + (hasExtraDiscountBoon ? 2 : 0) + (hasWindDiscountBoon ? 1 : 0);
   const spin10Cost = Math.max(10, 20 - total10PullDiscount);
 
   let rawShopDiscount = [0, 0.1, 0.2, 0.3, 0.4, 0.5][Math.min(5, coreLevels.channelling || 0)];
@@ -286,7 +288,7 @@ export const GachaGame: React.FC<GachaGameProps> = ({
   const shopDiscountPercent = rawShopDiscount;
 
   // Treasury Core calculations + Boons
-  const baseGrant = getCoreBonusMultiplier('treasury', coreLevels.treasury || 0) || 20;
+  const baseGrant = (getCoreBonusMultiplier('treasury', coreLevels.treasury || 0) || 20) * coreHarmonizeMultiplier;
   const boonGrantBonus = boonSet.has('boon-27') ? 45 : 0;
   const treasuryGrantAmount = baseGrant + boonGrantBonus;
 
@@ -294,10 +296,10 @@ export const GachaGame: React.FC<GachaGameProps> = ({
   const treasuryInterestPer10 = baseTreasuryInterest + (hasPassiveInterestBoon ? 4 : 0);
 
   // Miracle Core values
-  const miracleBaseBonus = getCoreBonusMultiplier('miracle', coreLevels.miracle || 0);
+  const miracleBaseBonus = getCoreBonusMultiplier('miracle', coreLevels.miracle || 0) * coreHarmonizeMultiplier;
 
   // Enlighten Core values (bonus gold per duplicate item)
-  const enlightenBonusPerDup = getCoreBonusMultiplier('enlighten', coreLevels.enlighten || 0);
+  const enlightenBonusPerDup = getCoreBonusMultiplier('enlighten', coreLevels.enlighten || 0) * coreHarmonizeMultiplier;
 
   // Set for CodexView
   const discoveredSet = useMemo(() => new Set(discoveredItemIds), [discoveredItemIds]);
@@ -399,14 +401,51 @@ export const GachaGame: React.FC<GachaGameProps> = ({
       }
     }
 
-    // Roll items (pure rates boosted by Destiny core, NO PITY)
+    // Roll items (pure rates boosted by Destiny core & Boons, NO PITY)
     let pulled: GachaItem[] = [];
     if (totalCardsToPull === 1) {
-      pulled = [rollSingleGacha(currentTier, false, coreLevels.destiny || 0)];
+      pulled = [rollSingleGacha(currentTier, false, coreLevels.destiny || 0, boonSet)];
     } else {
       for (let i = 0; i < totalCardsToPull; i++) {
-        pulled.push(rollSingleGacha(currentTier, false, coreLevels.destiny || 0));
+        pulled.push(rollSingleGacha(currentTier, false, coreLevels.destiny || 0, boonSet));
       }
+    }
+
+    // Boon-61: Guarantee at least 2 Rare in 10-pull
+    if (count === 10 && boonSet.has('boon-61')) {
+      const rarePlusCount = pulled.filter(it => it.rarity !== 'common').length;
+      if (rarePlusCount < 2) {
+        const needed = 2 - rarePlusCount;
+        const rarePool = GACHA_ITEMS.filter(it => it.rarity === 'rare');
+        for (let k = 0; k < needed; k++) {
+          const commonIdx = pulled.findIndex(it => it.rarity === 'common');
+          if (commonIdx !== -1) {
+            pulled[commonIdx] = rarePool[Math.floor(Math.random() * rarePool.length)];
+          }
+        }
+      }
+    }
+
+    // Boon-18: Transmute 1 Common to Rare
+    if (boonSet.has('boon-18')) {
+      const commonIdx = pulled.findIndex(it => it.rarity === 'common');
+      if (commonIdx !== -1) {
+        const rarePool = GACHA_ITEMS.filter(it => it.rarity === 'rare');
+        pulled[commonIdx] = rarePool[Math.floor(Math.random() * rarePool.length)];
+      }
+    }
+
+    // Boon-62: 30% chance for extra card of same rarity
+    if (boonSet.has('boon-62') && Math.random() < 0.30 && pulled.length > 0) {
+      const sampleItem = pulled[Math.floor(Math.random() * pulled.length)];
+      const sameRarityPool = GACHA_ITEMS.filter(it => it.rarity === sampleItem.rarity);
+      pulled.push(sameRarityPool[Math.floor(Math.random() * sameRarityPool.length)]);
+    }
+
+    // Boon-66: Every 10-pull gives 1 free Rare
+    if (count === 10 && boonSet.has('boon-66')) {
+      const rarePool = GACHA_ITEMS.filter(it => it.rarity === 'rare');
+      pulled.push(rarePool[Math.floor(Math.random() * rarePool.length)]);
     }
 
     // Transmutation Boons (boon-49: 25% Common -> Rare, boon-50: 15% Rare -> Epic, boon-51: 8% Epic -> Legend)
@@ -433,12 +472,51 @@ export const GachaGame: React.FC<GachaGameProps> = ({
     let miracleBonusCoins = 0;
     let enlightenBonusCoins = 0;
     let codexBonusCoins = 0;
+    let boonExtraGold = 0;
 
     const codexLvl = coreLevels.codex_master || 0;
     const coinPerNewItem = [0, 20, 50, 100, 220, 400][codexLvl];
 
     const newDiscovered = new Set(discoveredItemIds);
     const updatedInventory = { ...inventory };
+
+    // Boon-06: refund 3 coins on x10 when shop tier >= 3 (idx >= 2)
+    if (count === 10 && shopTierIndex >= 2 && boonSet.has('boon-06')) {
+      boonExtraGold += 3;
+    }
+
+    // Boon-67: 25% chance refund 50% on x10
+    if (count === 10 && boonSet.has('boon-67') && Math.random() < 0.25) {
+      boonExtraGold += Math.round(cost * 0.5);
+    }
+
+    // Boon-29: 15% chance to hit 100 coins pot
+    if (boonSet.has('boon-29') && Math.random() < 0.15) {
+      boonExtraGold += 100;
+      showToast('🏺 TỤ BẢO BỒN: Nổ hũ Thượng Cổ thưởng nóng +100 Đồng!', 'text-yellow-300 font-black');
+    }
+
+    // Boon-68: +15 coins if pull has both Metal and Water
+    if (boonSet.has('boon-68')) {
+      const hasMetal = pulled.some(it => it.element.includes('Kim'));
+      const hasWater = pulled.some(it => it.element.includes('Thủy'));
+      if (hasMetal && hasWater) boonExtraGold += 15;
+    }
+
+    // Boon-77: +35 coins when x10 has >= 3 cards of same rarity
+    if (count === 10 && boonSet.has('boon-77')) {
+      const rCounts: Record<string, number> = {};
+      pulled.forEach(it => { rCounts[it.rarity] = (rCounts[it.rarity] || 0) + 1; });
+      if (Object.values(rCounts).some(c => c >= 3)) {
+        boonExtraGold += 35;
+      }
+    }
+
+    // Boon-57: +8 coins if x10 has no Epic/Legend/Mystic
+    if (count === 10 && boonSet.has('boon-57')) {
+      const hasHighTier = pulled.some(it => it.rarity === 'epic' || it.rarity === 'legend' || it.rarity === 'mystic');
+      if (!hasHighTier) boonExtraGold += 8;
+    }
 
     pulled.forEach(item => {
       let addCount = 1;
@@ -458,6 +536,17 @@ export const GachaGame: React.FC<GachaGameProps> = ({
         else if (beastCoreLvl >= 4) addCount += 1;
         else if (beastCoreLvl >= 1 && Math.random() < [0, 0.3, 0.5, 0.75][beastCoreLvl]) addCount += 1;
       }
+
+      // Light boon: 35% duplicate
+      if (item.element.includes('Quang') && boonSet.has('boon-17') && Math.random() < 0.35) {
+        addCount += 1;
+      }
+
+      // Elemental bonus coins from boons
+      if (item.element.includes('Mộc') && boonSet.has('boon-10')) boonExtraGold += 3;
+      if (item.element.includes('Hỏa') && boonSet.has('boon-12')) boonExtraGold += 8;
+      if (item.element.includes('Lôi') && boonSet.has('boon-15')) boonExtraGold += 20;
+      if (item.category === 'potion' && boonSet.has('boon-47')) boonExtraGold += 1;
 
       if (harvesterChance > 0) {
         const isCommonOrRare = item.rarity === 'common' || item.rarity === 'rare';
@@ -483,6 +572,11 @@ export const GachaGame: React.FC<GachaGameProps> = ({
         if (item.rarity === 'epic') miracleBonusCoins += miracleBaseBonus;
         else if (item.rarity === 'legend') miracleBonusCoins += miracleBaseBonus * 3.5 + (boonSet.has('boon-71') ? 150 : 0);
         else if (item.rarity === 'mystic') miracleBonusCoins += miracleBaseBonus * 10 + (boonSet.has('boon-71') ? 150 : 0);
+      }
+
+      // Boon-43: +10 coins on Relic
+      if (item.category === 'relic' && boonSet.has('boon-43')) {
+        miracleBonusCoins += 10;
       }
 
       // Boon-45 & Rune Master Core
@@ -515,10 +609,18 @@ export const GachaGame: React.FC<GachaGameProps> = ({
     }
 
     // Total net coins change
-    const totalExtraEarnings = refundedCoins + treasuryYield + miracleBonusCoins + enlightenBonusCoins + codexBonusCoins + shadowRefund;
+    const totalExtraEarnings = refundedCoins + treasuryYield + miracleBonusCoins + enlightenBonusCoins + codexBonusCoins + shadowRefund + boonExtraGold;
     const netCoinsDelta = totalExtraEarnings - cost;
 
-    setCoins(prev => Math.max(0, Number((prev + netCoinsDelta).toFixed(1))));
+    let finalNextCoins = Math.max(0, Number((coins + netCoinsDelta).toFixed(1)));
+
+    // Boon-26: Bailout if coins < 20
+    if (boonSet.has('boon-26') && finalNextCoins < 20) {
+      finalNextCoins += 40;
+      showToast('🛡️ BẢO HIỂM KIM NGÂN: Tự động hồi phục +40 Đồng!', 'text-yellow-300 font-bold');
+    }
+
+    setCoins(finalNextCoins);
 
     // Feedback toasts
     if (rollSurgeExtra > 0 || rollFrenzyExtra > 0 || freeRollExtra > 0) {
@@ -588,8 +690,9 @@ export const GachaGame: React.FC<GachaGameProps> = ({
       if (rLvl > 0) multiplier *= (1 + [0, 0.35, 0.70, 1.10, 1.60, 2.50][rLvl]);
     }
 
-    // Element cores
+    // Element cores & Boons
     if (item.element.includes('Kim')) {
+      if (boonSet.has('boon-09')) multiplier *= 1.35;
       const kLvl = coreLevels.element_metal || 0;
       if (kLvl > 0) multiplier *= (1 + [0, 0.40, 0.80, 1.20, 1.80, 2.50][kLvl]);
     }
@@ -606,6 +709,7 @@ export const GachaGame: React.FC<GachaGameProps> = ({
       if (hLvl > 0) multiplier *= (1 + [0, 0.40, 0.80, 1.25, 1.90, 2.60][hLvl]);
     }
     if (item.element.includes('Thổ')) {
+      if (boonSet.has('boon-13')) multiplier *= 1.40;
       const dLvl = coreLevels.element_earth || 0;
       if (dLvl > 0) multiplier *= (1 + [0, 0.40, 0.80, 1.25, 1.90, 2.60][dLvl]);
     }
@@ -626,6 +730,15 @@ export const GachaGame: React.FC<GachaGameProps> = ({
       if (dLvl > 0) multiplier *= (1 + [0, 0.60, 1.20, 1.80, 2.50, 3.50][dLvl]);
     }
 
+    if (boonSet.has('boon-16')) multiplier *= 1.15;
+    if (boonSet.has('boon-56') && item.rarity === 'common') multiplier *= 1.30;
+
+    // Boon-46: +15% sell price when owning 10+ weapons
+    if (boonSet.has('boon-46')) {
+      const weaponCount = GACHA_ITEMS.filter(it => it.category === 'weapon').reduce((acc, it) => acc + (inventory[it.id] || 0), 0);
+      if (weaponCount >= 10) multiplier *= 1.15;
+    }
+
     // Omnipresence Core (Boosts everything)
     const omniLvl = coreLevels.omnipresence || 0;
     if (omniLvl > 0) {
@@ -635,6 +748,7 @@ export const GachaGame: React.FC<GachaGameProps> = ({
     if (item.rarity === 'mystic' && boonSet.has('boon-72')) multiplier *= 2.5;
 
     const basePrice = RARITY_CONFIG[item.rarity]?.sellPrice ?? item.sellPrice;
+    if (boonSet.has('boon-55') && basePrice >= 100) multiplier *= 1.10;
     return Number((basePrice * multiplier).toFixed(1));
   };
 
@@ -645,8 +759,12 @@ export const GachaGame: React.FC<GachaGameProps> = ({
     const targetItem = GACHA_ITEMS.find(it => it.id === itemId);
     if (!targetItem) return;
 
-    const unitPrice = getItemEffectiveSellPrice(targetItem);
-    const earned = Number((unitPrice * count).toFixed(1));
+    let unitPrice = getItemEffectiveSellPrice(targetItem);
+    if (targetItem.rarity === 'legend' && boonSet.has('boon-58')) unitPrice += 50;
+    let earned = Number((unitPrice * count).toFixed(1));
+    if (boonSet.has('boon-53') && count >= 5) {
+      earned += Math.floor(count / 5) * 6;
+    }
     setCoins(prev => Number((prev + earned).toFixed(1)));
 
     setInventory(prev => {
@@ -666,6 +784,7 @@ export const GachaGame: React.FC<GachaGameProps> = ({
   // Bulk sell in inventory
   const handleBulkSell = (rarity: Rarity, preserveOne: boolean) => {
     let earned = 0;
+    let totalSold = 0;
     const nextInventory = { ...inventory };
 
     GACHA_ITEMS.filter(it => it.rarity === rarity).forEach(item => {
@@ -673,7 +792,9 @@ export const GachaGame: React.FC<GachaGameProps> = ({
       if (count > 0) {
         const sellAmount = preserveOne ? count - 1 : count;
         if (sellAmount > 0) {
-          const unitPrice = getItemEffectiveSellPrice(item);
+          totalSold += sellAmount;
+          let unitPrice = getItemEffectiveSellPrice(item);
+          if (item.rarity === 'legend' && boonSet.has('boon-58')) unitPrice += 50;
           earned += sellAmount * unitPrice;
           if (preserveOne) {
             nextInventory[item.id] = 1;
@@ -683,6 +804,10 @@ export const GachaGame: React.FC<GachaGameProps> = ({
         }
       }
     });
+
+    if (boonSet.has('boon-53') && totalSold >= 5) {
+      earned += Math.floor(totalSold / 5) * 6;
+    }
 
     if (earned > 0) {
       setCoins(prev => Number((prev + Math.round(earned * 10) / 10).toFixed(1)));
@@ -695,17 +820,25 @@ export const GachaGame: React.FC<GachaGameProps> = ({
   // Bulk sell duplicates across all items
   const handleBulkSellDuplicates = () => {
     let earned = 0;
+    let totalSold = 0;
     const nextInventory = { ...inventory };
 
     GACHA_ITEMS.forEach(item => {
       const count = nextInventory[item.id] || 0;
       if (count > 1) {
         const sellAmount = count - 1;
-        const unitPrice = getItemEffectiveSellPrice(item);
+        totalSold += sellAmount;
+        let unitPrice = getItemEffectiveSellPrice(item);
+        if (boonSet.has('boon-54')) unitPrice += 2; // +2 coins extra per duplicate
+        if (item.rarity === 'legend' && boonSet.has('boon-58')) unitPrice += 50;
         earned += sellAmount * unitPrice;
         nextInventory[item.id] = 1;
       }
     });
+
+    if (boonSet.has('boon-53') && totalSold >= 5) {
+      earned += Math.floor(totalSold / 5) * 6;
+    }
 
     if (earned > 0) {
       setCoins(prev => Number((prev + Math.round(earned * 10) / 10).toFixed(1)));
@@ -834,9 +967,10 @@ export const GachaGame: React.FC<GachaGameProps> = ({
     }
 
     // Roll 3 of 80 Ancient Boons for player to choose 1!
-    const offeredBoons = rollThreeRandomBoons(activeBoonIds);
+    const offeredBoons = rollThreeRandomBoons(activeBoonIds, stage, shopTierIndex);
     setPendingBoonChoices(offeredBoons);
     setCompletedStageForBoon(stage);
+    setIsParchmentModalOpen(false); // Close parchment modal so user focuses on boon selection
     setIsBoonSelectionOpen(true);
 
     showToast(`🎉 Hoàn thành đơn hàng Đợt ${stage}! Nhận +${finalEarnedCoins} Đồng!`);
@@ -845,11 +979,13 @@ export const GachaGame: React.FC<GachaGameProps> = ({
   // PLAYER SELECTS 1 OF 3 ANCIENT BOONS
   const handleSelectBoon = (boon: AncientBoon) => {
     setIsBoonSelectionOpen(false);
-    setActiveBoonIds(prev => [...prev, boon.id]);
+    setPendingBoonChoices([]); // CRITICAL FIX: Clears choices so the banner/button disappears immediately!
+    setActiveBoonIds(prev => (prev.includes(boon.id) ? prev : [...prev, boon.id]));
 
     // Handle instant effects
     if (boon.instantCoinPercent) {
-      const bonus = Math.max(20, Math.round(coins * boon.instantCoinPercent));
+      const minCoin = boon.id === 'boon-21' ? 100 : 20;
+      const bonus = Math.max(minCoin, Math.round(coins * boon.instantCoinPercent));
       setCoins(prev => prev + bonus);
       showToast(`🌟 Thần Lực ${boon.name}: Nhận ngay +${bonus} Đồng (+${Math.round(boon.instantCoinPercent * 100)}% ngân khố)!`, 'text-yellow-300 font-black');
     } else if (boon.instantCoinsFlat) {
@@ -857,14 +993,25 @@ export const GachaGame: React.FC<GachaGameProps> = ({
       showToast(`🌟 Thần Lực ${boon.name}: Ban tặng ngay +${boon.instantCoinsFlat} Đồng mặt!`, 'text-yellow-300 font-black');
     } else if (boon.instantCoreUpgrade) {
       const coreKey = boon.instantCoreUpgrade as CoreType;
-      setCoreLevels(prev => ({
-        ...prev,
-        [coreKey]: Math.min(5, (prev[coreKey] || 0) + 1),
-      }));
-      showToast(`🌟 Thần Lực ${boon.name}: Nâng cấp miễn phí +1 Cấp cho ${ARCANE_CORES[coreKey]?.name}!`, 'text-cyan-300 font-bold');
+      const curLvl = coreLevels[coreKey] || 0;
+      if (curLvl < 5) {
+        setCoreLevels(prev => ({
+          ...prev,
+          [coreKey]: Math.min(5, curLvl + 1),
+        }));
+        showToast(`🌟 Thần Lực ${boon.name}: Nâng cấp miễn phí +1 Cấp cho ${ARCANE_CORES[coreKey]?.name}!`, 'text-cyan-300 font-bold');
+      } else {
+        setCoins(prev => prev + 250);
+        showToast(`🌟 Thần Lực ${boon.name}: ${ARCANE_CORES[coreKey]?.name} đã đạt Cấp Tối Thượng! Ban tặng bù +250 Đồng!`, 'text-yellow-300 font-black');
+      }
     } else if (boon.freeShopTierUpgrade) {
-      setShopTierIndex(prev => Math.min(5, prev + 1));
-      showToast(`🌟 Thần Lực ${boon.name}: Đột phá miễn phí lên Bậc Cửa Hàng mới!`, 'text-purple-300 font-bold');
+      if (shopTierIndex < 5) {
+        setShopTierIndex(prev => Math.min(5, prev + 1));
+        showToast(`🌟 Thần Lực ${boon.name}: Đột phá miễn phí lên Bậc Cửa Hàng mới!`, 'text-purple-300 font-bold');
+      } else {
+        setCoins(prev => prev + 500);
+        showToast(`🌟 Thần Lực ${boon.name}: Cửa Hàng đã đạt Bậc Tối Thượng (Bậc 6)! Ban tặng bù +500 Đồng Ngân Khố!`, 'text-yellow-300 font-black');
+      }
     } else {
       showToast(`🌟 Đã tiếp nhận Thần Lực: ${boon.name}!`, 'text-amber-300 font-bold');
     }
