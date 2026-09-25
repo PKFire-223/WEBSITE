@@ -4,6 +4,9 @@ export interface UserAccount {
   displayName: string;
   avatarId: string;
   avatarEmoji: string;
+  avatarUrl?: string; // Custom uploaded avatar image (Base64/URL)
+  avatarBorder?: string; // Custom avatar frame / border effect
+  customTitle?: string; // Player title
   passwordHash: string;
   salt: string;
   pinHash: string; // 4-digit PIN hash
@@ -23,6 +26,9 @@ export interface UserGameData {
   playerLevel: number;
   playTimeSeconds: number;
   customBio?: string;
+  customAvatarUrl?: string;
+  customAvatarBorder?: string;
+  customTitle?: string;
   coreLevels?: Record<string, number>;
   activeBoonIds?: string[];
   pityCounter?: number;

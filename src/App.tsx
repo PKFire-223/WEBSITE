@@ -7,15 +7,6 @@ import { ProfilePage } from './components/ProfilePage';
 import { LevelUpNotification } from './components/LevelUpNotification';
 import { AuthModal } from './components/AuthModal';
 import { QuickLockScreen } from './components/QuickLockScreen';
-import { Navbar } from './components/Navbar';
-import { Hero } from './components/Hero';
-import { ProjectsSection } from './components/ProjectsSection';
-import { SkillsSection } from './components/SkillsSection';
-import { PKFireLab } from './components/PKFireLab';
-import { ExperienceSection } from './components/ExperienceSection';
-import { AboutSection } from './components/AboutSection';
-import { ContactSection } from './components/ContactSection';
-import { Footer } from './components/Footer';
 import {
   isSoundEnabled,
   setSoundEnabled as setGlobalSoundEnabled,
@@ -33,8 +24,8 @@ import { UserAccount } from './types/auth';
 import { Gamepad2, Sparkles, BookOpen } from 'lucide-react';
 
 export function App() {
-  // Navigation views: 'cover' (Bìa sách 3D - BẮT ĐẦU ĐÓNG CHỜ MỞ) | 'hub' (Kho game) | 'portfolio' (Trang cá nhân) | 'profile' (Hồ sơ người chơi)
-  const [currentView, setCurrentView] = useState<'cover' | 'hub' | 'portfolio' | 'profile'>('cover');
+  // Navigation views: 'cover' (Bìa sách 3D) | 'hub' (Kho game) | 'profile' (Hồ sơ người chơi)
+  const [currentView, setCurrentView] = useState<'cover' | 'hub' | 'profile'>('cover');
 
   // Authentication & Security State
   const [currentUser, setCurrentUser] = useState<UserAccount | null>(() => {
@@ -196,7 +187,6 @@ export function App() {
             onSelectEmptySlot={handleSelectEmptySlot}
             onBackToCover={() => setCurrentView('cover')}
             onOpenProfile={() => setCurrentView('profile')}
-            onOpenPortfolio={() => setCurrentView('portfolio')}
             soundEnabled={soundEnabled}
             onToggleSound={toggleSound}
             currentUser={currentUser}
@@ -218,37 +208,6 @@ export function App() {
           currentUser={currentUser}
           onOpenAuth={openAuth}
         />
-      )}
-
-      {/* 4. PORTFOLIO VIEW (Trang Cá Nhân & Dự Án PKFire) */}
-      {currentView === 'portfolio' && (
-        <div className="relative">
-          {/* Top banner button to return to Game Hub */}
-          <div className="fixed top-20 right-4 sm:right-8 z-40">
-            <button
-              onClick={() => {
-                playClickSound();
-                setCurrentView('hub');
-              }}
-              className="flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 hover:from-amber-400 hover:to-orange-400 text-neutral-950 font-black text-xs font-mono shadow-[0_0_25px_rgba(245,158,11,0.5)] border border-amber-300 transition-all transform hover:scale-105 active:scale-95 cursor-pointer"
-            >
-              <Gamepad2 className="w-4 h-4" />
-              <span>Kho Game PolyPlay ({INITIAL_GAMES.length})</span>
-            </button>
-          </div>
-
-          <Navbar onOpenTerminal={() => {}} />
-          <main>
-            <Hero />
-            <ProjectsSection />
-            <SkillsSection />
-            <PKFireLab />
-            <ExperienceSection />
-            <AboutSection />
-            <ContactSection />
-          </main>
-          <Footer />
-        </div>
       )}
 
       {/* ACTIVE GAME MODAL (Renders whichever game is selected, including Gacha Game!) */}

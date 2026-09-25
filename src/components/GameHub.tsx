@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { GameItem } from '../data/gamesData';
 import { UserAccount } from '../types/auth';
 import { calculateAccountSecurityRating } from '../utils/security';
@@ -34,7 +34,6 @@ interface GameHubProps {
   onSelectEmptySlot: (slotNumber: number) => void;
   onBackToCover: () => void;
   onOpenProfile: () => void;
-  onOpenPortfolio?: () => void;
   soundEnabled: boolean;
   onToggleSound: () => void;
   currentUser?: UserAccount | null;
@@ -51,13 +50,25 @@ export const GameHub: React.FC<GameHubProps> = ({
   onSelectEmptySlot,
   onBackToCover,
   onOpenProfile,
-  onOpenPortfolio,
   soundEnabled,
   onToggleSound,
   currentUser,
   onOpenAuth,
 }) => {
   const [activeCategory, setActiveCategory] = useState<string>('Tất cả');
+
+  // Load custom avatar if exists
+  const customAvatar = useMemo(() => {
+    if (currentUser?.avatarUrl) return currentUser.avatarUrl;
+    try {
+      const saved = localStorage.getItem('polyplay_user_profile');
+      if (saved) {
+        const p = JSON.parse(saved);
+        return p.avatarUrl || null;
+      }
+    } catch {}
+    return null;
+  }, [currentUser]);
 
   // Format seconds into MM:SS or HH:MM:SS
   const formatTime = (totalSeconds: number) => {
@@ -196,9 +207,13 @@ export const GameHub: React.FC<GameHubProps> = ({
                 onOpenProfile();
               }}
               className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-gradient-to-r from-amber-500/20 to-yellow-500/20 hover:from-amber-500/30 hover:to-yellow-500/30 text-amber-300 border border-amber-500/40 text-xs font-mono font-bold transition-all shadow hover:shadow-amber-500/20 cursor-pointer shrink-0 self-center sm:self-auto"
-              title="Xem hồ sơ cá nhân và bảng lưu điểm số"
+              title="Xem hồ sơ cá nhân và bảng thành tựu"
             >
-              <User className="w-4 h-4 text-amber-400" />
+              {customAvatar ? (
+                <img src={customAvatar} alt="avatar" className="w-4 h-4 rounded-full object-cover border border-amber-400" />
+              ) : (
+                <User className="w-4 h-4 text-amber-400" />
+              )}
               <span>Hồ Sơ</span>
             </button>
 
@@ -212,7 +227,11 @@ export const GameHub: React.FC<GameHubProps> = ({
                 className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-neutral-900 hover:bg-neutral-800 text-white border border-amber-500/40 text-xs font-mono transition-all cursor-pointer shrink-0 self-center sm:self-auto"
                 title="Quản trị bảo mật tài khoản"
               >
-                <span className="text-base leading-none">{currentUser.avatarEmoji || '🧙‍♂️'}</span>
+                {customAvatar ? (
+                  <img src={customAvatar} alt="avatar" className="w-4 h-4 rounded-full object-cover border border-amber-400" />
+                ) : (
+                  <span className="text-base leading-none">{currentUser.avatarEmoji || '🧙‍♂️'}</span>
+                )}
                 <span className="font-bold hidden sm:inline max-w-[90px] truncate">{currentUser.displayName}</span>
                 <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
               </button>
@@ -228,21 +247,6 @@ export const GameHub: React.FC<GameHubProps> = ({
                 <Shield className="w-4 h-4 text-amber-400" />
                 <span className="hidden sm:inline">Tài Khoản / Bảo Mật</span>
                 <span className="sm:hidden">Đăng Nhập</span>
-              </button>
-            )}
-
-            {/* Portfolio View Button */}
-            {onOpenPortfolio && (
-              <button
-                onClick={() => {
-                  playClickSound();
-                  onOpenPortfolio();
-                }}
-                className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-neutral-900 hover:bg-neutral-800 text-neutral-300 hover:text-white border border-neutral-700 text-xs font-mono font-bold transition-all cursor-pointer shrink-0 self-center sm:self-auto"
-                title="Xem Hồ sơ năng lực & Dự án lập trình viên"
-              >
-                <Sparkles className="w-4 h-4 text-amber-400" />
-                <span className="hidden sm:inline">Portfolio</span>
               </button>
             )}
 

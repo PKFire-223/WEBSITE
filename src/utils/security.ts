@@ -86,6 +86,12 @@ export function saveUsers(users: UserAccount[]): void {
   localStorage.setItem(USERS_DB_KEY, JSON.stringify(users));
 }
 
+export function updateUserAccount(updatedUser: UserAccount): void {
+  const users = getAllUsers();
+  const nextUsers = users.map((u) => (u.id === updatedUser.id ? updatedUser : u));
+  saveUsers(nextUsers);
+}
+
 export function findUserByUsername(username: string): UserAccount | undefined {
   const users = getAllUsers();
   const normalized = username.trim().toLowerCase();
