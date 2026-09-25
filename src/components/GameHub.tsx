@@ -1,7 +1,10 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { GameItem } from '../data/gamesData';
 import { UserAccount } from '../types/auth';
 import { calculateAccountSecurityRating } from '../utils/security';
+import { getAvatarOption, getBorderClass } from '../data/avatarConfig';
+import { TitleSelectorModal } from './TitleSelectorModal';
+import { PlayerStatsContext } from '../data/achievementsData';
 import {
   Sparkles,
   Star,
@@ -56,19 +59,138 @@ export const GameHub: React.FC<GameHubProps> = ({
   onOpenAuth,
 }) => {
   const [activeCategory, setActiveCategory] = useState<string>('Tất cả');
+  const [isTitleModalOpen, setIsTitleModalOpen] = useState<boolean>(false);
 
-  // Load custom avatar if exists
-  const customAvatar = useMemo(() => {
-    if (currentUser?.avatarUrl) return currentUser.avatarUrl;
+  // Load and keep user profile in sync with ProfilePage and localStorage
+  const [userProfile, setUserProfile] = useState<{
+    name: string;
+    avatarId: string;
+    avatarUrl?: string;
+    avatarBorder?: string;
+    customTitle?: string;
+  }>(() => {
     try {
       const saved = localStorage.getItem('polyplay_user_profile');
       if (saved) {
         const p = JSON.parse(saved);
-        return p.avatarUrl || null;
+        return {
+          name: p.name || currentUser?.displayName || 'Pháp Sư PolyPlay',
+          avatarId: p.avatarId || currentUser?.avatarId || 'mage',
+          avatarUrl: p.avatarUrl || currentUser?.avatarUrl || '',
+          avatarBorder: p.avatarBorder || currentUser?.avatarBorder || 'gold',
+          customTitle: p.customTitle || currentUser?.customTitle || 'Tân Thủ Nhập Môn',
+        };
       }
     } catch {}
-    return null;
+    return {
+      name: currentUser?.displayName || 'Pháp Sư PolyPlay',
+      avatarId: currentUser?.avatarId || 'mage',
+      avatarUrl: currentUser?.avatarUrl || '',
+      avatarBorder: currentUser?.avatarBorder || 'gold',
+      customTitle: currentUser?.customTitle || 'Tân Thủ Nhập Môn',
+    };
+  });
+
+  useEffect(() => {
+    const syncProfile = () => {
+      try {
+        const saved = localStorage.getItem('polyplay_user_profile');
+        if (saved) {
+          const p = JSON.parse(saved);
+          setUserProfile({
+            name: p.name || currentUser?.displayName || 'Pháp Sư PolyPlay',
+            avatarId: p.avatarId || currentUser?.avatarId || 'mage',
+            avatarUrl: p.avatarUrl || currentUser?.avatarUrl || '',
+            avatarBorder: p.avatarBorder || currentUser?.avatarBorder || 'gold',
+            customTitle: p.customTitle || currentUser?.customTitle || 'Tân Thủ Nhập Môn',
+          });
+        }
+      } catch {}
+    };
+
+    syncProfile();
+    window.addEventListener('storage', syncProfile);
+    window.addEventListener('focus', syncProfile);
+    return () => {
+      window.removeEventListener('storage', syncProfile);
+      window.removeEventListener('focus', syncProfile);
+    };
   }, [currentUser]);
+
+  const handleSelectTitle = (newTitle: string) => {
+    setUserProfile((prev) => {
+      const updated = { ...prev, customTitle: newTitle };
+      try {
+        const saved = localStorage.getItem('polyplay_user_profile');
+        const obj = saved ? JSON.parse(saved) : {};
+        localStorage.setItem(
+          'polyplay_user_profile',
+          JSON.stringify({ ...obj, customTitle: newTitle })
+        );
+        window.dispatchEvent(new Event('storage'));
+      } catch {}
+      return updated;
+    });
+  };
+
+  // Compile statsContext for Title unlock requirements
+  const statsContext = useMemo<PlayerStatsContext>(() => {
+    let snakeHighScore = 0;
+    let fanHighScore = 0;
+    let blockHighScore = 0;
+    let artilleryWins = 0;
+    let battleshipWins = 0;
+    let gachaPulls = 0;
+    let gachaItemsCount = 0;
+    let typingSharkStats: any = {};
+
+    try {
+      snakeHighScore = parseInt(localStorage.getItem('polyplay_snake_high_score') || '0', 10);
+      fanHighScore = parseInt(localStorage.getItem('onlyafan_high_score') || '0', 10);
+      blockHighScore = parseInt(localStorage.getItem('polyplay_block_high_score') || '0', 10);
+      artilleryWins = parseInt(localStorage.getItem('artillery_total_wins') || '0', 10);
+      battleshipWins = parseInt(localStorage.getItem('polyplay_battleship_wins') || '0', 10);
+
+      const gachaRaw = localStorage.getItem('van_co_ky_tran_save');
+      if (gachaRaw) {
+        const p = JSON.parse(gachaRaw);
+        gachaPulls = p.totalPulls || 0;
+        gachaItemsCount = p.discoveredItemIds?.length || 0;
+      }
+
+      const sharkRaw = localStorage.getItem('polyplay_typingshark_stats');
+      if (sharkRaw) {
+        typingSharkStats = JSON.parse(sharkRaw);
+      }
+    } catch {}
+
+    return {
+      playerLevel,
+      totalPlaySeconds: playTimeSeconds,
+      snakeHighScore,
+      fanHighScore,
+      blockHighScore,
+      artilleryWins,
+      artilleryStreak: 0,
+      artilleryHighestStreak: 0,
+      artilleryBeatGrandmaster: false,
+      artilleryMaxDamage: 0,
+      isCustomizedProfile: true,
+      hasCustomAvatar: Boolean(userProfile.avatarUrl),
+      typingSharkKills: typingSharkStats.kills || 0,
+      typingSharkBosses: typingSharkStats.bossesKilled || 0,
+      typingSharkMaxWpm: typingSharkStats.maxWpm || 0,
+      typingSharkMaxMinutes: typingSharkStats.highestMinuteSurvived || 0,
+      typingSharkGold: typingSharkStats.lifetimeGold || 0,
+      typingSharkVictories: typingSharkStats.victories || 0,
+      gachaPulls,
+      gachaItemsCount,
+      battleshipWins,
+    };
+  }, [playerLevel, playTimeSeconds, userProfile.avatarUrl]);
+
+  const currentAvatarObj = getAvatarOption(userProfile.avatarId);
+  const currentBorderClass = getBorderClass(userProfile.avatarBorder);
 
   // Format seconds into MM:SS or HH:MM:SS
   const formatTime = (totalSeconds: number) => {
@@ -80,15 +202,6 @@ export const GameHub: React.FC<GameHubProps> = ({
       return `${hrs}h ${remMins}m ${secs < 10 ? '0' : ''}${secs}s`;
     }
     return `${mins}m ${secs < 10 ? '0' : ''}${secs}s`;
-  };
-
-  const getRankTitle = (lvl: number) => {
-    if (lvl >= 50) return 'Đại Pháp Sư Tối Thượng';
-    if (lvl >= 25) return 'Bậc Thầy Ma Thuật';
-    if (lvl >= 10) return 'Pháp Sư Tinh Anh';
-    if (lvl >= 5) return 'Pháp Sư PolyPlay';
-    if (lvl >= 2) return 'Học Viên Ma Pháp';
-    return 'Tân Thủ Nhập Môn';
   };
 
   // We ensure at least 8 square slots are shown
@@ -162,34 +275,82 @@ export const GameHub: React.FC<GameHubProps> = ({
             </div>
           </div>
 
-          {/* PLAYER LEVEL & REAL-TIME PROGRESS BAR (REQUIREMENT: "cứ đủ thời gian là lv +1") */}
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 bg-neutral-950/80 p-3 sm:p-3.5 rounded-2xl border border-amber-500/30 shadow-lg">
+          {/* PLAYER AVATAR, TITLE, LEVEL & REAL-TIME PROGRESS BAR */}
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3.5 bg-neutral-950/90 p-3 sm:p-3.5 rounded-2xl border-2 border-amber-500/40 shadow-[0_0_35px_rgba(245,158,11,0.2)]">
             
-            {/* Level Badge */}
-            <div className="flex items-center gap-2.5">
-              <div className="relative flex items-center justify-center w-11 h-11 rounded-xl bg-gradient-to-tr from-amber-500 to-yellow-300 text-neutral-950 font-black text-base font-mono shadow-md shadow-amber-500/30">
-                <Zap className="w-3.5 h-3.5 text-neutral-950 absolute -top-1 -right-1 fill-current" />
-                <span>LV.{playerLevel}</span>
-              </div>
-              <div>
-                <div className="text-[10px] font-mono uppercase tracking-wider text-amber-400 font-bold flex items-center gap-1">
-                  <Trophy className="w-3 h-3 text-amber-400" />
-                  <span>{getRankTitle(playerLevel)}</span>
+            {/* AVATAR + LEVEL DOCKED CREST */}
+            <div
+              onClick={() => {
+                playClickSound();
+                onOpenProfile();
+              }}
+              className="flex items-center gap-3 cursor-pointer group"
+              title="Nhấp để vào Hồ Sơ Cá Nhân"
+            >
+              <div className="relative shrink-0">
+                <div
+                  className={`w-12 h-12 sm:w-14 sm:h-14 rounded-2xl overflow-hidden border-2 flex items-center justify-center transition-all duration-300 ${currentBorderClass} bg-gradient-to-tr ${currentAvatarObj.color} group-hover:scale-105`}
+                >
+                  {userProfile.avatarUrl ? (
+                    <img
+                      src={userProfile.avatarUrl}
+                      alt={userProfile.name}
+                      className="w-full h-full object-cover rounded-xl"
+                    />
+                  ) : (
+                    <span className="text-2xl sm:text-3xl select-none leading-none">
+                      {currentAvatarObj.emoji}
+                    </span>
+                  )}
                 </div>
-                <div className="text-xs font-mono text-neutral-300 flex items-center gap-1">
-                  <Clock className="w-3 h-3 text-neutral-400" />
-                  <span>Đã chơi: <strong>{formatTime(playTimeSeconds)}</strong></span>
+
+                {/* Level Tag pinned neatly to bottom-right corner of avatar */}
+                <div className="absolute -bottom-1 -right-1 px-1.5 py-0.2 rounded-md bg-gradient-to-r from-amber-500 via-orange-400 to-yellow-300 text-neutral-950 font-black text-[10px] font-mono shadow-md border border-neutral-950 flex items-center gap-0.5">
+                  <Zap className="w-2.5 h-2.5 fill-current" />
+                  <span>LV.{playerLevel}</span>
+                </div>
+              </div>
+
+              {/* NAME, TITLE (CLICKABLE TO CHANGE), AND PLAY TIME */}
+              <div className="min-w-0 pr-1">
+                <div className="flex items-center gap-1.5 leading-tight">
+                  <span className="font-bold text-white text-sm font-sans truncate max-w-[130px] sm:max-w-[160px] group-hover:text-amber-200 transition-colors">
+                    {userProfile.name}
+                  </span>
+                </div>
+
+                {/* Clickable Title Badge */}
+                <div className="mt-0.5">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      playClickSound();
+                      setIsTitleModalOpen(true);
+                    }}
+                    className="px-2 py-0.5 rounded-md bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 text-[10px] font-mono font-bold flex items-center gap-1 cursor-pointer transition-all hover:scale-105"
+                    title="Bấm để chọn danh hiệu"
+                  >
+                    <Sparkles className="w-2.5 h-2.5 text-amber-400" />
+                    <span className="truncate max-w-[130px] sm:max-w-[160px]">{userProfile.customTitle || 'Tân Thủ Nhập Môn'}</span>
+                    <span className="text-[9px] text-amber-400/80 font-normal underline">[Đổi]</span>
+                  </button>
+                </div>
+
+                {/* Time Played */}
+                <div className="text-[11px] font-mono text-neutral-400 flex items-center gap-1 mt-0.5 whitespace-nowrap">
+                  <Clock className="w-3 h-3 text-neutral-500 shrink-0" />
+                  <span>Đã chơi: <strong className="text-neutral-200">{formatTime(playTimeSeconds)}</strong></span>
                 </div>
               </div>
             </div>
 
             {/* Level Progress Gauge */}
-            <div className="flex flex-col justify-center min-w-[180px] sm:min-w-[210px] space-y-1 sm:pl-3 sm:border-l sm:border-neutral-800">
+            <div className="flex flex-col justify-center min-w-[160px] sm:min-w-[190px] space-y-1 sm:pl-3 sm:border-l sm:border-neutral-800">
               <div className="flex items-center justify-between text-[10px] font-mono">
-                <span className="text-neutral-400">Tiến trình lên Cấp {playerLevel + 1}:</span>
+                <span className="text-neutral-400">Lên Cấp {playerLevel + 1}:</span>
                 <span className="text-amber-300 font-bold">{levelProgressPercent}%</span>
               </div>
-              <div className="w-full h-2.5 bg-neutral-900 rounded-full border border-neutral-700 overflow-hidden relative">
+              <div className="w-full h-2.5 bg-neutral-900 rounded-full border border-neutral-700 overflow-hidden relative shadow-inner">
                 <div
                   className="h-full bg-gradient-to-r from-amber-500 via-orange-400 to-yellow-300 rounded-full transition-all duration-500 ease-out"
                   style={{ width: `${levelProgressPercent}%` }}
@@ -207,14 +368,10 @@ export const GameHub: React.FC<GameHubProps> = ({
                 onOpenProfile();
               }}
               className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-gradient-to-r from-amber-500/20 to-yellow-500/20 hover:from-amber-500/30 hover:to-yellow-500/30 text-amber-300 border border-amber-500/40 text-xs font-mono font-bold transition-all shadow hover:shadow-amber-500/20 cursor-pointer shrink-0 self-center sm:self-auto"
-              title="Xem hồ sơ cá nhân và bảng thành tựu"
+              title="Xem hồ sơ cá nhân và 108 thành tựu"
             >
-              {customAvatar ? (
-                <img src={customAvatar} alt="avatar" className="w-4 h-4 rounded-full object-cover border border-amber-400" />
-              ) : (
-                <User className="w-4 h-4 text-amber-400" />
-              )}
-              <span>Hồ Sơ</span>
+              <Trophy className="w-4 h-4 text-amber-400" />
+              <span>Hồ Sơ (108)</span>
             </button>
 
             {/* Account & Security Button */}
@@ -227,10 +384,10 @@ export const GameHub: React.FC<GameHubProps> = ({
                 className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-neutral-900 hover:bg-neutral-800 text-white border border-amber-500/40 text-xs font-mono transition-all cursor-pointer shrink-0 self-center sm:self-auto"
                 title="Quản trị bảo mật tài khoản"
               >
-                {customAvatar ? (
-                  <img src={customAvatar} alt="avatar" className="w-4 h-4 rounded-full object-cover border border-amber-400" />
+                {userProfile.avatarUrl ? (
+                  <img src={userProfile.avatarUrl} alt="avatar" className="w-4 h-4 rounded-full object-cover border border-amber-400" />
                 ) : (
-                  <span className="text-base leading-none">{currentUser.avatarEmoji || '🧙‍♂️'}</span>
+                  <span className="text-base leading-none">{currentUser.avatarEmoji || currentAvatarObj.emoji}</span>
                 )}
                 <span className="font-bold hidden sm:inline max-w-[90px] truncate">{currentUser.displayName}</span>
                 <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
@@ -439,6 +596,15 @@ export const GameHub: React.FC<GameHubProps> = ({
         </div>
 
       </div>
+
+      {/* Global Title Selector Modal */}
+      <TitleSelectorModal
+        isOpen={isTitleModalOpen}
+        onClose={() => setIsTitleModalOpen(false)}
+        currentTitle={userProfile.customTitle || 'Tân Thủ Nhập Môn'}
+        onSelectTitle={handleSelectTitle}
+        statsContext={statsContext}
+      />
     </div>
   );
 };

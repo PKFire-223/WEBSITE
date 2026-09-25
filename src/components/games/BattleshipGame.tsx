@@ -317,6 +317,13 @@ export const BattleshipGame: React.FC<BattleshipGameProps> = ({
   // ========================================================
   // PLAYER ATTACK: Standard Attack on AI Board (LEFT SIDE)
   // ========================================================
+  const handlePlayerWon = () => {
+    try {
+      const cur = parseInt(localStorage.getItem('polyplay_battleship_wins') || '0', 10);
+      localStorage.setItem('polyplay_battleship_wins', String(cur + 1));
+    } catch {}
+  };
+
   const handlePlayerAttack = (r: number, c: number) => {
     if (isAiThinking || phase !== 'battle') return;
 
@@ -392,6 +399,7 @@ export const BattleshipGame: React.FC<BattleshipGameProps> = ({
     }
 
     if (checkGameOver(nextShips)) {
+      handlePlayerWon();
       navalAudio.playVictoryHorn();
       confetti({ particleCount: 180, spread: 110, origin: { y: 0.6 } });
       setPhase('game-over');
@@ -553,6 +561,7 @@ export const BattleshipGame: React.FC<BattleshipGameProps> = ({
       }
 
       if (checkGameOver(nextShips)) {
+        handlePlayerWon();
         navalAudio.playVictoryHorn();
         confetti({ particleCount: 180, spread: 110, origin: { y: 0.6 } });
         setPhase('game-over');
@@ -677,6 +686,7 @@ export const BattleshipGame: React.FC<BattleshipGameProps> = ({
     });
 
     if (checkGameOver(nextShips)) {
+      handlePlayerWon();
       navalAudio.playVictoryHorn();
       confetti({ particleCount: 180, spread: 110, origin: { y: 0.6 } });
       setPhase('game-over');
