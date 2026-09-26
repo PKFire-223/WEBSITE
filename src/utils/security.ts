@@ -1,5 +1,7 @@
 import { UserAccount, UserGameData, ACCOUNT_AVATARS } from '../types/auth';
-import { getInitialSeedUsers } from '../data/mockSeedData';
+import { getInitialSeedUsers, SEED_TESTER_USER } from '../data/mockSeedData';
+
+export { SEED_TESTER_USER };
 
 // Web Crypto API SHA-256
 export async function sha256(message: string, salt: string = ''): Promise<string> {
@@ -46,22 +48,6 @@ export function evaluatePasswordStrength(password: string): {
       return { score: 0, label: 'Rất Yếu (< 6 ký tự)', color: 'bg-rose-700', barWidth: '15%' };
   }
 }
-
-// Pre-seeded Tester Account (Username: Tester123 / Password: Password123@ / PIN: 1234)
-export const SEED_TESTER_USER: UserAccount = {
-  id: 'user_tester_123',
-  username: 'Tester123',
-  displayName: 'Tester123 (VIP)',
-  avatarId: 'celestial',
-  avatarEmoji: '👑',
-  passwordHash: '4be6eb188d662373b2f91374d93e834720d394e49ec6eda2e93a079d2751b2b6',
-  salt: 'seed_salt_tester123',
-  pinHash: '8aa3616e8e7034c126d9fea91fc7c9eade7e2d2303f7ba7e1c608c286d9349a2',
-  securityQuestion: 'Pháp bảo hộ thân yêu thích nhất của bạn là gì?',
-  securityAnswerHash: 'cde982ae895aa03672d538c3c82b55a4ea888ae27adec6efe34d96c49e9b9fd8',
-  createdAt: '24/09/2026',
-  lastLoginAt: '24/09/2026',
-};
 
 // Users Database stored in localStorage
 const USERS_DB_KEY = 'polyplay_secure_users_db_v1';

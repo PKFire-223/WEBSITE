@@ -70,6 +70,9 @@ export const MOCK_SEED_INITIAL_GAME_DATA: UserGameData = {
   customTitle: 'Tân Thủ Nhập Môn',
 };
 
+// Seed tester user reference
+export const SEED_TESTER_USER: UserAccount = MOCK_SEED_USERS[0];
+
 /**
  * Lấy danh sách tài khoản khởi tạo mẫu (dùng làm fallback khi chưa có MongoDB)
  */

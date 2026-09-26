@@ -11,6 +11,12 @@ import {
   Dices,
   Wand2,
   Hammer,
+  ArrowUp,
+  ArrowDown,
+  ArrowLeft,
+  ArrowRight,
+  Check,
+  Gamepad2,
 } from 'lucide-react';
 import {
   playBlockPlaceSound,
@@ -411,56 +417,35 @@ export const BlockPuzzleGame: React.FC = () => {
     [isHammerActive, hammerCharges, board, addFloatingNotice]
   );
 
-  // Keyboard shortcut listener: R / Space for Rotate, 1/2/3 for slot select, D for Reroll, F for Hammer
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (isGameOver) return;
-      const key = e.key.toLowerCase();
+  // Advance pieces & check game over
+  const handlePostPlacement = useCallback(
+    (currentBoard: BoardCell[][], placedPieceIndex: number) => {
+      const nextPieces = [...availablePieces];
+      nextPieces[placedPieceIndex] = null;
 
-      if (key === 'r' || key === ' ') {
-        e.preventDefault();
-        const activeIdx =
-          draggingIndex !== null
-            ? draggingIndex
-            : selectedPieceIndex !== null
-            ? selectedPieceIndex
-            : availablePieces.findIndex((p) => p !== null);
+      setSelectedPieceIndex(null);
+      setHoverPosition(null);
+      setDraggingIndex(null);
+      setDragPointer(null);
 
-        if (activeIdx !== -1 && availablePieces[activeIdx]) {
-          rotatePieceAtIndex(activeIdx);
-          addFloatingNotice('🔄 ĐÃ XOAY KHỐI (R)', '#facc15', 50, 48);
-        }
-      } else if (key === '1' || key === '2' || key === '3') {
-        const idx = parseInt(key, 10) - 1;
-        if (availablePieces[idx]) {
-          setSelectedPieceIndex(idx);
-          playClickSound();
-        }
-      } else if (key === 'd') {
-        if (magicRerolls > 0) {
-          handleMagicReroll();
-        }
-      } else if (key === 'f') {
-        if (hammerCharges > 0) {
-          setIsHammerActive((prev) => !prev);
-          playClickSound();
-        }
+      // If all 3 pieces used, spawn 3 new pieces
+      const allUsed = nextPieces.every((p) => p === null);
+      let finalPieces = nextPieces;
+      if (allUsed) {
+        finalPieces = generateRandomPieces();
+        playCoinSound();
+        addFloatingNotice('✨ TIẾP TẾ 3 KHỐI MỚI!', '#38bdf8', 50, 50);
       }
-    };
 
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [
-    isGameOver,
-    draggingIndex,
-    selectedPieceIndex,
-    availablePieces,
-    rotatePieceAtIndex,
-    addFloatingNotice,
-    magicRerolls,
-    hammerCharges,
-    handleMagicReroll,
-  ]);
+      setAvailablePieces(finalPieces);
+
+      if (checkGameOver(currentBoard, finalPieces)) {
+        setIsGameOver(true);
+        playGameOverSound();
+      }
+    },
+    [availablePieces, checkGameOver, addFloatingNotice]
+  );
 
   // Execute placement of a piece
   const executePlacement = useCallback(
@@ -600,38 +585,124 @@ export const BlockPuzzleGame: React.FC = () => {
         handlePostPlacement(nextBoard, pieceIndex);
       }
     },
-    [availablePieces, board, isGameOver, canPlacePiece, streakCombo, addFloatingNotice]
+    [availablePieces, board, isGameOver, canPlacePiece, streakCombo, addFloatingNotice, handlePostPlacement]
   );
 
-  // Advance pieces & check game over
-  const handlePostPlacement = useCallback(
-    (currentBoard: BoardCell[][], placedPieceIndex: number) => {
-      const nextPieces = [...availablePieces];
-      nextPieces[placedPieceIndex] = null;
+  // Virtual D-Pad movement for keyboard & on-screen buttons
+  const handleDpadMove = useCallback((dr: number, dc: number) => {
+    if (isGameOver) return;
+    const activeIdx = selectedPieceIndex !== null ? selectedPieceIndex : availablePieces.findIndex((p) => p !== null);
+    if (activeIdx === -1 || !availablePieces[activeIdx]) return;
+    const piece = availablePieces[activeIdx]!;
 
-      setSelectedPieceIndex(null);
-      setHoverPosition(null);
-      setDraggingIndex(null);
-      setDragPointer(null);
+    if (selectedPieceIndex !== activeIdx) {
+      setSelectedPieceIndex(activeIdx);
+    }
 
-      // If all 3 pieces used, spawn 3 new pieces
-      const allUsed = nextPieces.every((p) => p === null);
-      let finalPieces = nextPieces;
-      if (allUsed) {
-        finalPieces = generateRandomPieces();
-        playCoinSound();
-        addFloatingNotice('✨ TIẾP TẾ 3 KHỐI MỚI!', '#38bdf8', 50, 50);
+    const currentR = hoverPosition ? hoverPosition.r : 3;
+    const currentC = hoverPosition ? hoverPosition.c : 3;
+
+    const maxR = BOARD_SIZE - piece.matrix.length;
+    const maxC = BOARD_SIZE - piece.matrix[0].length;
+
+    const nextR = Math.max(0, Math.min(maxR, currentR + dr));
+    const nextC = Math.max(0, Math.min(maxC, currentC + dc));
+
+    const isValid = canPlacePiece(board, piece, nextR, nextC);
+    setHoverPosition({ r: nextR, c: nextC, isValid });
+    playClickSound();
+  }, [isGameOver, selectedPieceIndex, availablePieces, hoverPosition, board]);
+
+  const handleDpadPlace = useCallback(() => {
+    if (isGameOver) return;
+    const activeIdx = selectedPieceIndex !== null ? selectedPieceIndex : availablePieces.findIndex((p) => p !== null);
+    if (activeIdx === -1 || !availablePieces[activeIdx]) return;
+
+    if (!hoverPosition) {
+      const piece = availablePieces[activeIdx]!;
+      const r = 3, c = 3;
+      if (canPlacePiece(board, piece, r, c)) {
+        executePlacement(activeIdx, r, c);
+      } else {
+        addFloatingNotice('⚠️ Hãy di chuyển khối đến vị trí hợp lệ!', '#ef4444', 50, 48);
       }
+      return;
+    }
 
-      setAvailablePieces(finalPieces);
+    if (hoverPosition.isValid) {
+      executePlacement(activeIdx, hoverPosition.r, hoverPosition.c);
+    } else {
+      addFloatingNotice('⚠️ Vị trí không hợp lệ!', '#ef4444', 50, 48);
+    }
+  }, [isGameOver, selectedPieceIndex, availablePieces, hoverPosition, board, executePlacement, addFloatingNotice]);
 
-      if (checkGameOver(currentBoard, finalPieces)) {
-        setIsGameOver(true);
-        playGameOverSound();
+  // Keyboard shortcut listener: R / Space for Rotate, 1/2/3 for slot select, Arrow keys/WASD for D-Pad, Enter for place, D for Reroll, F for Hammer
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (isGameOver) return;
+      const key = e.key.toLowerCase();
+
+      if (key === 'r' || key === ' ') {
+        e.preventDefault();
+        const activeIdx =
+          draggingIndex !== null
+            ? draggingIndex
+            : selectedPieceIndex !== null
+            ? selectedPieceIndex
+            : availablePieces.findIndex((p) => p !== null);
+
+        if (activeIdx !== -1 && availablePieces[activeIdx]) {
+          rotatePieceAtIndex(activeIdx);
+          addFloatingNotice('🔄 ĐÃ XOAY KHỐI (R)', '#facc15', 50, 48);
+        }
+      } else if (key === 'arrowup' || key === 'w') {
+        e.preventDefault();
+        handleDpadMove(-1, 0);
+      } else if (key === 'arrowdown' || key === 's') {
+        e.preventDefault();
+        handleDpadMove(1, 0);
+      } else if (key === 'arrowleft' || key === 'a') {
+        e.preventDefault();
+        handleDpadMove(0, -1);
+      } else if (key === 'arrowright') {
+        e.preventDefault();
+        handleDpadMove(0, 1);
+      } else if (key === 'enter') {
+        e.preventDefault();
+        handleDpadPlace();
+      } else if (key === '1' || key === '2' || key === '3') {
+        const idx = parseInt(key, 10) - 1;
+        if (availablePieces[idx]) {
+          setSelectedPieceIndex(idx);
+          playClickSound();
+        }
+      } else if (key === 'd' && !['arrowup', 'arrowdown', 'arrowleft', 'arrowright'].includes(key)) {
+        if (magicRerolls > 0) {
+          handleMagicReroll();
+        }
+      } else if (key === 'f') {
+        if (hammerCharges > 0) {
+          setIsHammerActive((prev) => !prev);
+          playClickSound();
+        }
       }
-    },
-    [availablePieces, checkGameOver, addFloatingNotice]
-  );
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [
+    isGameOver,
+    draggingIndex,
+    selectedPieceIndex,
+    availablePieces,
+    rotatePieceAtIndex,
+    addFloatingNotice,
+    magicRerolls,
+    hammerCharges,
+    handleMagicReroll,
+    handleDpadMove,
+    handleDpadPlace,
+  ]);
 
   // Restart game
   const handleRestart = () => {
@@ -1223,6 +1294,175 @@ export const BlockPuzzleGame: React.FC = () => {
               </div>
             );
           })}
+        </div>
+
+        {/* ========================================================================= */}
+        {/* VIRTUAL CONTROLLER FOR MOBILE & IPAD: D-PAD, ROTATE & PLACEMENT BUTTONS */}
+        {/* ========================================================================= */}
+        <div className="w-full max-w-lg mx-auto mt-2 bg-[#120522]/90 border border-purple-500/40 rounded-2xl p-2.5 sm:p-3 shadow-xl flex flex-col gap-2.5">
+          {/* Quick Slot Selector & Rotate */}
+          <div className="flex items-center justify-between gap-2 flex-wrap">
+            <div className="flex items-center gap-1.5">
+              <span className="text-[10px] font-mono text-neutral-400">Chọn khối:</span>
+              {[0, 1, 2].map((idx) => {
+                const p = availablePieces[idx];
+                const isSelected = selectedPieceIndex === idx;
+                return (
+                  <button
+                    key={`slot-btn-${idx}`}
+                    type="button"
+                    disabled={!p || isGameOver}
+                    onClick={() => {
+                      if (p) {
+                        setSelectedPieceIndex(idx);
+                        playClickSound();
+                      }
+                    }}
+                    className={`px-2.5 py-1 rounded-xl text-xs font-mono font-bold transition-all cursor-pointer ${
+                      !p
+                        ? 'bg-neutral-950 text-neutral-600 border border-neutral-800 cursor-not-allowed opacity-40'
+                        : isSelected
+                        ? 'bg-amber-500 text-neutral-950 border border-amber-300 shadow-[0_0_10px_rgba(245,158,11,0.5)] scale-105'
+                        : 'bg-neutral-900 text-neutral-300 hover:text-white border border-neutral-700'
+                    }`}
+                  >
+                    #{idx + 1}
+                  </button>
+                );
+              })}
+            </div>
+
+            <div className="flex items-center gap-1.5">
+              {/* Rotate Active Piece */}
+              <button
+                type="button"
+                disabled={isGameOver || (selectedPieceIndex === null && !availablePieces.some((p) => p !== null))}
+                onClick={() => {
+                  const activeIdx =
+                    selectedPieceIndex !== null
+                      ? selectedPieceIndex
+                      : availablePieces.findIndex((p) => p !== null);
+                  if (activeIdx !== -1 && availablePieces[activeIdx]) {
+                    rotatePieceAtIndex(activeIdx);
+                    addFloatingNotice('🔄 ĐÃ XOAY KHỐI (R)', '#facc15', 50, 48);
+                  }
+                }}
+                className="px-2.5 py-1 rounded-xl bg-purple-900/60 hover:bg-purple-800 active:bg-amber-500 text-purple-200 active:text-neutral-950 border border-purple-500/50 text-xs font-mono font-bold flex items-center gap-1 shadow transition-all cursor-pointer"
+                title="Xoay 90° (Phím R)"
+              >
+                <RotateCw className="w-3.5 h-3.5" />
+                <span>Xoay (R)</span>
+              </button>
+
+              {/* Reroll 3 Pieces */}
+              <button
+                type="button"
+                disabled={magicRerolls <= 0 || isGameOver}
+                onClick={handleMagicReroll}
+                className={`px-2.5 py-1 rounded-xl text-xs font-mono font-bold flex items-center gap-1 border transition-all cursor-pointer ${
+                  magicRerolls > 0
+                    ? 'bg-sky-950/60 hover:bg-sky-900 text-sky-300 border-sky-500/50 shadow'
+                    : 'bg-neutral-950 text-neutral-600 border-neutral-800 opacity-40 cursor-not-allowed'
+                }`}
+                title="Đổi 3 khối mới (Phím D)"
+              >
+                <Dices className="w-3.5 h-3.5 text-sky-400" />
+                <span>Đổi ({magicRerolls})</span>
+              </button>
+
+              {/* Thunder Hammer */}
+              <button
+                type="button"
+                disabled={hammerCharges <= 0 || isGameOver}
+                onClick={() => {
+                  setIsHammerActive((prev) => !prev);
+                  playClickSound();
+                }}
+                className={`px-2.5 py-1 rounded-xl text-xs font-mono font-bold flex items-center gap-1 border transition-all cursor-pointer ${
+                  isHammerActive
+                    ? 'bg-amber-500 text-neutral-950 border-amber-300 shadow-[0_0_12px_rgba(245,158,11,0.7)] animate-pulse'
+                    : hammerCharges > 0
+                    ? 'bg-amber-950/50 hover:bg-amber-900 text-amber-300 border-amber-500/40 shadow'
+                    : 'bg-neutral-950 text-neutral-600 border-neutral-800 opacity-40 cursor-not-allowed'
+                }`}
+                title="Búa sấm sét phá 1 ô (Phím F)"
+              >
+                <Hammer className="w-3.5 h-3.5" />
+                <span>Búa ({hammerCharges})</span>
+              </button>
+            </div>
+          </div>
+
+          {/* D-Pad Buttons + Place Button */}
+          <div className="flex items-center justify-between gap-3 pt-1 border-t border-purple-900/40">
+            {/* D-Pad 4 Directions */}
+            <div className="relative w-36 h-24 flex items-center justify-center select-none">
+              {/* UP */}
+              <button
+                type="button"
+                onClick={() => handleDpadMove(-1, 0)}
+                className="absolute top-0 w-10 h-10 rounded-xl bg-neutral-900 hover:bg-neutral-800 active:bg-amber-500 text-white active:text-neutral-950 border border-neutral-700 flex items-center justify-center shadow transition-transform active:scale-95 cursor-pointer"
+                title="Di chuyển lên (↑)"
+              >
+                <ArrowUp className="w-4 h-4" />
+              </button>
+              {/* LEFT */}
+              <button
+                type="button"
+                onClick={() => handleDpadMove(0, -1)}
+                className="absolute left-0 w-10 h-10 rounded-xl bg-neutral-900 hover:bg-neutral-800 active:bg-amber-500 text-white active:text-neutral-950 border border-neutral-700 flex items-center justify-center shadow transition-transform active:scale-95 cursor-pointer"
+                title="Di chuyển sang trái (←)"
+              >
+                <ArrowLeft className="w-4 h-4" />
+              </button>
+              {/* CENTER DOT */}
+              <div className="w-6 h-6 rounded-full bg-neutral-950 border border-neutral-800 flex items-center justify-center text-[9px] text-neutral-500 pointer-events-none">
+                ✦
+              </div>
+              {/* RIGHT */}
+              <button
+                type="button"
+                onClick={() => handleDpadMove(0, 1)}
+                className="absolute right-0 w-10 h-10 rounded-xl bg-neutral-900 hover:bg-neutral-800 active:bg-amber-500 text-white active:text-neutral-950 border border-neutral-700 flex items-center justify-center shadow transition-transform active:scale-95 cursor-pointer"
+                title="Di chuyển sang phải (→)"
+              >
+                <ArrowRight className="w-4 h-4" />
+              </button>
+              {/* DOWN */}
+              <button
+                type="button"
+                onClick={() => handleDpadMove(1, 0)}
+                className="absolute bottom-0 w-10 h-10 rounded-xl bg-neutral-900 hover:bg-neutral-800 active:bg-amber-500 text-white active:text-neutral-950 border border-neutral-700 flex items-center justify-center shadow transition-transform active:scale-95 cursor-pointer"
+                title="Di chuyển xuống (↓)"
+              >
+                <ArrowDown className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Place Block Button */}
+            <div className="flex-1 flex flex-col gap-1 items-end">
+              <button
+                type="button"
+                disabled={isGameOver}
+                onClick={handleDpadPlace}
+                className={`w-full max-w-[200px] py-3 px-4 rounded-2xl font-black font-sans text-xs tracking-wider uppercase transition-all shadow-xl flex items-center justify-center gap-2 cursor-pointer ${
+                  hoverPosition?.isValid
+                    ? 'bg-gradient-to-r from-emerald-500 via-teal-500 to-emerald-400 text-neutral-950 shadow-[0_0_20px_rgba(16,185,129,0.6)] transform hover:scale-[1.02] active:scale-95'
+                    : 'bg-neutral-900 text-neutral-400 border border-neutral-800 hover:text-white'
+                }`}
+              >
+                <Check className="w-4 h-4" />
+                <span>ĐẶT KHỐI</span>
+              </button>
+              <span className="text-[10px] font-mono text-neutral-400 text-right">
+                {hoverPosition
+                  ? hoverPosition.isValid
+                    ? '✓ Vị trí hợp lệ'
+                    : '⚠️ Vị trí không hợp lệ'
+                  : 'Dùng mũi tên căn vị trí'}
+              </span>
+            </div>
+          </div>
         </div>
       </div>
 

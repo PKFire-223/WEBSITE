@@ -133,9 +133,9 @@ export const GameModal: React.FC<GameModalProps> = ({
   }, [isOnlyAFan]);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-5 bg-black/90 backdrop-blur-md animate-in fade-in duration-200">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-1.5 sm:p-4 md:p-6 bg-black/90 backdrop-blur-md animate-in fade-in duration-200">
       <div
-        className="relative w-full max-w-4xl max-h-[96vh] overflow-y-auto bg-[#0d0714] border-2 border-amber-500/50 rounded-3xl shadow-[0_0_80px_rgba(245,158,11,0.3)] p-4 sm:p-6 space-y-5"
+        className="relative w-full max-w-5xl lg:max-w-6xl max-h-[98vh] overflow-y-auto bg-[#0d0714] border-2 border-amber-500/50 rounded-2xl sm:rounded-3xl shadow-[0_0_80px_rgba(245,158,11,0.3)] p-2.5 sm:p-5 md:p-6 space-y-4"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Ornate Golden Corners */}

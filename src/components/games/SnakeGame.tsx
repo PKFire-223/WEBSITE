@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { RotateCcw, Trophy, Music, VolumeX, AlertTriangle, ShieldAlert, ArrowUp, ArrowDown, ArrowLeft, ArrowRight, Clock } from 'lucide-react';
+import { RotateCcw, Trophy, Music, VolumeX, AlertTriangle, ArrowUp, ArrowDown, ArrowLeft, ArrowRight, Clock, Gamepad2 } from 'lucide-react';
 import {
   playEatAppleSound,
   playBombSound,
@@ -11,9 +11,12 @@ import {
   stopSnakeGameBGM,
 } from '../../utils/audio';
 
-// Grid size: 16 x 16 (Classic arcade layout)
+// ============================================================================
+// GAME CONFIGURATION
+// ============================================================================
 const GRID_SIZE = 16;
-const ITEM_LIFETIME = 8; // Táo, Bom và Đá đều tồn tại đúng 8 giây rồi biến mất
+const ITEM_LIFETIME = 8;
+const MOVE_INTERVAL_MS = 135;
 
 type Direction = 'UP' | 'DOWN' | 'LEFT' | 'RIGHT';
 type WallSide = 'TOP' | 'BOTTOM' | 'LEFT' | 'RIGHT';
@@ -28,7 +31,7 @@ interface Hazard {
   type: 'bomb' | 'rock';
   x: number;
   y: number;
-  life: number; // Despawns when 0
+  life: number;
 }
 
 interface FloatingNotice {
@@ -40,7 +43,9 @@ interface FloatingNotice {
 }
 
 export const SnakeGame: React.FC = () => {
-  // Game state
+  // ============================================================================
+  // GAME STATE
+  // ============================================================================
   const [snake, setSnake] = useState<Position[]>([
     { x: 8, y: 8 },
     { x: 7, y: 8 },
@@ -48,6 +53,7 @@ export const SnakeGame: React.FC = () => {
   ]);
   const [direction, setDirection] = useState<Direction>('RIGHT');
   const nextDirectionRef = useRef<Direction>('RIGHT');
+  const lastProcessedDirectionRef = useRef<Direction>('RIGHT');
 
   const [apple, setApple] = useState<Position>({ x: 12, y: 8 });
   const [appleLife, setAppleLife] = useState(ITEM_LIFETIME);
@@ -58,12 +64,10 @@ export const SnakeGame: React.FC = () => {
   const [gameOverReason, setGameOverReason] = useState<string>('Bạn đã va vào thân mình!');
   const [isStunned, setIsStunned] = useState(false);
 
-  // Blackout event (1 - 1.5s)
   const [isBlackout, setIsBlackout] = useState(false);
   const [gamePlaySeconds, setGamePlaySeconds] = useState(0);
   const [isMusicPlaying, setIsMusicPlaying] = useState(true);
 
-  // Random wall lockdown mechanic (active after 30 seconds)
   const [blockedWall, setBlockedWall] = useState<WallSide | null>(null);
   const [blockedWallSecondsLeft, setBlockedWallSecondsLeft] = useState(0);
 
@@ -77,8 +81,10 @@ export const SnakeGame: React.FC = () => {
   });
 
   const [floatingTexts, setFloatingTexts] = useState<FloatingNotice[]>([]);
+  const [showVirtualPad, setShowVirtualPad] = useState<boolean>(true);
+  const touchStartRef = useRef<{ x: number; y: number } | null>(null);
 
-  // Synchronous references so 1-second interval NEVER loses state or gets reset by movement ticks
+  // Synchronous references
   const snakeRef = useRef(snake);
   snakeRef.current = snake;
 
@@ -91,7 +97,7 @@ export const SnakeGame: React.FC = () => {
   const blockedWallRef = useRef<WallSide | null>(null);
   const blockedWallSecondsRef = useRef<number>(0);
 
-  // Music loop
+  // Audio background loop
   useEffect(() => {
     if (isMusicPlaying && !isGameOver) {
       startSnakeGameBGM();
@@ -120,7 +126,7 @@ export const SnakeGame: React.FC = () => {
     }
   }, [score, highScore]);
 
-  // Helper: Find random unoccupied cell
+  // Helper: Find free cell
   const getRandomFreeCell = useCallback(
     (excludePositions: Position[]): Position => {
       let attempts = 0;
@@ -136,13 +142,27 @@ export const SnakeGame: React.FC = () => {
     []
   );
 
-  // Helper: Trigger floating text
+  // Helper: Floating notification text
   const addFloatingNotice = useCallback((text: string, x: number, y: number, color: string) => {
     const id = `float-${Date.now()}-${Math.random()}`;
     setFloatingTexts((prev) => [...prev, { id, text, x, y, color }]);
     setTimeout(() => {
       setFloatingTexts((prev) => prev.filter((item) => item.id !== id));
     }, 1500);
+  }, []);
+
+  // Safe direction setter preventing instant 180-degree suicide
+  const setSafeDirection = useCallback((newDir: Direction) => {
+    const currentMoving = lastProcessedDirectionRef.current;
+    if (newDir === 'UP' && currentMoving !== 'DOWN') {
+      nextDirectionRef.current = 'UP';
+    } else if (newDir === 'DOWN' && currentMoving !== 'UP') {
+      nextDirectionRef.current = 'DOWN';
+    } else if (newDir === 'LEFT' && currentMoving !== 'RIGHT') {
+      nextDirectionRef.current = 'LEFT';
+    } else if (newDir === 'RIGHT' && currentMoving !== 'LEFT') {
+      nextDirectionRef.current = 'RIGHT';
+    }
   }, []);
 
   // Restart Game
@@ -154,63 +174,64 @@ export const SnakeGame: React.FC = () => {
       { x: 6, y: 8 },
     ];
     setSnake(initialSnake);
+    snakeRef.current = initialSnake;
     setDirection('RIGHT');
     nextDirectionRef.current = 'RIGHT';
+    lastProcessedDirectionRef.current = 'RIGHT';
     setScore(0);
     setIsGameOver(false);
     setGameOverReason('Bạn đã va vào thân mình!');
     setIsStunned(false);
     setIsBlackout(false);
     setGamePlaySeconds(0);
-    
-    // Reset blocked wall
+
     blockedWallRef.current = null;
     blockedWallSecondsRef.current = 0;
     setBlockedWall(null);
     setBlockedWallSecondsLeft(0);
 
     setHazards([]);
+    hazardsRef.current = [];
     setFloatingTexts([]);
 
     const newApple = getRandomFreeCell(initialSnake);
     setApple(newApple);
+    appleRef.current = newApple;
     setAppleLife(ITEM_LIFETIME);
 
     if (isMusicPlaying) startSnakeGameBGM();
   };
 
-  // Key listener for Controls
+  // Keyboard controls
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', ' '].includes(e.key)) {
         e.preventDefault();
       }
 
-      const cur = nextDirectionRef.current;
-      if ((e.key === 'ArrowUp' || e.key === 'w' || e.key === 'W') && cur !== 'DOWN') {
-        nextDirectionRef.current = 'UP';
-      } else if ((e.key === 'ArrowDown' || e.key === 's' || e.key === 'S') && cur !== 'UP') {
-        nextDirectionRef.current = 'DOWN';
-      } else if ((e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') && cur !== 'RIGHT') {
-        nextDirectionRef.current = 'LEFT';
-      } else if ((e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') && cur !== 'LEFT') {
-        nextDirectionRef.current = 'RIGHT';
+      if (e.key === 'ArrowUp' || e.key === 'w' || e.key === 'W') {
+        setSafeDirection('UP');
+      } else if (e.key === 'ArrowDown' || e.key === 's' || e.key === 'S') {
+        setSafeDirection('DOWN');
+      } else if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') {
+        setSafeDirection('LEFT');
+      } else if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') {
+        setSafeDirection('RIGHT');
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, []);
+  }, [setSafeDirection]);
 
-  // =========================================================================
-  // DEDICATED 1-SECOND INTERVAL (ROCK SOLID, INDEPENDENT FROM SNAKE TICKS)
-  // =========================================================================
+  // ============================================================================
+  // 1-SECOND TIMER LOOP: Hazards, Wall Lockdown & Item Lifetimes
+  // ============================================================================
   useEffect(() => {
     if (isGameOver) return;
 
     const secondInterval = setInterval(() => {
-      // 1. Apple Lifetime Countdown (Strictly 8 seconds)
-      // When apple reaches 1s -> despawns and relocates to a fresh random tile!
+      // Apple lifetime countdown
       setAppleLife((prevLife) => {
         if (prevLife <= 1) {
           const occupied: Position[] = [
@@ -219,18 +240,18 @@ export const SnakeGame: React.FC = () => {
           ];
           const newPos = getRandomFreeCell(occupied);
           setApple(newPos);
-          return ITEM_LIFETIME; // Reset back to 8s
+          appleRef.current = newPos;
+          return ITEM_LIFETIME;
         }
         return prevLife - 1;
       });
 
-      // 2. Playtime Counter & Special States
+      // Session play time and dynamic challenges
       setGamePlaySeconds((prev) => {
         const nextSec = prev + 1;
 
-        // BẮT ĐẦU KÍCH HOẠT KHI CHƠI ĐẠT 30 GIÂY TRỞ LÊN:
         if (nextSec >= 30) {
-          // A. Blackout glitch (Chớp tối màn hình 1.2s mỗi ~18s)
+          // Blackout glitch event
           if (nextSec % 18 === 0) {
             playGlitchSound();
             setIsBlackout(true);
@@ -239,41 +260,40 @@ export const SnakeGame: React.FC = () => {
             }, 1200);
           }
 
-          // B. Bombs & Rocks hazard spawning (mỗi 7s xuất hiện 1 vật phẩm)
+          // Hazards spawning
           if (nextSec % 7 === 0) {
             const type: 'bomb' | 'rock' = Math.random() < 0.5 ? 'bomb' : 'rock';
             setHazards((prevHazards) => {
-              if (prevHazards.length >= 3) return prevHazards; // Tối đa 3 vật phẩm cùng lúc
+              if (prevHazards.length >= 3) return prevHazards;
               const occupied: Position[] = [
                 ...snakeRef.current,
                 appleRef.current,
                 ...prevHazards.map((h) => ({ x: h.x, y: h.y })),
               ];
               const freeCell = getRandomFreeCell(occupied);
-              return [
+              const nextList = [
                 ...prevHazards,
                 {
                   id: `hazard-${Date.now()}-${Math.random()}`,
                   type,
                   x: freeCell.x,
                   y: freeCell.y,
-                  life: ITEM_LIFETIME, // Cùng tồn tại 8s như táo
+                  life: ITEM_LIFETIME,
                 },
               ];
+              hazardsRef.current = nextList;
+              return nextList;
             });
           }
 
-          // C. WALL LOCKDOWN (TƯỜNG NGĂN 1 PHÍA NGẪU NHIÊN TRONG 5S)
-          // Kích hoạt ngay tại giây 30 và lặp lại định kỳ mỗi 12 giây
+          // Wall lockdown
           if (blockedWallSecondsRef.current <= 0 && (nextSec === 30 || nextSec % 12 === 0)) {
             const walls: WallSide[] = ['TOP', 'BOTTOM', 'LEFT', 'RIGHT'];
             const chosen = walls[Math.floor(Math.random() * walls.length)];
-            
-            // Set synchronous ref FIRST so next movement tick immediately sees it
-            blockedWallRef.current = chosen;
-            blockedWallSecondsRef.current = 5; // Khóa 5 giây
 
-            // Then update React states for UI rendering
+            blockedWallRef.current = chosen;
+            blockedWallSecondsRef.current = 5;
+
             setBlockedWall(chosen);
             setBlockedWallSecondsLeft(5);
 
@@ -285,7 +305,7 @@ export const SnakeGame: React.FC = () => {
         return nextSec;
       });
 
-      // 3. Decrement blocked wall countdown via synchronous ref
+      // Countdown blocked wall
       if (blockedWallSecondsRef.current > 0) {
         blockedWallSecondsRef.current -= 1;
         setBlockedWallSecondsLeft(blockedWallSecondsRef.current);
@@ -295,28 +315,30 @@ export const SnakeGame: React.FC = () => {
         }
       }
 
-      // 4. Hazards lifetime (despawns when 8s expire)
-      setHazards((prev) =>
-        prev
+      // Hazards lifetime
+      setHazards((prev) => {
+        const nextList = prev
           .map((h) => ({ ...h, life: h.life - 1 }))
-          .filter((h) => h.life > 0)
-      );
+          .filter((h) => h.life > 0);
+        hazardsRef.current = nextList;
+        return nextList;
+      });
     }, 1000);
 
     return () => clearInterval(secondInterval);
   }, [isGameOver, getRandomFreeCell, addFloatingNotice]);
 
-  // =========================================================================
-  // MAIN MOVEMENT TICK (SNAKE ADVANCES EVERY 135ms)
-  // =========================================================================
+  // ============================================================================
+  // MOVEMENT & COLLISION ENGINE
+  // ============================================================================
   useEffect(() => {
     if (isGameOver) return;
 
     const moveInterval = setInterval(() => {
-      // If stunned by rock, snake stands still
       if (isStunned) return;
 
       const curDir = nextDirectionRef.current;
+      lastProcessedDirectionRef.current = curDir;
       setDirection(curDir);
 
       setSnake((prevSnake) => {
@@ -324,19 +346,14 @@ export const SnakeGame: React.FC = () => {
         let nextX = curHead.x;
         let nextY = curHead.y;
 
-        // Calculate theoretical next position
         if (curDir === 'UP') nextY -= 1;
         if (curDir === 'DOWN') nextY += 1;
         if (curDir === 'LEFT') nextX -= 1;
         if (curDir === 'RIGHT') nextX += 1;
 
-        // Current locked wall check from synchronous ref
         const currentBlocked = blockedWallRef.current;
 
-        // =====================================================================
-        // WALL WRAP-AROUND & BLOCKED WALL CHECK
-        // =====================================================================
-        // 1. Check UP boundary
+        // Boundary wrap & Wall barrier check
         if (nextY < 0) {
           if (currentBlocked === 'TOP') {
             setIsGameOver(true);
@@ -345,11 +362,8 @@ export const SnakeGame: React.FC = () => {
             stopSnakeGameBGM();
             return prevSnake;
           }
-          nextY = GRID_SIZE - 1; // Wrap around to bottom
-        }
-
-        // 2. Check DOWN boundary
-        else if (nextY >= GRID_SIZE) {
+          nextY = GRID_SIZE - 1;
+        } else if (nextY >= GRID_SIZE) {
           if (currentBlocked === 'BOTTOM') {
             setIsGameOver(true);
             setGameOverReason('Rắn đã đâm vào TƯỜNG DƯỚI đang bị phong tỏa!');
@@ -357,10 +371,9 @@ export const SnakeGame: React.FC = () => {
             stopSnakeGameBGM();
             return prevSnake;
           }
-          nextY = 0; // Wrap around to top
+          nextY = 0;
         }
 
-        // 3. Check LEFT boundary
         if (nextX < 0) {
           if (currentBlocked === 'LEFT') {
             setIsGameOver(true);
@@ -369,11 +382,8 @@ export const SnakeGame: React.FC = () => {
             stopSnakeGameBGM();
             return prevSnake;
           }
-          nextX = GRID_SIZE - 1; // Wrap around to right
-        }
-
-        // 4. Check RIGHT boundary
-        else if (nextX >= GRID_SIZE) {
+          nextX = GRID_SIZE - 1;
+        } else if (nextX >= GRID_SIZE) {
           if (currentBlocked === 'RIGHT') {
             setIsGameOver(true);
             setGameOverReason('Rắn đã đâm vào TƯỜNG PHẢI đang bị phong tỏa!');
@@ -381,13 +391,15 @@ export const SnakeGame: React.FC = () => {
             stopSnakeGameBGM();
             return prevSnake;
           }
-          nextX = 0; // Wrap around to left
+          nextX = 0;
         }
 
         const newHead: Position = { x: nextX, y: nextY };
+        const isEatingApple = newHead.x === appleRef.current.x && newHead.y === appleRef.current.y;
 
-        // 5. Check Self Collision (Game Over)
-        const hitSelf = prevSnake.some((seg, idx) => idx > 0 && seg.x === newHead.x && seg.y === newHead.y);
+        // Self-collision check (if not eating apple, tail moves forward safely)
+        const bodyToCheck = isEatingApple ? prevSnake : prevSnake.slice(0, -1);
+        const hitSelf = bodyToCheck.some((seg) => seg.x === newHead.x && seg.y === newHead.y);
         if (hitSelf) {
           setIsGameOver(true);
           setGameOverReason('Rắn đã cắn trúng thân mình!');
@@ -396,72 +408,94 @@ export const SnakeGame: React.FC = () => {
           return prevSnake;
         }
 
-        // 6. Check Apple Collision
-        if (newHead.x === appleRef.current.x && newHead.y === appleRef.current.y) {
+        // Apple collection
+        if (isEatingApple) {
           playEatAppleSound();
           setScore((s) => s + 10);
 
-          // Reset Apple position & lifetime back to 8s
-          const occupied: Position[] = [newHead, ...prevSnake, ...hazardsRef.current.map((h) => ({ x: h.x, y: h.y }))];
-          setApple(getRandomFreeCell(occupied));
+          const occupied: Position[] = [
+            newHead,
+            ...prevSnake,
+            ...hazardsRef.current.map((h) => ({ x: h.x, y: h.y })),
+          ];
+          const newPos = getRandomFreeCell(occupied);
+          setApple(newPos);
+          appleRef.current = newPos;
           setAppleLife(ITEM_LIFETIME);
 
-          // Snake grows: return new head with all current body segments
-          return [newHead, ...prevSnake];
+          const grownSnake = [newHead, ...prevSnake];
+          snakeRef.current = grownSnake;
+          return grownSnake;
         }
 
-        // 7. Check Hazard Collisions (Bomb or Rock)
+        // Hazard interactions
         const currentHazards = hazardsRef.current;
         const hitHazardIndex = currentHazards.findIndex((h) => h.x === newHead.x && h.y === newHead.y);
         if (hitHazardIndex !== -1) {
           const hazard = currentHazards[hitHazardIndex];
-          setHazards((hz) => hz.filter((_, i) => i !== hitHazardIndex));
+          const nextHazards = currentHazards.filter((_, i) => i !== hitHazardIndex);
+          hazardsRef.current = nextHazards;
+          setHazards(nextHazards);
 
           if (hazard.type === 'bomb') {
-            // ĂN BOM: Giảm 1/6 kích thước và 1/6 số điểm (làm tròn lên Math.ceil)
             playBombSound();
             const curLen = prevSnake.length;
             const sizePenalty = Math.ceil(curLen / 6);
 
-            setScore((s) => {
-              const scorePenalty = Math.ceil(s / 6);
-              return Math.max(0, s - scorePenalty);
-            });
-
+            setScore((s) => Math.max(0, s - Math.ceil(s / 6)));
             addFloatingNotice(`💥 BOM! -${sizePenalty} thân & -1/6 điểm`, newHead.x, newHead.y, '#ef4444');
 
             const remainingBody = prevSnake.slice(0, Math.max(3, prevSnake.length - sizePenalty));
-            return [newHead, ...remainingBody.slice(0, -1)];
+            const newSnake = [newHead, ...remainingBody.slice(0, -1)];
+            snakeRef.current = newSnake;
+            return newSnake;
           } else if (hazard.type === 'rock') {
-            // ĂN ĐÁ: Bị choáng 3s đứng yên
             playRockHitSound();
             setIsStunned(true);
-
             addFloatingNotice('💫 CHOÁNG 3 GIÂY!', newHead.x, newHead.y, '#facc15');
 
             setTimeout(() => {
               setIsStunned(false);
             }, 3000);
 
-            return [newHead, ...prevSnake.slice(0, -1)];
+            const newSnake = [newHead, ...prevSnake.slice(0, -1)];
+            snakeRef.current = newSnake;
+            return newSnake;
           }
         }
 
-        // Standard movement: advance head, discard tail
-        return [newHead, ...prevSnake.slice(0, -1)];
+        // Standard movement step
+        const movedSnake = [newHead, ...prevSnake.slice(0, -1)];
+        snakeRef.current = movedSnake;
+        return movedSnake;
       });
-    }, 135);
+    }, MOVE_INTERVAL_MS);
 
     return () => clearInterval(moveInterval);
   }, [isGameOver, isStunned, getRandomFreeCell, addFloatingNotice]);
 
-  // Touch controls for mobile
-  const handleTouchDirection = (newDir: Direction) => {
-    const cur = nextDirectionRef.current;
-    if (newDir === 'UP' && cur !== 'DOWN') nextDirectionRef.current = 'UP';
-    if (newDir === 'DOWN' && cur !== 'UP') nextDirectionRef.current = 'DOWN';
-    if (newDir === 'LEFT' && cur !== 'RIGHT') nextDirectionRef.current = 'LEFT';
-    if (newDir === 'RIGHT' && cur !== 'LEFT') nextDirectionRef.current = 'RIGHT';
+  // Touch gesture listeners
+  const handleBoardTouchStart = (e: React.TouchEvent) => {
+    if (e.touches.length > 0) {
+      touchStartRef.current = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+    }
+  };
+
+  const handleBoardTouchEnd = (e: React.TouchEvent) => {
+    if (!touchStartRef.current || e.changedTouches.length === 0) return;
+    const endX = e.changedTouches[0].clientX;
+    const endY = e.changedTouches[0].clientY;
+    const dx = endX - touchStartRef.current.x;
+    const dy = endY - touchStartRef.current.y;
+    touchStartRef.current = null;
+
+    if (Math.abs(dx) < 20 && Math.abs(dy) < 20) return;
+
+    if (Math.abs(dx) > Math.abs(dy)) {
+      setSafeDirection(dx > 0 ? 'RIGHT' : 'LEFT');
+    } else {
+      setSafeDirection(dy > 0 ? 'DOWN' : 'UP');
+    }
   };
 
   const getWallLabel = (wall: WallSide | null) => {
@@ -474,26 +508,23 @@ export const SnakeGame: React.FC = () => {
     }
   };
 
+  // ============================================================================
+  // UI RENDERING
+  // ============================================================================
   return (
-    <div className="relative w-full h-[470px] sm:h-[550px] rounded-2xl overflow-hidden select-none flex flex-col justify-between p-3 sm:p-4 font-sans">
-      
-      {/* ========================================================================= */}
-      {/* 1. TRANQUIL FOREST & TREES BACKGROUND */}
-      {/* ========================================================================= */}
+    <div className="relative w-full min-h-[500px] sm:min-h-[560px] rounded-2xl overflow-hidden select-none flex flex-col justify-between p-2.5 sm:p-4 font-sans">
+      {/* Background Graphic */}
       <img
         src="https://images.unsplash.com/photo-1511497584788-87676104235f?auto=format&fit=crop&w=1400&q=80"
         alt="Enchanted Forest"
         className="absolute inset-0 w-full h-full object-cover object-center filter brightness-[0.4] contrast-110 pointer-events-none"
       />
-      {/* Soft forest vignette & sunbeam overlay */}
       <div className="absolute inset-0 bg-radial-[circle_at_center,transparent_30%,#040a04_95%] pointer-events-none" />
       <div className="absolute inset-0 bg-emerald-950/20 pointer-events-none" />
 
-      {/* ========================================================================= */}
-      {/* 2. TOP DASHBOARD (Score, Playtime Seconds, Snake Length, Music) */}
-      {/* ========================================================================= */}
-      <div className="relative z-20 flex items-center justify-between gap-2 bg-neutral-950/85 backdrop-blur-md px-3.5 py-2 rounded-xl border border-emerald-500/40 shadow-xl">
-        <div className="flex items-center gap-2.5 sm:gap-4">
+      {/* Top Dashboard HUD */}
+      <div className="relative z-20 flex items-center justify-between gap-2 bg-neutral-950/85 backdrop-blur-md px-3 py-2 rounded-xl border border-emerald-500/40 shadow-xl flex-wrap">
+        <div className="flex items-center gap-2 sm:gap-4 flex-wrap">
           <div className="flex items-center gap-1.5">
             <span className="text-[11px] font-sans font-bold text-amber-400 uppercase">ĐIỂM:</span>
             <span className="text-xl sm:text-2xl font-black font-sans text-white drop-shadow-[0_0_8px_rgba(245,158,11,0.5)]">
@@ -501,8 +532,7 @@ export const SnakeGame: React.FC = () => {
             </span>
           </div>
 
-          {/* Real-time seconds played */}
-          <div className="flex items-center gap-1.5 pl-2.5 sm:pl-3 border-l border-neutral-800 text-xs font-sans">
+          <div className="flex items-center gap-1.5 pl-2 sm:pl-3 border-l border-neutral-800 text-xs font-sans">
             <Clock className="w-3.5 h-3.5 text-sky-400" />
             <span className="text-neutral-400">Thời gian:</span>
             <strong className={`font-mono text-xs ${gamePlaySeconds >= 30 ? 'text-amber-400 font-bold' : 'text-sky-300'}`}>
@@ -520,32 +550,43 @@ export const SnakeGame: React.FC = () => {
           </div>
         </div>
 
-        {/* Music toggle button */}
-        <button
-          onClick={toggleMusic}
-          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-sans transition-all cursor-pointer ${
-            isMusicPlaying
-              ? 'bg-emerald-500/20 border-emerald-400 text-emerald-300 shadow-[0_0_12px_rgba(16,185,129,0.3)]'
-              : 'bg-neutral-900 border-neutral-800 text-neutral-500'
-          }`}
-          title={isMusicPlaying ? 'Tắt nhạc nền' : 'Bật nhạc nền'}
-        >
-          {isMusicPlaying ? <Music className="w-3.5 h-3.5 animate-bounce" /> : <VolumeX className="w-3.5 h-3.5" />}
-          <span className="hidden md:inline">{isMusicPlaying ? 'Nhạc: BẬT' : 'Nhạc: TẮT'}</span>
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setShowVirtualPad((prev) => !prev)}
+            className={`flex items-center gap-1 px-2.5 py-1.5 rounded-xl border text-xs font-sans transition-all cursor-pointer ${
+              showVirtualPad
+                ? 'bg-amber-500/20 border-amber-400 text-amber-300 shadow-[0_0_10px_rgba(245,158,11,0.3)]'
+                : 'bg-neutral-900 border-neutral-800 text-neutral-400'
+            }`}
+            title="Bật/Tắt phím điều khiển ảo cho Mobile / iPad"
+          >
+            <Gamepad2 className="w-3.5 h-3.5 text-amber-400" />
+            <span className="text-[11px] font-bold">{showVirtualPad ? 'Tay Cầm' : 'Phím Ẩn'}</span>
+          </button>
+
+          <button
+            onClick={toggleMusic}
+            className={`flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl border text-xs font-sans transition-all cursor-pointer ${
+              isMusicPlaying
+                ? 'bg-emerald-500/20 border-emerald-400 text-emerald-300 shadow-[0_0_12px_rgba(16,185,129,0.3)]'
+                : 'bg-neutral-900 border-neutral-800 text-neutral-500'
+            }`}
+            title={isMusicPlaying ? 'Tắt nhạc nền' : 'Bật nhạc nền'}
+          >
+            {isMusicPlaying ? <Music className="w-3.5 h-3.5 animate-bounce" /> : <VolumeX className="w-3.5 h-3.5" />}
+            <span className="hidden md:inline">{isMusicPlaying ? 'Nhạc: BẬT' : 'Nhạc: TẮT'}</span>
+          </button>
+        </div>
       </div>
 
-      {/* ========================================================================= */}
-      {/* 3. 16x16 LAWN BOARD */}
-      {/* ========================================================================= */}
-      <div className="relative z-10 flex-1 flex items-center justify-center my-1 overflow-hidden">
-        
-        {/* Outer Wooden/Garden Border Container */}
-        <div className="relative aspect-square h-full max-h-[350px] sm:max-h-[390px] rounded-2xl p-2.5 bg-gradient-to-br from-[#2a1a0e] via-[#1f1309] to-[#2a1a0e] border-2 border-amber-600/70 shadow-[0_0_35px_rgba(0,0,0,0.9)]">
-          
-          {/* ================================================================= */}
-          {/* HIGH-VISIBILITY LOCKED WALL BARRIER (PHONG TỎA TƯỜNG CỰC KỲ RÕ NÉT) */}
-          {/* ================================================================= */}
+      {/* 16x16 Lawn Board */}
+      <div className="relative z-10 w-full flex items-center justify-center my-1">
+        <div
+          onTouchStart={handleBoardTouchStart}
+          onTouchEnd={handleBoardTouchEnd}
+          className="relative w-full max-w-[340px] sm:max-w-[380px] aspect-square rounded-2xl p-2 sm:p-2.5 bg-gradient-to-br from-[#2a1a0e] via-[#1f1309] to-[#2a1a0e] border-2 border-amber-600/70 shadow-[0_0_35px_rgba(0,0,0,0.9)] touch-none cursor-grab"
+        >
+          {/* Locked Wall Indicators */}
           {blockedWall === 'TOP' && (
             <div className="absolute top-0 left-0 right-0 h-4 z-50 bg-gradient-to-r from-red-600 via-rose-500 to-red-600 rounded-t-xl shadow-[0_0_25px_#ef4444] border-b-2 border-yellow-300 animate-pulse flex items-center justify-center">
               <span className="text-[9px] font-sans font-black text-white uppercase tracking-wider drop-shadow-md">
@@ -575,7 +616,7 @@ export const SnakeGame: React.FC = () => {
             </div>
           )}
 
-          {/* Lush Green Lawn Grid */}
+          {/* Grid Viewport */}
           <div
             className="relative w-full h-full rounded-xl overflow-hidden grid shadow-inner border border-emerald-950"
             style={{
@@ -583,7 +624,7 @@ export const SnakeGame: React.FC = () => {
               gridTemplateRows: `repeat(${GRID_SIZE}, minmax(0, 1fr))`,
             }}
           >
-            {/* Alternating Checkered Lawn Tiles */}
+            {/* Lawn Tiles */}
             {Array.from({ length: GRID_SIZE * GRID_SIZE }).map((_, i) => {
               const row = Math.floor(i / GRID_SIZE);
               const col = i % GRID_SIZE;
@@ -606,7 +647,7 @@ export const SnakeGame: React.FC = () => {
               );
             })}
 
-            {/* 1. APPLE (TÁO ĐỎ CÓ CUỐNG LÁ TRÊN BÃI CỎ - BIẾN MẤT VÀ ĐỔI VỊ TRÍ SAU 8S) */}
+            {/* Apple */}
             <div
               className="absolute z-20 flex items-center justify-center transform -translate-x-1/2 -translate-y-1/2"
               style={{
@@ -617,13 +658,12 @@ export const SnakeGame: React.FC = () => {
               }}
             >
               <div className="relative w-4/5 h-4/5 rounded-full bg-gradient-to-tr from-red-600 via-red-500 to-rose-400 shadow-[0_0_15px_rgba(239,68,68,0.9)] border border-red-300 flex items-center justify-center animate-bounce">
-                {/* Green Leaf */}
                 <div className="absolute -top-1 right-1 w-2 h-2.5 bg-emerald-400 rounded-tr-full rotate-12 shadow" />
                 <div className="w-1.5 h-1.5 bg-white/80 rounded-full -mt-0.5 -ml-0.5 shadow" />
               </div>
             </div>
 
-            {/* 2. HAZARDS: BOM & ĐÁ */}
+            {/* Hazards */}
             {hazards.map((hz) => (
               <div
                 key={hz.id}
@@ -636,13 +676,11 @@ export const SnakeGame: React.FC = () => {
                 }}
               >
                 {hz.type === 'bomb' ? (
-                  // BOMB ICON
                   <div className="relative w-4/5 h-4/5 rounded-full bg-gradient-to-b from-neutral-800 to-neutral-950 border-2 border-red-500 shadow-[0_0_15px_#ef4444] flex items-center justify-center animate-bounce">
                     <div className="absolute -top-1.5 right-1 w-2 h-2 rounded-full bg-amber-400 animate-ping" />
                     <span className="text-[10px] font-sans font-black text-red-400">💣</span>
                   </div>
                 ) : (
-                  // ROCK ICON
                   <div className="relative w-4/5 h-4/5 rounded-lg bg-gradient-to-br from-stone-600 via-stone-700 to-stone-900 border border-stone-400 shadow-[0_0_10px_rgba(0,0,0,0.6)] flex items-center justify-center">
                     <span className="text-[11px] font-sans font-black text-stone-300">🪨</span>
                   </div>
@@ -650,7 +688,7 @@ export const SnakeGame: React.FC = () => {
               </div>
             ))}
 
-            {/* 3. SNAKE ON THE LAWN */}
+            {/* Snake */}
             {snake.map((seg, idx) => {
               const isHead = idx === 0;
 
@@ -666,7 +704,6 @@ export const SnakeGame: React.FC = () => {
                   }}
                 >
                   {isHead ? (
-                    // Snake Head
                     <div
                       className={`relative w-[92%] h-[92%] rounded-xl shadow-[0_0_15px_rgba(74,222,128,0.9)] border-2 transition-all flex items-center justify-center ${
                         isStunned
@@ -674,7 +711,6 @@ export const SnakeGame: React.FC = () => {
                           : 'bg-gradient-to-tr from-emerald-500 via-lime-400 to-emerald-300 border-white'
                       }`}
                     >
-                      {/* Big Cartoon Eyes */}
                       <div className="flex items-center justify-around w-full px-0.5">
                         <div className="w-2 h-2 rounded-full bg-white flex items-center justify-center shadow">
                           <span className="w-1 h-1 rounded-full bg-neutral-950" />
@@ -684,7 +720,6 @@ export const SnakeGame: React.FC = () => {
                         </div>
                       </div>
 
-                      {/* Stun icon */}
                       {isStunned && (
                         <div className="absolute -top-3 text-xs font-black text-yellow-300 animate-spin">
                           💫
@@ -692,7 +727,6 @@ export const SnakeGame: React.FC = () => {
                       )}
                     </div>
                   ) : (
-                    // Snake Body Segment
                     <div
                       className="w-[84%] h-[84%] rounded-xl bg-gradient-to-b from-lime-400 to-emerald-600 border border-lime-200/60 shadow-sm"
                       style={{
@@ -719,9 +753,7 @@ export const SnakeGame: React.FC = () => {
               </div>
             ))}
 
-            {/* ================================================================= */}
-            {/* BLACKOUT GLITCH OVERLAY (Chớp tối màn hình 1.2s) */}
-            {/* ================================================================= */}
+            {/* Blackout overlay */}
             {isBlackout && (
               <div className="absolute inset-0 z-50 bg-black/98 flex items-center justify-center animate-in fade-in duration-100">
                 <div className="flex flex-col items-center gap-1.5 text-center">
@@ -732,75 +764,112 @@ export const SnakeGame: React.FC = () => {
                 </div>
               </div>
             )}
-
           </div>
         </div>
-
       </div>
 
-      {/* ========================================================================= */}
-      {/* 4. BOTTOM CONTROLLER & STATUS */}
-      {/* ========================================================================= */}
-      <div className="relative z-20 flex items-center justify-between gap-3">
-        {/* Keyboard hint or Locked Wall Alert Banner */}
-        <div className="flex items-center gap-2 text-xs font-sans">
+      {/* Bottom Controller & Virtual D-Pad */}
+      <div className="relative z-20 flex flex-col gap-2 pt-1 border-t border-emerald-950/60">
+        <div className="flex flex-wrap items-center justify-between gap-2 text-xs font-sans">
           {blockedWall ? (
             <div className="flex items-center gap-2 bg-red-950/80 px-3 py-1 rounded-lg border border-red-500 animate-pulse">
               <span className="w-2 h-2 rounded-full bg-red-400 animate-ping" />
-              <span className="text-red-300 font-black">
+              <span className="text-red-300 font-black text-[11px] sm:text-xs">
                 ⚠️ NGUY HIỂM: TƯỜNG {getWallLabel(blockedWall)} ĐANG BỊ KHÓA ({blockedWallSecondsLeft}s)!
               </span>
             </div>
           ) : (
-            <div className="hidden sm:flex items-center gap-2 text-neutral-300">
-              <span className="text-emerald-400 font-medium">🌿 Rắn có thể xuyên vách tường!</span>
+            <div className="flex items-center gap-2 text-neutral-300 text-[11px] sm:text-xs">
+              <span className="text-emerald-400 font-medium">🌿 Vuốt trên cỏ hoặc bấm phím</span>
               <span>•</span>
-              <span className="text-neutral-400">Di chuyển: W-A-S-D hoặc ↑ ↓ ← →</span>
+              <span className="text-neutral-400 hidden sm:inline">Phím: W-A-S-D / ↑ ↓ ← →</span>
+              <span className="text-neutral-400 sm:hidden">Rắn xuyên tường</span>
+            </div>
+          )}
+
+          {isStunned && (
+            <div className="text-xs font-sans text-yellow-400 font-bold animate-pulse flex items-center gap-1">
+              <span>💫 Đang bị choáng (3s)</span>
             </div>
           )}
         </div>
 
-        {/* Touch D-Pad for Mobile */}
-        <div className="flex sm:hidden items-center justify-center mx-auto gap-1">
-          <button
-            onClick={() => handleTouchDirection('LEFT')}
-            className="p-2.5 rounded-xl bg-neutral-900 active:bg-amber-500 border border-neutral-800 text-white"
-          >
-            <ArrowLeft className="w-5 h-5" />
-          </button>
-          <div className="flex flex-col gap-1">
-            <button
-              onClick={() => handleTouchDirection('UP')}
-              className="p-2.5 rounded-xl bg-neutral-900 active:bg-amber-500 border border-neutral-800 text-white"
-            >
-              <ArrowUp className="w-5 h-5" />
-            </button>
-            <button
-              onClick={() => handleTouchDirection('DOWN')}
-              className="p-2.5 rounded-xl bg-neutral-900 active:bg-amber-500 border border-neutral-800 text-white"
-            >
-              <ArrowDown className="w-5 h-5" />
-            </button>
-          </div>
-          <button
-            onClick={() => handleTouchDirection('RIGHT')}
-            className="p-2.5 rounded-xl bg-neutral-900 active:bg-amber-500 border border-neutral-800 text-white"
-          >
-            <ArrowRight className="w-5 h-5" />
-          </button>
-        </div>
+        {showVirtualPad && (
+          <div className="flex items-center justify-center gap-4 py-1 animate-in fade-in slide-in-from-bottom-2 duration-200">
+            <div className="relative w-36 h-28 sm:w-44 sm:h-32 flex items-center justify-center select-none">
+              <button
+                type="button"
+                onClick={() => setSafeDirection('UP')}
+                className={`absolute top-0 w-11 h-11 sm:w-13 sm:h-13 rounded-2xl flex items-center justify-center shadow-lg transition-transform active:scale-90 border cursor-pointer ${
+                  direction === 'UP'
+                    ? 'bg-gradient-to-b from-amber-400 to-amber-500 text-neutral-950 border-amber-200 shadow-amber-500/50'
+                    : 'bg-neutral-900/90 text-white hover:bg-neutral-800 border-neutral-700/80 active:bg-amber-500'
+                }`}
+                title="Đi Lên (W / ↑)"
+              >
+                <ArrowUp className="w-5 h-5 sm:w-6 sm:h-6" />
+              </button>
 
-        {/* Live Stunned Indicator */}
-        {isStunned && (
-          <div className="text-xs font-sans text-yellow-400 font-bold animate-pulse">
-            ⚡ Đang bị choáng (3s)
+              <button
+                type="button"
+                onClick={() => setSafeDirection('LEFT')}
+                className={`absolute left-0 w-11 h-11 sm:w-13 sm:h-13 rounded-2xl flex items-center justify-center shadow-lg transition-transform active:scale-90 border cursor-pointer ${
+                  direction === 'LEFT'
+                    ? 'bg-gradient-to-b from-amber-400 to-amber-500 text-neutral-950 border-amber-200 shadow-amber-500/50'
+                    : 'bg-neutral-900/90 text-white hover:bg-neutral-800 border-neutral-700/80 active:bg-amber-500'
+                }`}
+                title="Sang Trái (A / ←)"
+              >
+                <ArrowLeft className="w-5 h-5 sm:w-6 sm:h-6" />
+              </button>
+
+              <div className="w-8 h-8 rounded-full bg-neutral-950/90 border border-neutral-800 flex items-center justify-center text-[10px] text-neutral-500 pointer-events-none">
+                ✦
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setSafeDirection('RIGHT')}
+                className={`absolute right-0 w-11 h-11 sm:w-13 sm:h-13 rounded-2xl flex items-center justify-center shadow-lg transition-transform active:scale-90 border cursor-pointer ${
+                  direction === 'RIGHT'
+                    ? 'bg-gradient-to-b from-amber-400 to-amber-500 text-neutral-950 border-amber-200 shadow-amber-500/50'
+                    : 'bg-neutral-900/90 text-white hover:bg-neutral-800 border-neutral-700/80 active:bg-amber-500'
+                }`}
+                title="Sang Phải (D / →)"
+              >
+                <ArrowRight className="w-5 h-5 sm:w-6 sm:h-6" />
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setSafeDirection('DOWN')}
+                className={`absolute bottom-0 w-11 h-11 sm:w-13 sm:h-13 rounded-2xl flex items-center justify-center shadow-lg transition-transform active:scale-90 border cursor-pointer ${
+                  direction === 'DOWN'
+                    ? 'bg-gradient-to-b from-amber-400 to-amber-500 text-neutral-950 border-amber-200 shadow-amber-500/50'
+                    : 'bg-neutral-900/90 text-white hover:bg-neutral-800 border-neutral-700/80 active:bg-amber-500'
+                }`}
+                title="Đi Xuống (S / ↓)"
+              >
+                <ArrowDown className="w-5 h-5 sm:w-6 sm:h-6" />
+              </button>
+            </div>
+
+            <div className="flex flex-col gap-2">
+              <button
+                type="button"
+                onClick={restartGame}
+                className="px-3 py-2 rounded-xl bg-neutral-900 hover:bg-neutral-800 text-neutral-300 active:text-white border border-neutral-800 text-xs font-sans font-bold flex items-center gap-1.5 shadow-sm active:scale-95 cursor-pointer"
+                title="Chơi lại ván mới"
+              >
+                <RotateCcw className="w-3.5 h-3.5 text-amber-400" />
+                <span className="hidden sm:inline">Chơi Lại</span>
+              </button>
+            </div>
           </div>
         )}
       </div>
 
-      {/* ========================================================================= */}
-      {/* 5. GAME OVER MODAL */}
-      {/* ========================================================================= */}
+      {/* Game Over Modal */}
       {isGameOver && (
         <div className="absolute inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md animate-in fade-in duration-300">
           <div className="relative max-w-sm w-full bg-[#120719] border-2 border-red-500/80 rounded-3xl p-6 text-center space-y-4 shadow-[0_0_60px_rgba(239,68,68,0.4)]">
@@ -842,7 +911,6 @@ export const SnakeGame: React.FC = () => {
           </div>
         </div>
       )}
-
     </div>
   );
 };

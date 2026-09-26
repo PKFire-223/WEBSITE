@@ -215,7 +215,7 @@ export const GameHub: React.FC<GameHubProps> = ({
   });
 
   return (
-    <div className="relative min-h-screen bg-[#07040d] text-neutral-100 p-3 sm:p-6 lg:p-8 font-sans selection:bg-amber-500 selection:text-neutral-950">
+    <div className="relative min-h-screen bg-[#07040d] text-neutral-100 p-2 sm:p-5 lg:p-8 font-sans selection:bg-amber-500 selection:text-neutral-950">
       {/* Mystical Background Lighting */}
       <div className="fixed inset-0 bg-[radial-gradient(circle_at_top,#2b0e3e_0%,#110419_60%,#05010a_100%)] pointer-events-none -z-20" />
       <div className="fixed inset-0 bg-[linear-gradient(to_right,#ffffff05_1px,transparent_1px),linear-gradient(to_bottom,#ffffff05_1px,transparent_1px)] bg-[size:3.5rem_3.5rem] pointer-events-none -z-10 opacity-50" />
@@ -223,52 +223,52 @@ export const GameHub: React.FC<GameHubProps> = ({
       {/* ========================================================================= */}
       {/* ORNATE MAGIC FRAME AROUND THE HUB CONTENT ("TRANG TRÍ KHUNG XUNG QUANH") */}
       {/* ========================================================================= */}
-      <div className="relative max-w-7xl mx-auto rounded-[32px] sm:rounded-[44px] border-4 border-amber-500/50 bg-[#0d0714]/90 shadow-[0_0_80px_rgba(245,158,11,0.25),inset_0_0_50px_rgba(0,0,0,0.9)] p-4 sm:p-8 overflow-hidden">
+      <div className="relative max-w-7xl mx-auto rounded-2xl sm:rounded-[36px] lg:rounded-[44px] border-2 sm:border-4 border-amber-500/50 bg-[#0d0714]/90 shadow-[0_0_80px_rgba(245,158,11,0.25),inset_0_0_50px_rgba(0,0,0,0.9)] p-3 sm:p-6 lg:p-8 overflow-hidden">
         
         {/* Frame Arcane Gold Corner Filigrees */}
-        <div className="absolute top-2.5 left-2.5 w-10 h-10 sm:w-16 sm:h-16 border-t-4 border-l-4 border-amber-400 rounded-tl-2xl pointer-events-none z-20 shadow-[0_0_20px_rgba(245,158,11,0.6)]" />
-        <div className="absolute top-2.5 right-2.5 w-10 h-10 sm:w-16 sm:h-16 border-t-4 border-r-4 border-amber-400 rounded-tr-2xl pointer-events-none z-20 shadow-[0_0_20px_rgba(245,158,11,0.6)]" />
-        <div className="absolute bottom-2.5 left-2.5 w-10 h-10 sm:w-16 sm:h-16 border-b-4 border-l-4 border-amber-400 rounded-bl-2xl pointer-events-none z-20 shadow-[0_0_20px_rgba(245,158,11,0.6)]" />
-        <div className="absolute bottom-2.5 right-2.5 w-10 h-10 sm:w-16 sm:h-16 border-b-4 border-r-4 border-amber-400 rounded-br-2xl pointer-events-none z-20 shadow-[0_0_20px_rgba(245,158,11,0.6)]" />
+        <div className="absolute top-1.5 left-1.5 w-7 h-7 sm:w-14 sm:h-14 border-t-2 sm:border-t-4 border-l-2 sm:border-l-4 border-amber-400 rounded-tl-xl sm:rounded-tl-2xl pointer-events-none z-20 shadow-[0_0_15px_rgba(245,158,11,0.6)]" />
+        <div className="absolute top-1.5 right-1.5 w-7 h-7 sm:w-14 sm:h-14 border-t-2 sm:border-t-4 border-r-2 sm:border-r-4 border-amber-400 rounded-tr-xl sm:rounded-tr-2xl pointer-events-none z-20 shadow-[0_0_15px_rgba(245,158,11,0.6)]" />
+        <div className="absolute bottom-1.5 left-1.5 w-7 h-7 sm:w-14 sm:h-14 border-b-2 sm:border-b-4 border-l-2 sm:border-l-4 border-amber-400 rounded-bl-xl sm:rounded-bl-2xl pointer-events-none z-20 shadow-[0_0_15px_rgba(245,158,11,0.6)]" />
+        <div className="absolute bottom-1.5 right-1.5 w-7 h-7 sm:w-14 sm:h-14 border-b-2 sm:border-b-4 border-r-2 sm:border-r-4 border-amber-400 rounded-br-xl sm:rounded-br-2xl pointer-events-none z-20 shadow-[0_0_15px_rgba(245,158,11,0.6)]" />
 
         {/* Inner Golden Runic Border Line */}
-        <div className="absolute inset-2 sm:inset-3 rounded-[26px] sm:rounded-[36px] border border-amber-500/20 pointer-events-none -z-0" />
+        <div className="absolute inset-1.5 sm:inset-2.5 rounded-xl sm:rounded-[30px] border border-amber-500/20 pointer-events-none -z-0" />
 
         {/* ========================================================================= */}
         {/* TOP HEADER: BRAND, LEVEL TRACKER & LEVEL UP PROGRESS */}
         {/* ========================================================================= */}
-        <div className="relative z-10 flex flex-col xl:flex-row xl:items-center justify-between gap-4 pb-5 border-b-2 border-neutral-800/80 mb-6 w-full min-w-0">
+        <div className="relative z-10 flex flex-col xl:flex-row xl:items-center justify-between gap-3 sm:gap-4 pb-4 sm:pb-5 border-b-2 border-neutral-800/80 mb-5 sm:mb-6 w-full min-w-0">
           
           {/* Back to Magic Book & PolyPlay Title */}
-          <div className="flex flex-wrap sm:flex-nowrap items-center gap-3 min-w-0">
+          <div className="flex flex-wrap sm:flex-nowrap items-center gap-2.5 sm:gap-3 min-w-0">
             <button
               onClick={() => {
                 playClickSound();
                 onBackToCover();
               }}
-              className="flex items-center gap-2 px-3 py-2 sm:px-3.5 sm:py-2.5 rounded-xl bg-neutral-900/90 hover:bg-neutral-800 border border-amber-500/30 hover:border-amber-400 text-xs font-mono font-bold text-amber-200 transition-all shadow-md group shrink-0 cursor-pointer"
+              className="flex items-center gap-1.5 sm:gap-2 px-3 py-2 sm:px-3.5 sm:py-2.5 rounded-xl bg-neutral-900/90 hover:bg-neutral-800 border border-amber-500/30 hover:border-amber-400 text-xs font-mono font-bold text-amber-200 transition-all shadow-md group shrink-0 cursor-pointer"
               title="Gấp sách và quay lại trang bìa ma thuật"
             >
               <BookOpen className="w-4 h-4 text-amber-400 group-hover:-translate-x-0.5 transition-transform" />
               <span>Đóng Sách</span>
             </button>
 
-            <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
-              <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-amber-500 via-yellow-400 to-purple-600 p-0.5 flex items-center justify-center shadow-lg shadow-amber-500/30 shrink-0">
+            <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+              <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-2xl bg-gradient-to-tr from-amber-500 via-yellow-400 to-purple-600 p-0.5 flex items-center justify-center shadow-lg shadow-amber-500/30 shrink-0">
                 <div className="w-full h-full bg-[#120501] rounded-[14px] flex items-center justify-center">
-                  <Flame className="w-5 h-5 text-amber-400 animate-pulse" />
+                  <Flame className="w-4 h-4 sm:w-5 sm:h-5 text-amber-400 animate-pulse" />
                 </div>
               </div>
               <div className="min-w-0">
-                <div className="flex items-center gap-2">
-                  <h1 className="text-xl sm:text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-yellow-400 to-amber-500 font-serif tracking-wide truncate">
+                <div className="flex items-center gap-1.5 sm:gap-2">
+                  <h1 className="text-lg sm:text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-yellow-400 to-amber-500 font-serif tracking-wide truncate">
                     POLYPLAY
                   </h1>
-                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 font-mono font-semibold shrink-0">
+                  <span className="text-[9px] sm:text-[10px] px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 font-mono font-semibold shrink-0">
                     SẢNH GAME
                   </span>
                 </div>
-                <p className="text-[11px] font-mono text-neutral-400 truncate max-w-[280px] sm:max-w-md">
+                <p className="text-[10px] sm:text-[11px] font-mono text-neutral-400 truncate max-w-[240px] sm:max-w-md">
                   Chọn trò chơi bất kỳ • Cứ đủ thời gian chơi là Cấp độ tăng (LV +1)
                 </p>
               </div>
@@ -276,7 +276,7 @@ export const GameHub: React.FC<GameHubProps> = ({
           </div>
 
           {/* PLAYER AVATAR, TITLE, LEVEL & REAL-TIME PROGRESS BAR */}
-          <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 bg-neutral-950/90 p-2.5 sm:p-3 rounded-2xl border-2 border-amber-500/40 shadow-[0_0_35px_rgba(245,158,11,0.2)] w-full xl:w-auto min-w-0 overflow-hidden">
+          <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-2.5 sm:gap-3 bg-neutral-950/90 p-2 sm:p-3 rounded-2xl border-2 border-amber-500/40 shadow-[0_0_35px_rgba(245,158,11,0.2)] w-full xl:w-auto min-w-0 overflow-hidden">
             
             {/* AVATAR + LEVEL DOCKED CREST */}
             <div
@@ -284,28 +284,28 @@ export const GameHub: React.FC<GameHubProps> = ({
                 playClickSound();
                 onOpenProfile();
               }}
-              className="flex items-center gap-2.5 sm:gap-3 cursor-pointer group min-w-0 flex-1"
+              className="flex items-center gap-2 sm:gap-3 cursor-pointer group min-w-0 flex-1"
               title="Nhấp để vào Hồ Sơ Cá Nhân"
             >
               <div className="relative shrink-0">
                 <div
-                  className={`w-11 h-11 sm:w-12 sm:h-12 rounded-2xl overflow-hidden border-2 flex items-center justify-center transition-all duration-300 ${currentBorderClass} bg-gradient-to-tr ${currentAvatarObj.color} group-hover:scale-105`}
+                  className={`w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl overflow-hidden border-2 flex items-center justify-center transition-all duration-300 ${currentBorderClass} bg-gradient-to-tr ${currentAvatarObj.color} group-hover:scale-105`}
                 >
                   {userProfile.avatarUrl ? (
                     <img
                       src={userProfile.avatarUrl}
                       alt={userProfile.name}
-                      className="w-full h-full object-cover rounded-xl"
+                      className="w-full h-full object-cover rounded-lg sm:rounded-xl"
                     />
                   ) : (
-                    <span className="text-2xl select-none leading-none">
+                    <span className="text-xl sm:text-2xl select-none leading-none">
                       {currentAvatarObj.emoji}
                     </span>
                   )}
                 </div>
 
                 {/* Level Tag pinned neatly to bottom-right corner of avatar */}
-                <div className="absolute -bottom-1 -right-1 px-1.5 py-0.2 rounded-md bg-gradient-to-r from-amber-500 via-orange-400 to-yellow-300 text-neutral-950 font-black text-[10px] font-mono shadow-md border border-neutral-950 flex items-center gap-0.5">
+                <div className="absolute -bottom-1 -right-1 px-1.5 py-0.2 rounded-md bg-gradient-to-r from-amber-500 via-orange-400 to-yellow-300 text-neutral-950 font-black text-[9px] sm:text-[10px] font-mono shadow-md border border-neutral-950 flex items-center gap-0.5">
                   <Zap className="w-2.5 h-2.5 fill-current" />
                   <span>LV.{playerLevel}</span>
                 </div>
@@ -337,7 +337,7 @@ export const GameHub: React.FC<GameHubProps> = ({
                 </div>
 
                 {/* Time Played */}
-                <div className="text-[10px] sm:text-[11px] font-mono text-neutral-400 flex items-center gap-1 mt-0.5 truncate">
+                <div className="text-[9px] sm:text-[11px] font-mono text-neutral-400 flex items-center gap-1 mt-0.5 truncate">
                   <Clock className="w-3 h-3 text-neutral-500 shrink-0" />
                   <span className="truncate">Đã chơi: <strong className="text-neutral-200">{formatTime(playTimeSeconds)}</strong></span>
                 </div>
@@ -345,8 +345,8 @@ export const GameHub: React.FC<GameHubProps> = ({
             </div>
 
             {/* Level Progress Gauge */}
-            <div className="flex flex-col justify-center min-w-[110px] max-w-[150px] w-full md:w-36 space-y-1 md:pl-3 md:border-l md:border-neutral-800 shrink-0">
-              <div className="flex items-center justify-between text-[10px] font-mono">
+            <div className="flex flex-col justify-center min-w-[110px] max-w-full md:max-w-[150px] w-full md:w-36 space-y-1 md:pl-3 md:border-l md:border-neutral-800 shrink-0">
+              <div className="flex items-center justify-between text-[9px] sm:text-[10px] font-mono">
                 <span className="text-neutral-400">Lên Cấp {playerLevel + 1}:</span>
                 <span className="text-amber-300 font-bold">{levelProgressPercent}%</span>
               </div>
@@ -362,17 +362,17 @@ export const GameHub: React.FC<GameHubProps> = ({
             </div>
 
             {/* Action Buttons Toolbar */}
-            <div className="flex items-center gap-1.5 sm:gap-2 shrink-0 md:pl-3 md:border-l md:border-neutral-800/80 justify-end">
+            <div className="flex items-center gap-1.5 sm:gap-2 shrink-0 md:pl-3 md:border-l md:border-neutral-800/80 justify-between md:justify-end w-full md:w-auto">
               {/* Profile Page Button */}
               <button
                 onClick={() => {
                   playClickSound();
                   onOpenProfile();
                 }}
-                className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-xl bg-gradient-to-r from-amber-500/20 to-yellow-500/20 hover:from-amber-500/30 hover:to-yellow-500/30 text-amber-300 border border-amber-500/40 text-[11px] sm:text-xs font-mono font-bold transition-all shadow hover:shadow-amber-500/20 cursor-pointer shrink-0"
+                className="flex-1 md:flex-initial flex items-center justify-center gap-1.5 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-xl bg-gradient-to-r from-amber-500/20 to-yellow-500/20 hover:from-amber-500/30 hover:to-yellow-500/30 text-amber-300 border border-amber-500/40 text-[10px] sm:text-xs font-mono font-bold transition-all shadow hover:shadow-amber-500/20 cursor-pointer shrink-0"
                 title="Xem hồ sơ cá nhân và 108 thành tựu"
               >
-                <Trophy className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-400" />
+                <Trophy className="w-3.5 h-3.5 text-amber-400" />
                 <span className="whitespace-nowrap">Hồ Sơ (108)</span>
               </button>
 
@@ -383,7 +383,7 @@ export const GameHub: React.FC<GameHubProps> = ({
                     playClickSound();
                     onOpenAuth?.('security');
                   }}
-                  className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-xl bg-neutral-900 hover:bg-neutral-800 text-white border border-amber-500/40 text-[11px] sm:text-xs font-mono transition-all cursor-pointer shrink-0"
+                  className="flex-1 md:flex-initial flex items-center justify-center gap-1.5 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-xl bg-neutral-900 hover:bg-neutral-800 text-white border border-amber-500/40 text-[10px] sm:text-xs font-mono transition-all cursor-pointer shrink-0"
                   title="Quản trị bảo mật tài khoản"
                 >
                   {userProfile.avatarUrl ? (
@@ -391,8 +391,8 @@ export const GameHub: React.FC<GameHubProps> = ({
                   ) : (
                     <span className="text-base leading-none">{currentUser.avatarEmoji || currentAvatarObj.emoji}</span>
                   )}
-                  <span className="font-bold hidden md:inline max-w-[70px] truncate">{currentUser.displayName}</span>
-                  <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+                  <span className="font-bold truncate max-w-[65px] sm:max-w-[80px]">{currentUser.displayName}</span>
+                  <ShieldCheck className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
                 </button>
               ) : (
                 <button
@@ -400,12 +400,12 @@ export const GameHub: React.FC<GameHubProps> = ({
                     playClickSound();
                     onOpenAuth?.('login');
                   }}
-                  className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/40 text-[11px] sm:text-xs font-mono font-bold transition-all cursor-pointer shrink-0"
+                  className="flex-1 md:flex-initial flex items-center justify-center gap-1.5 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/40 text-[10px] sm:text-xs font-mono font-bold transition-all cursor-pointer shrink-0"
                   title="Đăng nhập hoặc tạo tài khoản để bảo lưu dữ liệu"
                 >
-                  <Shield className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-400" />
-                  <span className="hidden sm:inline">Tài Khoản / Bảo Mật</span>
-                  <span className="sm:hidden">Tài Khoản</span>
+                  <Shield className="w-3.5 h-3.5 text-amber-400" />
+                  <span className="hidden sm:inline">Tài Khoản</span>
+                  <span className="sm:hidden">TK / Bảo Mật</span>
                 </button>
               )}
 
@@ -486,7 +486,7 @@ export const GameHub: React.FC<GameHubProps> = ({
         {/* ========================================================================= */}
         {/* SQUARE TILES GRID ("CÁC Ô VUÔNG CHỨA GAME TƯƠNG ỨNG BẤM VÀO SẼ MỞ GAME") */}
         {/* ========================================================================= */}
-        <div className="relative z-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 sm:gap-6">
+        <div className="relative z-10 grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-2.5 sm:gap-5 lg:gap-6">
           {slots.map((slot) => {
             const { slotNumber, game } = slot;
 
@@ -499,7 +499,7 @@ export const GameHub: React.FC<GameHubProps> = ({
                     playCoinSound();
                     onSelectGame(game);
                   }}
-                  className="group relative cursor-pointer aspect-square rounded-2xl overflow-hidden bg-neutral-950 border-2 border-amber-500/40 hover:border-amber-400 transition-all duration-300 transform hover:-translate-y-1.5 hover:shadow-[0_12px_35px_rgba(245,158,11,0.35)] flex flex-col justify-between p-4"
+                  className="group relative cursor-pointer aspect-square rounded-2xl overflow-hidden bg-neutral-950 border-2 border-amber-500/40 hover:border-amber-400 transition-all duration-300 transform hover:-translate-y-1.5 hover:shadow-[0_12px_35px_rgba(245,158,11,0.35)] flex flex-col justify-between p-2.5 sm:p-4 active:scale-95"
                 >
                   {game.thumbnail && (
                     <img
@@ -512,32 +512,33 @@ export const GameHub: React.FC<GameHubProps> = ({
                   <div className="absolute inset-0 bg-gradient-to-t from-neutral-950/90 via-transparent to-black/40 group-hover:from-neutral-950/70 transition-all duration-300 z-10" />
 
                   {/* Top info */}
-                  <div className="relative z-20 flex items-center justify-between w-full">
-                    <span className="text-[10px] font-mono font-bold px-2.5 py-1 rounded-lg bg-black/70 backdrop-blur-md text-amber-400 border border-amber-500/30">
+                  <div className="relative z-20 flex items-center justify-between w-full gap-1">
+                    <span className="text-[9px] sm:text-[10px] font-mono font-bold px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-lg bg-black/70 backdrop-blur-md text-amber-400 border border-amber-500/30 truncate max-w-[80%]">
                       {game.genre || `Slot #${slotNumber}`}
                     </span>
                     {game.badge && (
-                      <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-red-600 text-white">
+                      <span className="text-[8px] sm:text-[10px] font-mono font-bold px-1.5 sm:px-2 py-0.5 rounded bg-red-600 text-white shrink-0">
                         {game.badge}
                       </span>
                     )}
                   </div>
 
-                  {/* Center Play Icon on hover */}
-                  <div className="relative z-20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                    <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-amber-500 to-yellow-300 text-neutral-950 flex items-center justify-center shadow-xl shadow-amber-500/50 transform group-hover:scale-110 transition-transform">
-                      <Play className="w-7 h-7 fill-current ml-0.5" />
+                  {/* Center Play Icon on hover / touch */}
+                  <div className="relative z-20 flex items-center justify-center opacity-0 group-hover:opacity-100 group-active:opacity-100 transition-opacity">
+                    <div className="w-10 h-10 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-tr from-amber-500 to-yellow-300 text-neutral-950 flex items-center justify-center shadow-xl shadow-amber-500/50 transform group-hover:scale-110 transition-transform">
+                      <Play className="w-5 h-5 sm:w-7 sm:h-7 fill-current ml-0.5" />
                     </div>
                   </div>
 
                   {/* Bottom info */}
-                  <div className="relative z-20 bg-black/70 backdrop-blur-md p-2.5 rounded-xl border border-neutral-800">
-                    <h3 className="text-sm font-bold text-white font-mono truncate group-hover:text-amber-400 transition-colors">
+                  <div className="relative z-20 bg-black/75 backdrop-blur-md p-2 sm:p-2.5 rounded-xl border border-neutral-800">
+                    <h3 className="text-xs sm:text-sm font-bold text-white font-mono truncate group-hover:text-amber-400 transition-colors">
                       {game.title}
                     </h3>
-                    <div className="flex items-center justify-between text-[10px] font-mono text-neutral-400 mt-1">
-                      <span>Bấm để chơi</span>
-                      <span className="text-amber-400">Tích lũy LV ▶</span>
+                    <div className="flex items-center justify-between text-[9px] sm:text-[10px] font-mono text-neutral-400 mt-0.5 sm:mt-1">
+                      <span className="hidden xs:inline">Bấm chơi</span>
+                      <span className="xs:hidden">Chơi</span>
+                      <span className="text-amber-400 truncate">LV +1 ▶</span>
                     </div>
                   </div>
                 </div>
@@ -552,7 +553,7 @@ export const GameHub: React.FC<GameHubProps> = ({
                   playClickSound();
                   onSelectEmptySlot(slotNumber);
                 }}
-                className="group relative cursor-pointer aspect-square rounded-2xl overflow-hidden bg-neutral-950/90 border-2 border-dashed border-amber-500/35 hover:border-amber-400/90 transition-all duration-300 transform hover:-translate-y-1.5 hover:shadow-[0_10px_30px_rgba(245,158,11,0.25)] flex flex-col justify-between p-4"
+                className="group relative cursor-pointer aspect-square rounded-2xl overflow-hidden bg-neutral-950/90 border-2 border-dashed border-amber-500/35 hover:border-amber-400/90 transition-all duration-300 transform hover:-translate-y-1.5 hover:shadow-[0_10px_30px_rgba(245,158,11,0.25)] flex flex-col justify-between p-2.5 sm:p-4 active:scale-95"
               >
                 {/* Subtle runic grid inside empty square */}
                 <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(245,158,11,0.06)_0%,transparent_70%)] group-hover:bg-[radial-gradient(circle_at_center,rgba(245,158,11,0.15)_0%,transparent_70%)] transition-colors" />

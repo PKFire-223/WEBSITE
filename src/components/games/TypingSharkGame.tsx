@@ -67,6 +67,7 @@ import {
   Globe,
   Sparkles,
   Gift,
+  Keyboard,
 } from 'lucide-react';
 
 export const TypingSharkGame: React.FC = () => {
@@ -81,6 +82,8 @@ export const TypingSharkGame: React.FC = () => {
   const [isGameOverContext, setIsGameOverContext] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [language, setLanguage] = useState<'en' | 'vi'>('en');
+  const [showVirtualKeyboard, setShowVirtualKeyboard] = useState<boolean>(true);
+  const hiddenInputRef = useRef<HTMLInputElement | null>(null);
 
   // Live in-game stats for current run
   const [gameTime, setGameTime] = useState<number>(0); // in seconds
@@ -750,206 +753,6 @@ export const TypingSharkGame: React.FC = () => {
     setBoss(newBoss);
   };
 
-  // Keyboard typing input handler
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (gameState !== 'playing' || isPaused || showSkillTree) return;
-
-      if (e.code === 'Space') {
-        e.preventDefault();
-        triggerDepthBomb();
-        return;
-      }
-
-      if (e.key.length !== 1 || e.ctrlKey || e.altKey || e.metaKey) return;
-
-      const pressedChar = e.key.toUpperCase();
-      const engine = engineRef.current;
-      setTotalKeys((k) => k + 1);
-
-      let lockedTarget = engine.targets.find((t) => t.id === engine.lockedTargetId);
-
-      // Boss target check if no locked monster
-      if (!lockedTarget && engine.currentBoss) {
-        const hasMinions = engine.targets.some((t) => t.isBossPart);
-        if (!hasMinions) {
-          const bossWord = engine.currentBoss.activeWords.find((w) => {
-            const nextChar = w.word[w.typedIndex];
-            return nextChar === pressedChar;
-          });
-
-          if (bossWord) {
-            playKeystrokeSound();
-            playTorpedoSound();
-            setCorrectKeys((k) => k + 1);
-            setCombo((c) => {
-              const next = c + 1;
-              setMaxCombo((mc) => Math.max(mc, next));
-              return next;
-            });
-
-            bossWord.typedIndex++;
-
-            engine.projectiles.push({
-              id: Math.random().toString(),
-              startX: 140,
-              startY: 280,
-              x: 140,
-              y: 280,
-              targetId: engine.currentBoss.bossId,
-              targetX: engine.currentBoss.x + bossWord.offsetX,
-              targetY: engine.currentBoss.y + bossWord.offsetY,
-              speed: 16,
-              color: '#38bdf8',
-              type: 'torpedo',
-            });
-
-            if (bossWord.typedIndex >= bossWord.word.length) {
-              playMonsterExplodeSound();
-              const dmg = Math.round(12 * derivedStats.piercingTorpedo);
-              engine.currentBoss.currentHp -= dmg;
-              bossWord.word = getRandomBossWord(dictionary, engine.currentBoss.bossId);
-              bossWord.typedIndex = 0;
-
-              engine.floatingTexts.push({
-                id: Math.random().toString(),
-                text: `-${dmg} HP BOSS`,
-                x: engine.currentBoss.x,
-                y: engine.currentBoss.y,
-                color: '#f43f5e',
-                opacity: 1,
-                vy: -1.5,
-              });
-
-              if (engine.currentBoss.currentHp <= 0) {
-                handleBossDefeated(engine.currentBoss);
-              }
-            }
-            return;
-          }
-        }
-      }
-
-      // If we have a locked target
-      if (lockedTarget) {
-        const nextChar = lockedTarget.word[lockedTarget.typedIndex];
-        if (nextChar === pressedChar || (nextChar === ' ' && pressedChar === ' ')) {
-          playKeystrokeSound();
-          playTorpedoSound();
-          setCorrectKeys((k) => k + 1);
-          setCombo((c) => {
-            const next = c + 1;
-            setMaxCombo((mc) => Math.max(mc, next));
-            return next;
-          });
-
-          lockedTarget.typedIndex++;
-
-          // Multiple torpedo salvo if buff is active
-          if (hasBuff('torpedo_salvo')) {
-            for (let s = -1; s <= 1; s++) {
-              engine.projectiles.push({
-                id: Math.random().toString(),
-                startX: 140,
-                startY: 280 + s * 10,
-                x: 140,
-                y: 280 + s * 10,
-                targetId: lockedTarget.id,
-                targetX: lockedTarget.x,
-                targetY: lockedTarget.y + s * 15,
-                speed: 18,
-                color: '#f43f5e',
-                type: 'salvo',
-              });
-            }
-          } else {
-            engine.projectiles.push({
-              id: Math.random().toString(),
-              startX: 140,
-              startY: 280,
-              x: 140,
-              y: 280,
-              targetId: lockedTarget.id,
-              targetX: lockedTarget.x,
-              targetY: lockedTarget.y,
-              speed: 15,
-              color: '#38bdf8',
-              type: 'torpedo',
-            });
-          }
-
-          if (lockedTarget.typedIndex >= lockedTarget.word.length) {
-            handleTargetDestroyed(lockedTarget);
-          }
-        } else {
-          // Typo error
-          playTypoErrorSound();
-          setCombo(0);
-
-          if (engine.currentBoss?.bossId === 'leviathan') {
-            engine.screenShake = 12;
-            setHp((h) => {
-              const next = Math.max(0, h - 8);
-              if (next <= 0) handleGameOver();
-              return next;
-            });
-            engine.floatingTexts.push({
-              id: Math.random().toString(),
-              text: `PHẠT GÕ SAI -8HP!`,
-              x: 150,
-              y: 250,
-              color: '#ef4444',
-              opacity: 1,
-              vy: -2,
-            });
-          }
-        }
-      } else {
-        // Lock new target
-        const candidates = engine.targets.filter((t) => t.word[0] === pressedChar);
-        if (candidates.length > 0) {
-          candidates.sort((a, b) => a.x - b.x);
-          const newTarget = candidates[0];
-          engine.lockedTargetId = newTarget.id;
-          newTarget.typedIndex = 1;
-
-          playKeystrokeSound();
-          playTorpedoSound();
-          setCorrectKeys((k) => k + 1);
-          setCombo((c) => {
-            const next = c + 1;
-            setMaxCombo((mc) => Math.max(mc, next));
-            return next;
-          });
-
-          engine.projectiles.push({
-            id: Math.random().toString(),
-            startX: 140,
-            startY: 280,
-            x: 140,
-            y: 280,
-            targetId: newTarget.id,
-            targetX: newTarget.x,
-            targetY: newTarget.y,
-            speed: 15,
-            color: '#38bdf8',
-            type: 'torpedo',
-          });
-
-          if (newTarget.typedIndex >= newTarget.word.length) {
-            handleTargetDestroyed(newTarget);
-          }
-        } else {
-          playTypoErrorSound();
-          setCombo(0);
-        }
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [gameState, isPaused, showSkillTree, bombsAvailable, dictionary, derivedStats, hasBuff]);
-
   // Target Destroyed Logic
   const handleTargetDestroyed = (target: WordTarget) => {
     playMonsterExplodeSound();
@@ -1019,6 +822,264 @@ export const TypingSharkGame: React.FC = () => {
       engine.inkBlindness = Math.max(0, engine.inkBlindness - 0.3);
     }
   };
+
+  // Unified character input handler (supports Physical Keyboard, On-Screen Virtual Keyboard, and Tap-to-type)
+  const handleCharacterInput = useCallback((char: string) => {
+    if (gameState !== 'playing' || isPaused || showSkillTree) return;
+
+    if (char === ' ' || char === 'SPACE') {
+      triggerDepthBomb();
+      return;
+    }
+
+    const pressedChar = char.toUpperCase();
+    const engine = engineRef.current;
+    setTotalKeys((k) => k + 1);
+
+    let lockedTarget = engine.targets.find((t) => t.id === engine.lockedTargetId);
+
+    // Boss target check if no locked monster
+    if (!lockedTarget && engine.currentBoss) {
+      const hasMinions = engine.targets.some((t) => t.isBossPart);
+      if (!hasMinions) {
+        const bossWord = engine.currentBoss.activeWords.find((w) => {
+          const nextChar = w.word[w.typedIndex];
+          return nextChar === pressedChar;
+        });
+
+        if (bossWord) {
+          playKeystrokeSound();
+          playTorpedoSound();
+          setCorrectKeys((k) => k + 1);
+          setCombo((c) => {
+            const next = c + 1;
+            setMaxCombo((mc) => Math.max(mc, next));
+            return next;
+          });
+
+          bossWord.typedIndex++;
+
+          engine.projectiles.push({
+            id: Math.random().toString(),
+            startX: 140,
+            startY: 280,
+            x: 140,
+            y: 280,
+            targetId: engine.currentBoss.bossId,
+            targetX: engine.currentBoss.x + bossWord.offsetX,
+            targetY: engine.currentBoss.y + bossWord.offsetY,
+            speed: 16,
+            color: '#38bdf8',
+            type: 'torpedo',
+          });
+
+          if (bossWord.typedIndex >= bossWord.word.length) {
+            playMonsterExplodeSound();
+            const dmg = Math.round(12 * derivedStats.piercingTorpedo);
+            engine.currentBoss.currentHp -= dmg;
+            bossWord.word = getRandomBossWord(dictionary, engine.currentBoss.bossId);
+            bossWord.typedIndex = 0;
+
+            engine.floatingTexts.push({
+              id: Math.random().toString(),
+              text: `-${dmg} HP BOSS`,
+              x: engine.currentBoss.x,
+              y: engine.currentBoss.y,
+              color: '#f43f5e',
+              opacity: 1,
+              vy: -1.5,
+            });
+
+            if (engine.currentBoss.currentHp <= 0) {
+              handleBossDefeated(engine.currentBoss);
+            }
+          }
+          return;
+        }
+      }
+    }
+
+    // If we have a locked target
+    if (lockedTarget) {
+      const nextChar = lockedTarget.word[lockedTarget.typedIndex];
+      if (nextChar === pressedChar || (nextChar === ' ' && pressedChar === ' ')) {
+        playKeystrokeSound();
+        playTorpedoSound();
+        setCorrectKeys((k) => k + 1);
+        setCombo((c) => {
+          const next = c + 1;
+          setMaxCombo((mc) => Math.max(mc, next));
+          return next;
+        });
+
+        lockedTarget.typedIndex++;
+
+        // Multiple torpedo salvo if buff is active
+        if (hasBuff('torpedo_salvo')) {
+          for (let s = -1; s <= 1; s++) {
+            engine.projectiles.push({
+              id: Math.random().toString(),
+              startX: 140,
+              startY: 280 + s * 10,
+              x: 140,
+              y: 280 + s * 10,
+              targetId: lockedTarget.id,
+              targetX: lockedTarget.x,
+              targetY: lockedTarget.y + s * 15,
+              speed: 18,
+              color: '#f43f5e',
+              type: 'salvo',
+            });
+          }
+        } else {
+          engine.projectiles.push({
+            id: Math.random().toString(),
+            startX: 140,
+            startY: 280,
+            x: 140,
+            y: 280,
+            targetId: lockedTarget.id,
+            targetX: lockedTarget.x,
+            targetY: lockedTarget.y,
+            speed: 15,
+            color: '#38bdf8',
+            type: 'torpedo',
+          });
+        }
+
+        if (lockedTarget.typedIndex >= lockedTarget.word.length) {
+          handleTargetDestroyed(lockedTarget);
+        }
+      } else {
+        // Typo error
+        playTypoErrorSound();
+        setCombo(0);
+
+        if (engine.currentBoss?.bossId === 'leviathan') {
+          engine.screenShake = 12;
+          setHp((h) => {
+            const next = Math.max(0, h - 8);
+            if (next <= 0) handleGameOver();
+            return next;
+          });
+          engine.floatingTexts.push({
+            id: Math.random().toString(),
+            text: `PHẠT GÕ SAI -8HP!`,
+            x: 150,
+            y: 250,
+            color: '#ef4444',
+            opacity: 1,
+            vy: -2,
+          });
+        }
+      }
+    } else {
+      // Lock new target
+      const candidates = engine.targets.filter((t) => t.word[0] === pressedChar);
+      if (candidates.length > 0) {
+        candidates.sort((a, b) => a.x - b.x);
+        const newTarget = candidates[0];
+        engine.lockedTargetId = newTarget.id;
+        newTarget.typedIndex = 1;
+
+        playKeystrokeSound();
+        playTorpedoSound();
+        setCorrectKeys((k) => k + 1);
+        setCombo((c) => {
+          const next = c + 1;
+          setMaxCombo((mc) => Math.max(mc, next));
+          return next;
+        });
+
+        engine.projectiles.push({
+          id: Math.random().toString(),
+          startX: 140,
+          startY: 280,
+          x: 140,
+          y: 280,
+          targetId: newTarget.id,
+          targetX: newTarget.x,
+          targetY: newTarget.y,
+          speed: 15,
+          color: '#38bdf8',
+          type: 'torpedo',
+        });
+
+        if (newTarget.typedIndex >= newTarget.word.length) {
+          handleTargetDestroyed(newTarget);
+        }
+      } else {
+        playTypoErrorSound();
+        setCombo(0);
+      }
+    }
+  }, [gameState, isPaused, showSkillTree, triggerDepthBomb, dictionary, derivedStats, hasBuff, handleTargetDestroyed]);
+
+  // Tap-on-Monster or Canvas click handler
+  const handleCanvasPointerDown = (e: React.PointerEvent<HTMLCanvasElement>) => {
+    if (gameState !== 'playing' || isPaused) return;
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = 900 / rect.width;
+    const scaleY = 520 / rect.height;
+    const clickX = (e.clientX - rect.left) * scaleX;
+    const clickY = (e.clientY - rect.top) * scaleY;
+
+    const engine = engineRef.current;
+    // Find closest target within 80px
+    let bestDist = 80;
+    let closestTarget: WordTarget | null = null;
+    for (const t of engine.targets) {
+      const d = Math.hypot(t.x - clickX, t.y - clickY);
+      if (d < bestDist) {
+        bestDist = d;
+        closestTarget = t;
+      }
+    }
+
+    if (closestTarget) {
+      const nextChar = closestTarget.word[closestTarget.typedIndex];
+      if (nextChar) {
+        handleCharacterInput(nextChar);
+      }
+    } else if (engine.currentBoss) {
+      // Tap on Boss words
+      const bossWord = engine.currentBoss.activeWords.find((w) => {
+        const wordX = engine.currentBoss!.x + w.offsetX;
+        const wordY = engine.currentBoss!.y + w.offsetY;
+        return Math.hypot(wordX - clickX, wordY - clickY) < 60;
+      });
+      if (bossWord) {
+        const nextChar = bossWord.word[bossWord.typedIndex];
+        if (nextChar) handleCharacterInput(nextChar);
+      }
+    } else {
+      // Focus hidden input for mobile device soft keyboard
+      if (hiddenInputRef.current) {
+        hiddenInputRef.current.focus();
+      }
+    }
+  };
+
+  // Keyboard typing input listener
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (gameState !== 'playing' || isPaused || showSkillTree) return;
+
+      if (e.code === 'Space') {
+        e.preventDefault();
+        triggerDepthBomb();
+        return;
+      }
+
+      if (e.key.length !== 1 || e.ctrlKey || e.altKey || e.metaKey) return;
+      handleCharacterInput(e.key);
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [gameState, isPaused, showSkillTree, triggerDepthBomb, handleCharacterInput]);
 
   // Clock Timer Tick (1s interval)
   useEffect(() => {
@@ -1788,6 +1849,20 @@ export const TypingSharkGame: React.FC = () => {
             <span>{language.toUpperCase()}</span>
           </button>
 
+          {/* Toggle Virtual Keyboard */}
+          <button
+            onClick={() => setShowVirtualKeyboard((prev) => !prev)}
+            className={`px-2.5 py-1.5 rounded-xl border text-xs font-mono transition-colors cursor-pointer flex items-center gap-1 ${
+              showVirtualKeyboard
+                ? 'bg-cyan-500/20 border-cyan-400 text-cyan-300 shadow-[0_0_10px_rgba(6,182,212,0.3)]'
+                : 'bg-neutral-900 border-neutral-800 text-neutral-400'
+            }`}
+            title="Bật/Tắt bàn phím ảo trên màn hình cho Mobile / iPad"
+          >
+            <Keyboard className="w-4 h-4 text-cyan-400" />
+            <span className="hidden sm:inline">{showVirtualKeyboard ? 'Phím Ảo' : 'Ẩn Phím'}</span>
+          </button>
+
           <button
             onClick={handleToggleSound}
             className="p-1.5 bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 rounded-xl text-neutral-400 hover:text-white transition-colors cursor-pointer"
@@ -1827,13 +1902,32 @@ export const TypingSharkGame: React.FC = () => {
         </div>
       )}
 
+      {/* Hidden native input to summon iOS/Android soft keyboard on tap */}
+      <input
+        ref={hiddenInputRef}
+        type="text"
+        value=""
+        onChange={(e) => {
+          const val = e.target.value;
+          if (val.length > 0) {
+            const char = val[val.length - 1];
+            handleCharacterInput(char);
+          }
+        }}
+        className="opacity-0 absolute -left-[9999px] pointer-events-none"
+        autoCapitalize="characters"
+        autoCorrect="off"
+        spellCheck="false"
+      />
+
       {/* GAME CANVAS VIEWPORT */}
-      <div className="relative w-full max-w-[900px] h-[520px] bg-[#020617] overflow-hidden flex items-center justify-center shadow-2xl">
+      <div className="relative w-full max-w-[900px] aspect-[900/520] max-h-[500px] min-h-[260px] bg-[#020617] overflow-hidden flex items-center justify-center shadow-2xl">
         <canvas
           ref={canvasRef}
           width={900}
           height={520}
-          className="w-full h-full block cursor-crosshair"
+          onPointerDown={handleCanvasPointerDown}
+          className="w-full h-full block cursor-crosshair touch-none"
         />
 
         {/* LOBBY WELCOME OVERLAY */}
@@ -2021,6 +2115,84 @@ export const TypingSharkGame: React.FC = () => {
           </div>
         )}
       </div>
+
+      {/* ========================================================================= */}
+      {/* VIRTUAL QWERTY KEYBOARD FOR MOBILE & IPAD */}
+      {/* ========================================================================= */}
+      {showVirtualKeyboard && gameState === 'playing' && (
+        <div className="w-full max-w-[900px] bg-[#070e1c] border-t border-cyan-900/60 p-2 sm:p-3 flex flex-col gap-1.5 select-none animate-in fade-in duration-200">
+          {/* Row 1: Q-P */}
+          <div className="flex justify-center gap-1 sm:gap-1.5">
+            {['Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P'].map((key) => (
+              <button
+                key={key}
+                type="button"
+                onClick={() => handleCharacterInput(key)}
+                className="flex-1 max-w-[55px] h-10 sm:h-12 rounded-xl bg-neutral-900 hover:bg-cyan-950/80 active:bg-cyan-500 text-white active:text-neutral-950 border border-neutral-700/80 active:border-cyan-300 font-mono font-black text-sm sm:text-base shadow active:scale-95 transition-all cursor-pointer flex items-center justify-center"
+              >
+                {key}
+              </button>
+            ))}
+          </div>
+
+          {/* Row 2: A-L */}
+          <div className="flex justify-center gap-1 sm:gap-1.5 px-2 sm:px-4">
+            {['A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L'].map((key) => (
+              <button
+                key={key}
+                type="button"
+                onClick={() => handleCharacterInput(key)}
+                className="flex-1 max-w-[55px] h-10 sm:h-12 rounded-xl bg-neutral-900 hover:bg-cyan-950/80 active:bg-cyan-500 text-white active:text-neutral-950 border border-neutral-700/80 active:border-cyan-300 font-mono font-black text-sm sm:text-base shadow active:scale-95 transition-all cursor-pointer flex items-center justify-center"
+              >
+                {key}
+              </button>
+            ))}
+          </div>
+
+          {/* Row 3: Z-M */}
+          <div className="flex justify-center gap-1 sm:gap-1.5 px-6 sm:px-10">
+            {['Z', 'X', 'C', 'V', 'B', 'N', 'M'].map((key) => (
+              <button
+                key={key}
+                type="button"
+                onClick={() => handleCharacterInput(key)}
+                className="flex-1 max-w-[55px] h-10 sm:h-12 rounded-xl bg-neutral-900 hover:bg-cyan-950/80 active:bg-cyan-500 text-white active:text-neutral-950 border border-neutral-700/80 active:border-cyan-300 font-mono font-black text-sm sm:text-base shadow active:scale-95 transition-all cursor-pointer flex items-center justify-center"
+              >
+                {key}
+              </button>
+            ))}
+          </div>
+
+          {/* Row 4: Space Bomb + Soft Keyboard Trigger */}
+          <div className="flex items-center justify-center gap-2 pt-1 max-w-lg mx-auto w-full">
+            <button
+              type="button"
+              disabled={bombsAvailable <= 0}
+              onClick={triggerDepthBomb}
+              className={`flex-1 py-2.5 px-4 rounded-xl font-mono font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg transition-all cursor-pointer ${
+                bombsAvailable > 0
+                  ? 'bg-gradient-to-r from-orange-500 via-amber-500 to-red-500 text-neutral-950 border border-amber-300 shadow-orange-500/30 active:scale-95'
+                  : 'bg-neutral-900 text-neutral-600 border border-neutral-800 cursor-not-allowed'
+              }`}
+            >
+              <Bomb className="w-4 h-4" />
+              <span>THẢ BOM SÓNG NƯỚC (SPACE) • x{bombsAvailable}</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                if (hiddenInputRef.current) hiddenInputRef.current.focus();
+              }}
+              className="px-3 py-2.5 rounded-xl bg-neutral-900 hover:bg-neutral-800 active:bg-cyan-600 text-cyan-300 active:text-white border border-neutral-700 text-xs font-mono font-bold flex items-center gap-1.5 shadow transition-all cursor-pointer shrink-0"
+              title="Mở bàn phím gõ tiếng Việt / tiếng Anh mặc định của điện thoại / iPad"
+            >
+              <Keyboard className="w-4 h-4 text-cyan-400" />
+              <span className="hidden sm:inline">Phím Máy</span>
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* FOOTER CONTROLS & TIMELINE GUIDE */}
       <div className="w-full bg-neutral-950/80 border-t border-neutral-800/80 p-2.5 sm:p-3 flex flex-wrap items-center justify-between gap-3 text-xs font-mono text-neutral-400">

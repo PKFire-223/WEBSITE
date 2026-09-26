@@ -115,6 +115,7 @@ export const BattleshipGame: React.FC<BattleshipGameProps> = ({
   const [showProbabilityHeatmap, setShowProbabilityHeatmap] = useState(false);
   const [revealAiBoardOnGameOver, setRevealAiBoardOnGameOver] = useState(false);
   const [showDeviceEncyclopedia, setShowDeviceEncyclopedia] = useState(false);
+  const [mobileActiveBoard, setMobileActiveBoard] = useState<'both' | 'ai' | 'player'>('both');
 
   // Total ship cells for display
   const totalShipCells = matchShipTemplates.reduce((sum, s) => sum + s.size, 0);
@@ -1943,11 +1944,50 @@ export const BattleshipGame: React.FC<BattleshipGameProps> = ({
             )}
           </div>
 
+          {/* MOBILE & TABLET BOARD SWITCHER TABS */}
+          <div className="flex lg:hidden items-center justify-center gap-2 mb-3 bg-neutral-900/90 p-1 rounded-xl border border-neutral-800 max-w-sm mx-auto">
+            <button
+              type="button"
+              onClick={() => setMobileActiveBoard('both')}
+              className={`flex-1 py-1.5 px-2 rounded-lg text-xs font-mono font-bold transition-all cursor-pointer text-center ${
+                mobileActiveBoard === 'both'
+                  ? 'bg-cyan-500 text-neutral-950 shadow'
+                  : 'text-neutral-400 hover:text-white'
+              }`}
+            >
+              Cả 2 Bàn
+            </button>
+            <button
+              type="button"
+              onClick={() => setMobileActiveBoard('ai')}
+              className={`flex-1 py-1.5 px-2 rounded-lg text-xs font-mono font-bold transition-all cursor-pointer text-center ${
+                mobileActiveBoard === 'ai'
+                  ? 'bg-rose-500 text-neutral-950 shadow'
+                  : 'text-neutral-400 hover:text-white'
+              }`}
+            >
+              🎯 Bàn Địch
+            </button>
+            <button
+              type="button"
+              onClick={() => setMobileActiveBoard('player')}
+              className={`flex-1 py-1.5 px-2 rounded-lg text-xs font-mono font-bold transition-all cursor-pointer text-center ${
+                mobileActiveBoard === 'player'
+                  ? 'bg-emerald-500 text-neutral-950 shadow'
+                  : 'text-neutral-400 hover:text-white'
+              }`}
+            >
+              🛡️ Bàn Bạn
+            </button>
+          </div>
+
           {/* TWO BOARDS DUAL VIEW */}
           {/* LEFT: ENEMY AI BOARD (Target Zone) | RIGHT: PLAYER BOARD (Defense Zone) */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 items-start">
             {/* 1. TARGET BOARD (BÊN TRÁI: HẠM ĐỘI ĐỊCH - BẠN NGẮM BẮN VÀO ĐÂY) */}
-            <div className="bg-[#030d1a] border-2 border-cyan-800/80 rounded-2xl p-3 sm:p-4 shadow-xl">
+            <div className={`bg-[#030d1a] border-2 border-cyan-800/80 rounded-2xl p-3 sm:p-4 shadow-xl ${
+              mobileActiveBoard === 'player' ? 'hidden lg:block' : 'block'
+            }`}>
               <div className="flex items-center justify-between mb-3 border-b border-cyan-900/60 pb-2">
                 <div className="flex items-center gap-2">
                   <Crosshair className="w-4 h-4 text-cyan-400 animate-spin-slow" />

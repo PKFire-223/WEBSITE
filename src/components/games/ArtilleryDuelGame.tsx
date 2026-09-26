@@ -2074,39 +2074,55 @@ export const ArtilleryDuelGame: React.FC = () => {
       </div>
 
       {/* ========================================================================= */}
-      {/* 3. MOVEMENT CONTROLS & AI DIFFICULTY SELECTOR */}
+      {/* 3. MOVEMENT CONTROLS & AI DIFFICULTY SELECTOR (VIRTUAL CONTROLLER FOR MOBILE & IPAD) */}
       {/* ========================================================================= */}
-      <div className="relative z-20 w-full max-w-4xl flex flex-col sm:flex-row items-center justify-between gap-3 bg-[#120625]/90 px-4 py-2.5 rounded-2xl border border-purple-500/30 text-xs font-mono">
-        {/* Step movement controls */}
-        <div className="flex items-center gap-2">
-          <Footprints className="w-4 h-4 text-emerald-400" />
-          <span className="text-neutral-400">Di chuyển:</span>
-          <span className="font-bold text-emerald-300">{playerSteps}/5 bước</span>
+      <div className="relative z-20 w-full max-w-4xl flex flex-col sm:flex-row items-center justify-between gap-3 bg-[#120625]/95 px-4 py-3 rounded-2xl border border-purple-500/40 text-xs font-mono shadow-lg">
+        {/* Step movement controls with tactile buttons & step lights */}
+        <div className="flex items-center justify-between sm:justify-start gap-3 w-full sm:w-auto">
+          <div className="flex items-center gap-2">
+            <Footprints className="w-4 h-4 text-emerald-400" />
+            <span className="text-neutral-300 font-bold">Di chuyển:</span>
+            <div className="flex items-center gap-1">
+              {[0, 1, 2, 3, 4].map((idx) => (
+                <span
+                  key={`step-dot-${idx}`}
+                  className={`w-2.5 h-2.5 rounded-full transition-all ${
+                    idx < playerSteps
+                      ? 'bg-emerald-400 shadow-[0_0_6px_rgba(52,211,153,0.8)]'
+                      : 'bg-neutral-800 border border-neutral-700'
+                  }`}
+                />
+              ))}
+            </div>
+            <span className="font-black text-emerald-300 text-xs">{playerSteps}/5</span>
+          </div>
 
-          <div className="flex items-center gap-1 ml-2">
+          <div className="flex items-center gap-2">
             <button
               onClick={() => handlePlayerMove('left')}
               disabled={turn !== 'player_aiming' || playerSteps <= 0 || playerFrozen || isPreMatchModalOpen}
-              className="px-2.5 py-1 rounded-lg bg-neutral-800 hover:bg-neutral-700 disabled:opacity-30 disabled:cursor-not-allowed border border-neutral-700 text-[10px] font-bold text-white flex items-center gap-1 cursor-pointer"
+              className="px-3.5 py-2 rounded-xl bg-neutral-800 hover:bg-neutral-700 active:bg-emerald-600 disabled:opacity-30 disabled:cursor-not-allowed border border-neutral-700 text-xs font-bold text-white flex items-center gap-1.5 shadow-md active:scale-95 transition-all cursor-pointer min-h-[40px]"
               title="Phím A: Bước sang trái"
             >
-              <ArrowLeft className="w-3 h-3" /> [A] Trái
+              <ArrowLeft className="w-4 h-4 text-emerald-400" />
+              <span>Trái [A]</span>
             </button>
             <button
               onClick={() => handlePlayerMove('right')}
               disabled={turn !== 'player_aiming' || playerSteps <= 0 || playerFrozen || isPreMatchModalOpen}
-              className="px-2.5 py-1 rounded-lg bg-neutral-800 hover:bg-neutral-700 disabled:opacity-30 disabled:cursor-not-allowed border border-neutral-700 text-[10px] font-bold text-white flex items-center gap-1 cursor-pointer"
+              className="px-3.5 py-2 rounded-xl bg-neutral-800 hover:bg-neutral-700 active:bg-emerald-600 disabled:opacity-30 disabled:cursor-not-allowed border border-neutral-700 text-xs font-bold text-white flex items-center gap-1.5 shadow-md active:scale-95 transition-all cursor-pointer min-h-[40px]"
               title="Phím D: Bước sang phải"
             >
-              Phải [D] <ArrowRight className="w-3 h-3" />
+              <span>Phải [D]</span>
+              <ArrowRight className="w-4 h-4 text-emerald-400" />
             </button>
           </div>
         </div>
 
         {/* AI Thought & Difficulty Selector */}
-        <div className="flex items-center gap-2">
-          <div className="flex items-center gap-1.5 shrink-0">
-            <span className="text-neutral-400 text-[10px]">Cấp độ AI:</span>
+        <div className="flex items-center justify-between sm:justify-end gap-2 w-full sm:w-auto">
+          <span className="text-neutral-400 text-[10px]">Cấp độ AI:</span>
+          <div className="flex items-center gap-1">
             {(['novice', 'veteran', 'grandmaster'] as AIDifficulty[]).map((level) => (
               <button
                 key={level}
@@ -2114,7 +2130,7 @@ export const ArtilleryDuelGame: React.FC = () => {
                   playClickSound();
                   handleSetDifficulty(level);
                 }}
-                className={`px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase transition-all cursor-pointer ${
+                className={`px-2.5 py-1.5 rounded-lg text-[10px] font-bold uppercase transition-all cursor-pointer ${
                   aiDifficulty === level
                     ? 'bg-purple-600 text-white border border-purple-300 shadow-[0_0_10px_rgba(168,85,247,0.5)]'
                     : 'bg-neutral-900/80 text-neutral-400 hover:text-white border border-neutral-800'
@@ -2130,9 +2146,9 @@ export const ArtilleryDuelGame: React.FC = () => {
       {/* ========================================================================= */}
       {/* 4. IN-GAME WEAPON SELECTOR (FIREBALL + 3 LOCKED SPECIAL SKILLS) & SLIDERS */}
       {/* ========================================================================= */}
-      <div className="relative z-20 w-full max-w-4xl mt-3 grid grid-cols-1 md:grid-cols-12 gap-3 items-center">
+      <div className="relative z-20 w-full max-w-4xl mt-3 grid grid-cols-1 md:grid-cols-12 gap-3 items-stretch">
         {/* WEAPONS ROW: FIREBALL (BASE) + 3 SKILLS */}
-        <div className="md:col-span-5 p-2.5 rounded-2xl bg-[#120624] border border-purple-900/60 shadow-lg space-y-1.5">
+        <div className="md:col-span-5 p-2.5 rounded-2xl bg-[#120624] border border-purple-900/60 shadow-lg space-y-1.5 flex flex-col justify-between">
           <div className="flex items-center justify-between text-[10px] font-mono text-neutral-400 pb-1 border-b border-neutral-800">
             <span className="flex items-center gap-1 text-amber-300 font-bold">
               <Sparkles className="w-3 h-3 text-amber-400" />
@@ -2151,7 +2167,7 @@ export const ArtilleryDuelGame: React.FC = () => {
                 playClickSound();
                 setSelectedSkillId(BASIC_FIREBALL.id);
               }}
-              className={`relative p-2 rounded-xl flex flex-col items-center justify-center gap-0.5 transition-all cursor-pointer text-center ${
+              className={`relative p-2 rounded-xl flex flex-col items-center justify-center gap-0.5 transition-all cursor-pointer text-center min-h-[64px] ${
                 selectedSkillId === BASIC_FIREBALL.id
                   ? 'bg-gradient-to-b from-amber-500 to-amber-600 text-neutral-950 font-bold border-2 border-white shadow-[0_0_15px_rgba(245,158,11,0.5)] scale-105 z-10'
                   : 'bg-neutral-900/90 text-neutral-300 hover:bg-neutral-800 border border-neutral-800'
@@ -2177,7 +2193,7 @@ export const ArtilleryDuelGame: React.FC = () => {
                     playClickSound();
                     setSelectedSkillId(skill.id);
                   }}
-                  className={`relative p-2 rounded-xl flex flex-col items-center justify-center gap-0.5 transition-all text-center ${
+                  className={`relative p-2 rounded-xl flex flex-col items-center justify-center gap-0.5 transition-all text-center min-h-[64px] ${
                     isOnCooldown
                       ? 'bg-neutral-950 text-neutral-600 border border-neutral-900 cursor-not-allowed opacity-60'
                       : isSelected
@@ -2211,62 +2227,144 @@ export const ArtilleryDuelGame: React.FC = () => {
           </p>
         </div>
 
-        {/* SLIDERS FOR ANGLE & POWER (4 COLUMNS) */}
-        <div className="md:col-span-4 p-3 rounded-2xl bg-[#120624] border border-purple-900/60 shadow-lg space-y-2.5">
-          {/* Angle Slider */}
-          <div className="flex items-center justify-between gap-2 text-xs font-mono">
-            <span className="text-neutral-400 flex items-center gap-1 text-[11px]">
-              <Crosshair className="w-3.5 h-3.5 text-amber-400" />
-              <span>GÓC:</span>
-            </span>
-            <input
-              type="range"
-              min="10"
-              max="90"
-              value={angle}
-              onChange={(e) => setAngle(parseInt(e.target.value, 10))}
-              disabled={turn !== 'player_aiming' || isPreMatchModalOpen}
-              className="flex-1 accent-amber-400 cursor-pointer h-1.5 rounded-lg bg-neutral-800"
-            />
-            <span className="w-10 text-right font-black text-amber-400 font-mono text-xs">
-              {angle}°
-            </span>
+        {/* SLIDERS + STEPPER BUTTONS FOR ANGLE & POWER (MOBILE & IPAD ENHANCED) */}
+        <div className="md:col-span-4 p-3 rounded-2xl bg-[#120624] border border-purple-900/60 shadow-lg space-y-3">
+          {/* Angle Control with Stepper Buttons */}
+          <div className="space-y-1">
+            <div className="flex items-center justify-between text-xs font-mono">
+              <span className="text-neutral-400 flex items-center gap-1 text-[11px]">
+                <Crosshair className="w-3.5 h-3.5 text-amber-400" />
+                <span>GÓC BẮN:</span>
+              </span>
+              <span className="font-black text-amber-400 font-mono text-xs">
+                {angle}°
+              </span>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                disabled={turn !== 'player_aiming' || isPreMatchModalOpen}
+                onClick={() => setAngle((a) => Math.max(10, a - 5))}
+                className="px-1.5 py-1 rounded bg-neutral-900 hover:bg-neutral-800 disabled:opacity-30 border border-neutral-700 text-[10px] font-bold text-amber-300 active:scale-95 cursor-pointer"
+                title="Giảm 5 độ"
+              >
+                -5°
+              </button>
+              <button
+                type="button"
+                disabled={turn !== 'player_aiming' || isPreMatchModalOpen}
+                onClick={() => setAngle((a) => Math.max(10, a - 1))}
+                className="px-2 py-1 rounded bg-neutral-900 hover:bg-neutral-800 disabled:opacity-30 border border-neutral-700 text-[10px] font-bold text-white active:scale-95 cursor-pointer"
+                title="Giảm 1 độ (Mũi tên xuống)"
+              >
+                -1°
+              </button>
+              <input
+                type="range"
+                min="10"
+                max="90"
+                value={angle}
+                onChange={(e) => setAngle(parseInt(e.target.value, 10))}
+                disabled={turn !== 'player_aiming' || isPreMatchModalOpen}
+                className="flex-1 accent-amber-400 cursor-pointer h-2 rounded-lg bg-neutral-800"
+              />
+              <button
+                type="button"
+                disabled={turn !== 'player_aiming' || isPreMatchModalOpen}
+                onClick={() => setAngle((a) => Math.min(90, a + 1))}
+                className="px-2 py-1 rounded bg-neutral-900 hover:bg-neutral-800 disabled:opacity-30 border border-neutral-700 text-[10px] font-bold text-white active:scale-95 cursor-pointer"
+                title="Tăng 1 độ (Mũi tên lên)"
+              >
+                +1°
+              </button>
+              <button
+                type="button"
+                disabled={turn !== 'player_aiming' || isPreMatchModalOpen}
+                onClick={() => setAngle((a) => Math.min(90, a + 5))}
+                className="px-1.5 py-1 rounded bg-neutral-900 hover:bg-neutral-800 disabled:opacity-30 border border-neutral-700 text-[10px] font-bold text-amber-300 active:scale-95 cursor-pointer"
+                title="Tăng 5 độ"
+              >
+                +5°
+              </button>
+            </div>
           </div>
 
-          {/* Power Slider */}
-          <div className="flex items-center justify-between gap-2 text-xs font-mono">
-            <span className="text-neutral-400 flex items-center gap-1 text-[11px]">
-              <Flame className="w-3.5 h-3.5 text-orange-400" />
-              <span>LỰC:</span>
-            </span>
-            <input
-              type="range"
-              min="15"
-              max="100"
-              value={power}
-              onChange={(e) => setPower(parseInt(e.target.value, 10))}
-              disabled={turn !== 'player_aiming' || isPreMatchModalOpen}
-              className="flex-1 accent-orange-400 cursor-pointer h-1.5 rounded-lg bg-neutral-800"
-            />
-            <span className="w-10 text-right font-black text-orange-400 font-mono text-xs">
-              {power}%
-            </span>
+          {/* Power Control with Stepper Buttons */}
+          <div className="space-y-1">
+            <div className="flex items-center justify-between text-xs font-mono">
+              <span className="text-neutral-400 flex items-center gap-1 text-[11px]">
+                <Flame className="w-3.5 h-3.5 text-orange-400" />
+                <span>LỰC BẮN:</span>
+              </span>
+              <span className="font-black text-orange-400 font-mono text-xs">
+                {power}%
+              </span>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                disabled={turn !== 'player_aiming' || isPreMatchModalOpen}
+                onClick={() => setPower((p) => Math.max(15, p - 10))}
+                className="px-1.5 py-1 rounded bg-neutral-900 hover:bg-neutral-800 disabled:opacity-30 border border-neutral-700 text-[10px] font-bold text-orange-300 active:scale-95 cursor-pointer"
+                title="Giảm 10% lực"
+              >
+                -10
+              </button>
+              <button
+                type="button"
+                disabled={turn !== 'player_aiming' || isPreMatchModalOpen}
+                onClick={() => setPower((p) => Math.max(15, p - 2))}
+                className="px-2 py-1 rounded bg-neutral-900 hover:bg-neutral-800 disabled:opacity-30 border border-neutral-700 text-[10px] font-bold text-white active:scale-95 cursor-pointer"
+                title="Giảm 2% lực (Mũi tên trái)"
+              >
+                -2
+              </button>
+              <input
+                type="range"
+                min="15"
+                max="100"
+                value={power}
+                onChange={(e) => setPower(parseInt(e.target.value, 10))}
+                disabled={turn !== 'player_aiming' || isPreMatchModalOpen}
+                className="flex-1 accent-orange-400 cursor-pointer h-2 rounded-lg bg-neutral-800"
+              />
+              <button
+                type="button"
+                disabled={turn !== 'player_aiming' || isPreMatchModalOpen}
+                onClick={() => setPower((p) => Math.min(100, p + 2))}
+                className="px-2 py-1 rounded bg-neutral-900 hover:bg-neutral-800 disabled:opacity-30 border border-neutral-700 text-[10px] font-bold text-white active:scale-95 cursor-pointer"
+                title="Tăng 2% lực (Mũi tên phải)"
+              >
+                +2
+              </button>
+              <button
+                type="button"
+                disabled={turn !== 'player_aiming' || isPreMatchModalOpen}
+                onClick={() => setPower((p) => Math.min(100, p + 10))}
+                className="px-1.5 py-1 rounded bg-neutral-900 hover:bg-neutral-800 disabled:opacity-30 border border-neutral-700 text-[10px] font-bold text-orange-300 active:scale-95 cursor-pointer"
+                title="Tăng 10% lực"
+              >
+                +10
+              </button>
+            </div>
           </div>
         </div>
 
         {/* FIRE BUTTON (3 COLUMNS) */}
-        <div className="md:col-span-3">
+        <div className="md:col-span-3 flex items-center">
           <button
             onClick={handlePlayerFire}
             disabled={turn !== 'player_aiming' || isPreMatchModalOpen}
-            className={`w-full py-3.5 px-4 rounded-2xl font-black font-sans tracking-wider uppercase transition-all shadow-xl flex items-center justify-center gap-2 cursor-pointer ${
+            className={`w-full py-4 px-4 rounded-2xl font-black font-sans tracking-wider uppercase transition-all shadow-xl flex items-center justify-center gap-2 cursor-pointer min-h-[70px] ${
               turn === 'player_aiming' && !isPreMatchModalOpen
                 ? 'bg-gradient-to-r from-amber-500 via-orange-500 to-red-500 hover:from-amber-400 hover:to-red-400 text-neutral-950 shadow-[0_0_30px_rgba(245,158,11,0.6)] transform hover:scale-[1.02] active:scale-95'
                 : 'bg-neutral-800 text-neutral-500 cursor-not-allowed border border-neutral-700'
             }`}
           >
-            <Send className="w-4 h-4" />
-            <span>BẮN! [SPACE]</span>
+            <Send className="w-5 h-5" />
+            <span className="text-sm font-black">BẮN! [SPACE]</span>
           </button>
         </div>
       </div>
